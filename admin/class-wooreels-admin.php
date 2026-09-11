@@ -214,6 +214,20 @@ class Wooreels_Admin {
 	}
 
 	/**
+	 * Drop the "Thank you for creating with WordPress" footer on our screens.
+	 *
+	 * The app draws its own chrome to the bottom edge; the core footer line
+	 * underneath it reads as a stray. Every other admin screen keeps it.
+	 *
+	 * @since  1.0.0
+	 * @param  string $text The footer text WordPress would print.
+	 * @return string The text, or an empty string on a WooReels screen.
+	 */
+	public function admin_footer_text( $text ) {
+		return $this->is_wooreels_screen() ? '' : $text;
+	}
+
+	/**
 	 * Tell an administrator the bundle has not been built yet.
 	 *
 	 * @since  1.0.0

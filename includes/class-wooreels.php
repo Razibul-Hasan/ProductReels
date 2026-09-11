@@ -235,6 +235,10 @@ class Wooreels {
 
 		$this->loader->add_action( 'admin_menu', $plugin_admin, 'register_menu' );
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_assets' );
+
+		// Both halves of the core admin footer, on WooReels screens only.
+		$this->loader->add_filter( 'admin_footer_text', $plugin_admin, 'admin_footer_text', 99 );
+		$this->loader->add_filter( 'update_footer', $plugin_admin, 'admin_footer_text', 99 );
 	}
 
 	/**
