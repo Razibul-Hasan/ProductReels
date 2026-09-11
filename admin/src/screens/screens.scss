@@ -28,8 +28,12 @@
 
 	/* ------------------------------------------------------- Widgets table */
 
+	/* Wide tables scroll inside their card on mid-size screens; the page never
+	   does. Positioned, so absolutely placed descendants (screen-reader text)
+	   are clipped with the rest instead of leaking past the viewport. */
 	.wr-table-card {
-		overflow: hidden;
+		position: relative;
+		overflow-x: auto;
 	}
 
 	.wr-table {
@@ -118,6 +122,7 @@
 		font-family: var(--wr-font-mono);
 		font-size: 12px;
 		color: var(--wr-fg);
+		white-space: nowrap;
 		background: none;
 	}
 

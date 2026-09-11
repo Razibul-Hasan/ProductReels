@@ -174,6 +174,7 @@ class Wooreels_Widgets extends Wooreels_Repository {
 		$widget_ids = wp_list_pluck( $widgets, 'id' );
 		$reel_stats = $this->reel_totals_for_widgets( $widget_ids );
 		$clicks     = $this->clicks()->totals_for_widgets( $widget_ids );
+		$posters    = $this->reel_posters_for_widgets( $widget_ids );
 
 		$items = array();
 
@@ -183,15 +184,23 @@ class Wooreels_Widgets extends Wooreels_Repository {
 				'reel_count' => 0,
 				'view_total' => 0,
 			);
+			$styles = is_array( $widget['styles_json'] ) ? $widget['styles_json'] : array();
 
 			$items[] = array(
 				'id'          => $id,
 				'name'        => $widget['name'],
 				'slug'        => $widget['slug'],
+				'template'    => Wooreels_Validator::enum(
+					isset( $styles['template'] ) ? $styles['template'] : '',
+					array( 'grid', 'carousel', 'marquee', 'stacked', 'popup' ),
+					'carousel'
+				),
 				'reel_count'  => $totals['reel_count'],
 				'view_total'  => $totals['view_total'],
 				'click_total' => isset( $clicks[ $id ] ) ? $clicks[ $id ] : 0,
+				'posters'     => isset( $posters[ $id ] ) ? $posters[ $id ] : array(),
 				'created_at'  => $widget['created_at'],
+				'updated_at'  => $widget['updated_at'],
 			);
 		}
 
@@ -709,6 +718,86 @@ class Wooreels_Widgets extends Wooreels_Repository {
 		}
 
 		return $totals;
+	}
+
+	/**
+	 * The first few reel posters of each widget, for the list's thumbnails.
+	 *
+	 * Two queries for the whole page: the leading reels of every widget, then
+	 * the files of the ones that have no poster of their own.
+	 *
+	 * @since  1.0.0
+	 * @access private
+	 * @param  int[] $widget_ids Widget ids.
+	 * @param  int   $limit      Posters per widget.
+	 * @return array<int,string[]> Widget id => poster URLs, in display order.
+	 */
+	private function reel_posters_for_widgets( $widget_ids, $limit = 3 ) {
+		$widget_ids = array_values( array_unique( array_filter( array_map( 'absint', (array) $widget_ids ) ) ) );
+
+		if ( empty( $widget_ids ) ) {
+			return array();
+		}
+
+		$pivot        = $this->pivot();
+		$reels        = Wooreels_Schema::table( 'reels' );
+		$placeholders = $this->placeholders( count( $widget_ids ) );
+
+		$rows = $this->db()->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			$this->db()->prepare( // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+				"SELECT p.widget_id, r.id AS reel_id, r.thumbnail
+				FROM `{$pivot}` p
+				INNER JOIN `{$reels}` r ON r.id = p.reel_id
+				WHERE p.widget_id IN ({$placeholders})
+				ORDER BY p.widget_id ASC, p.sort_order ASC, p.id ASC",
+				$widget_ids
+			),
+			ARRAY_A
+		);
+
+		// Keep only the leading reels of each widget, then look up file
+		// posters for those without a thumbnail of their own.
+		$leading = array();
+		$missing = array();
+
+		foreach ( (array) $rows as $row ) {
+			$widget_id = (int) $row['widget_id'];
+
+			if ( isset( $leading[ $widget_id ] ) && count( $leading[ $widget_id ] ) >= $limit ) {
+				continue;
+			}
+
+			$reel_id   = (int) $row['reel_id'];
+			$thumbnail = (string) $row['thumbnail'];
+
+			$leading[ $widget_id ][] = array(
+				'reel_id'   => $reel_id,
+				'thumbnail' => $thumbnail,
+			);
+
+			if ( '' === $thumbnail ) {
+				$missing[] = $reel_id;
+			}
+		}
+
+		$files = empty( $missing ) ? array() : $this->files()->for_reels( $missing );
+		$out   = array();
+
+		foreach ( $leading as $widget_id => $entries ) {
+			$out[ $widget_id ] = array();
+
+			foreach ( $entries as $entry ) {
+				$poster = $entry['thumbnail'];
+
+				if ( '' === $poster && ! empty( $files[ $entry['reel_id'] ][0]['poster_url'] ) ) {
+					$poster = $files[ $entry['reel_id'] ][0]['poster_url'];
+				}
+
+				$out[ $widget_id ][] = $poster;
+			}
+		}
+
+		return $out;
 	}
 
 	/**

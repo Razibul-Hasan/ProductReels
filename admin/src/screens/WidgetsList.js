@@ -1,23 +1,28 @@
 /**
  * The widgets list.
  *
- * The first screen anyone sees, so it carries its own weight: real skeletons
- * while it loads, a designed empty state when there is nothing, and a
- * shortcode chip that copies in one click — the single thing people come to
- * this screen for once they have built a widget.
+ * The first screen anyone sees, so it carries its own weight: an overview
+ * strip with the numbers that matter, rows you can recognise by their reels
+ * rather than only by name, sortable columns, a shortcode chip that copies in
+ * one click, and — on a fresh install — a three-step start rather than an
+ * empty table.
  */
 
-import { useCallback, useEffect, useState } from '@wordpress/element';
+import { useCallback, useEffect, useMemo, useState } from '@wordpress/element';
 import { __, _n, sprintf } from '@wordpress/i18n';
-import { widgets as widgetsApi } from '../api';
+import { reels as reelsApi, widgets as widgetsApi } from '../api';
 import {
 	IconChart,
 	IconCheck,
+	IconChevronDown,
+	IconChevronRight,
 	IconCopy,
 	IconDuplicate,
 	IconEdit,
+	IconLayout,
 	IconPlus,
 	IconTrash,
+	IconVideo,
 } from '../components/icons';
 import { Button, IconButton } from '../components/ui/Button';
 import { EmptyState, Skeleton } from '../components/ui/Feedback';
@@ -25,20 +30,57 @@ import { SearchInput } from '../components/ui/Fields';
 import { ConfirmDialog } from '../components/ui/Modal';
 import { useToasts } from '../components/ui/Toasts';
 import { useDebounced } from '../hooks/use-debounced';
+import { ReelEditor } from './ReelEditor';
+
+const locale = () => document.documentElement.lang || undefined;
 
 const formatNumber = ( value ) =>
-	new Intl.NumberFormat( document.documentElement.lang || undefined ).format(
-		value
-	);
+	new Intl.NumberFormat( locale() ).format( Number( value ) || 0 );
+
+const formatPercent = ( value ) =>
+	new Intl.NumberFormat( locale(), {
+		style: 'percent',
+		maximumFractionDigits: 1,
+	} ).format( Number( value ) || 0 );
 
 const formatDate = ( value ) => {
 	const date = new Date( value.replace( ' ', 'T' ) );
 
 	return Number.isNaN( date.getTime() )
 		? value
-		: new Intl.DateTimeFormat( document.documentElement.lang || undefined, {
-				dateStyle: 'medium',
-		  } ).format( date );
+		: new Intl.DateTimeFormat( locale(), { dateStyle: 'medium' } ).format(
+				date
+		  );
+};
+
+const TEMPLATE_LABELS = {
+	grid: __( 'Grid', 'wooreels' ),
+	carousel: __( 'Carousel', 'wooreels' ),
+	marquee: __( 'Marquee', 'wooreels' ),
+	stacked: __( 'Stacked', 'wooreels' ),
+	popup: __( 'Popup', 'wooreels' ),
+};
+
+const ctrOf = ( widget ) =>
+	widget.view_total > 0 ? widget.click_total / widget.view_total : 0;
+
+/**
+ * Copy text with a fallback for browsers that refuse the clipboard API.
+ *
+ * @param {string} text What to copy.
+ */
+const copyText = async ( text ) => {
+	try {
+		await window.navigator.clipboard.writeText( text );
+	} catch ( error ) {
+		const field = document.createElement( 'textarea' );
+
+		field.value = text;
+		document.body.appendChild( field );
+		field.select();
+		document.execCommand( 'copy' );
+		document.body.removeChild( field );
+	}
 };
 
 const ShortcodeChip = ( { id, onCopied } ) => {
@@ -46,19 +88,7 @@ const ShortcodeChip = ( { id, onCopied } ) => {
 	const shortcode = `[wooreels id="${ id }"]`;
 
 	const copy = async () => {
-		try {
-			await window.navigator.clipboard.writeText( shortcode );
-		} catch ( error ) {
-			// Clipboard permission can be refused; fall back to a selection.
-			const field = document.createElement( 'textarea' );
-
-			field.value = shortcode;
-			document.body.appendChild( field );
-			field.select();
-			document.execCommand( 'copy' );
-			document.body.removeChild( field );
-		}
-
+		await copyText( shortcode );
 		setCopied( true );
 		onCopied();
 		setTimeout( () => setCopied( false ), 1600 );
@@ -70,10 +100,8 @@ const ShortcodeChip = ( { id, onCopied } ) => {
 			className="wr-shortcode"
 			onClick={ copy }
 			aria-label={ sprintf(
-				/* translators: %s: the shortcode. */ __(
-					'Copy %s',
-					'wooreels'
-				),
+				/* translators: %s: the shortcode. */
+				__( 'Copy %s', 'wooreels' ),
 				shortcode
 			) }
 		>
@@ -83,12 +111,142 @@ const ShortcodeChip = ( { id, onCopied } ) => {
 	);
 };
 
+/**
+ * Up to three reel posters, fanned, so a row is recognisable at a glance.
+ *
+ * @param {Object}   props         Props.
+ * @param {string[]} props.posters Poster URLs, in reel order.
+ * @param {number}   props.count   How many reels the widget has in total.
+ * @return {Object} The stack.
+ */
+const PosterStack = ( { posters, count } ) => (
+	<span className="wr-stack" aria-hidden="true">
+		{ ( posters.length ? posters : [ '' ] ).map( ( poster, index ) => (
+			<span key={ index } className="wr-stack__frame">
+				{ poster ? (
+					<img
+						src={ poster }
+						alt=""
+						loading="lazy"
+						decoding="async"
+					/>
+				) : (
+					<IconVideo size={ 12 } />
+				) }
+			</span>
+		) ) }
+		{ count > posters.length && posters.length > 0 && (
+			<span className="wr-stack__more">+{ count - posters.length }</span>
+		) }
+	</span>
+);
+
+const SortHeader = ( { column, label, sort, onSort, numeric = false } ) => {
+	const active = sort.column === column;
+	let ariaSort = 'none';
+
+	if ( active ) {
+		ariaSort = sort.direction === 'asc' ? 'ascending' : 'descending';
+	}
+
+	return (
+		<th
+			scope="col"
+			aria-sort={ ariaSort }
+			className={ numeric ? 'wr-table__num' : '' }
+		>
+			<button
+				type="button"
+				className={ `wr-sort${ active ? ' is-active' : '' }${
+					active && sort.direction === 'asc' ? ' is-asc' : ''
+				}` }
+				onClick={ () => onSort( column ) }
+			>
+				{ label }
+				<IconChevronDown size={ 12 } />
+			</button>
+		</th>
+	);
+};
+
+const Overview = ( { items, loading } ) => {
+	const totals = useMemo( () => {
+		const views = items.reduce( ( sum, w ) => sum + w.view_total, 0 );
+		const clicks = items.reduce( ( sum, w ) => sum + w.click_total, 0 );
+		const reels = items.reduce( ( sum, w ) => sum + w.reel_count, 0 );
+
+		return {
+			widgets: items.length,
+			reels,
+			views,
+			clicks,
+			ctr: views > 0 ? clicks / views : 0,
+		};
+	}, [ items ] );
+
+	const tiles = [
+		{
+			label: __( 'Widgets', 'wooreels' ),
+			value: formatNumber( totals.widgets ),
+			hint: sprintf(
+				/* translators: %d: number of reel placements across all widgets. */
+				_n(
+					'%d reel placed',
+					'%d reels placed',
+					totals.reels,
+					'wooreels'
+				),
+				totals.reels
+			),
+		},
+		{
+			label: __( 'Total Views', 'wooreels' ),
+			value: formatNumber( totals.views ),
+			hint: __( 'Across every widget', 'wooreels' ),
+		},
+		{
+			label: __( 'Total Clicks', 'wooreels' ),
+			value: formatNumber( totals.clicks ),
+			hint: __( 'Buttons and product cards', 'wooreels' ),
+		},
+		{
+			label: __( 'CTR', 'wooreels' ),
+			value: formatPercent( totals.ctr ),
+			hint: __( 'Clicks per view', 'wooreels' ),
+		},
+	];
+
+	return (
+		<div className="wr-overview">
+			{ tiles.map( ( tile ) => (
+				<div key={ tile.label } className="wr-overview__tile">
+					<span className="wr-overview__label">{ tile.label }</span>
+					{ loading ? (
+						<Skeleton width={ 72 } height={ 26 } />
+					) : (
+						<span className="wr-overview__value">
+							{ tile.value }
+						</span>
+					) }
+					<span className="wr-overview__hint">{ tile.hint }</span>
+				</div>
+			) ) }
+		</div>
+	);
+};
+
 const SkeletonRows = () => (
 	<>
 		{ [ 0, 1, 2, 3, 4 ].map( ( row ) => (
 			<tr key={ row } className="wr-table__row">
 				<td>
-					<Skeleton width="60%" height={ 14 } />
+					<span className="wr-table__widget">
+						<Skeleton width={ 56 } height={ 44 } radius="6px" />
+						<span className="wr-table__widget-text">
+							<Skeleton width={ 160 } height={ 14 } />
+							<Skeleton width={ 90 } height={ 11 } />
+						</span>
+					</span>
 				</td>
 				<td>
 					<Skeleton width={ 24 } height={ 14 } />
@@ -103,6 +261,9 @@ const SkeletonRows = () => (
 					<Skeleton width={ 32 } height={ 14 } />
 				</td>
 				<td>
+					<Skeleton width={ 40 } height={ 14 } />
+				</td>
+				<td>
 					<Skeleton width={ 74 } height={ 14 } />
 				</td>
 				<td>
@@ -112,6 +273,110 @@ const SkeletonRows = () => (
 		) ) }
 	</>
 );
+
+/**
+ * A fresh install: three steps, in order, with the first two as buttons.
+ *
+ * @param {Object}   props           Props.
+ * @param {boolean}  props.hasReels  Whether any reel exists yet.
+ * @param {Function} props.onAddReel Opens the reel editor.
+ * @param {Function} props.onCreate  Goes to the widget editor.
+ * @return {Object} The guide.
+ */
+const GettingStarted = ( { hasReels, onAddReel, onCreate } ) => {
+	const steps = [
+		{
+			title: __( 'Add Reel', 'wooreels' ),
+			text: __(
+				'Upload a short vertical video, or paste a Vimeo, YouTube Shorts or hosted link. Tag products or add a button.',
+				'wooreels'
+			),
+			done: hasReels,
+			action: (
+				<Button
+					variant={ hasReels ? 'secondary' : 'primary' }
+					icon={ IconPlus }
+					onClick={ onAddReel }
+				>
+					{ __( 'Add Reel', 'wooreels' ) }
+				</Button>
+			),
+		},
+		{
+			title: __( 'Create Widget', 'wooreels' ),
+			text: __(
+				'Group reels into a widget, pick a layout and style it in the live editor.',
+				'wooreels'
+			),
+			done: false,
+			action: (
+				<Button
+					variant={ hasReels ? 'primary' : 'secondary' }
+					icon={ IconLayout }
+					onClick={ onCreate }
+				>
+					{ __( 'Create Widget', 'wooreels' ) }
+				</Button>
+			),
+		},
+		{
+			title: __( 'Place it', 'wooreels' ),
+			text: __(
+				'Drop the shortcode into any page, or use the WooReels block or Elementor widget.',
+				'wooreels'
+			),
+			done: false,
+			action: (
+				<code className="wr-start__code">{ '[wooreels id="1"]' }</code>
+			),
+		},
+	];
+
+	return (
+		<div className="wr-card wr-start">
+			<div className="wr-start__head">
+				<h2 className="wr-start__title">
+					{ __( "You haven't created any widget yet!", 'wooreels' ) }
+				</h2>
+				<p className="wr-start__text">
+					{ __(
+						'A widget is a styled, reusable set of reels. Three steps and it is live.',
+						'wooreels'
+					) }
+				</p>
+			</div>
+			<ol className="wr-start__steps">
+				{ steps.map( ( step, index ) => (
+					<li
+						key={ step.title }
+						className={ `wr-start__step${
+							step.done ? ' is-done' : ''
+						}` }
+					>
+						<span className="wr-start__num">
+							{ step.done ? (
+								<IconCheck size={ 14 } />
+							) : (
+								index + 1
+							) }
+						</span>
+						<span className="wr-start__body">
+							<strong className="wr-start__step-title">
+								{ step.title }
+							</strong>
+							<span className="wr-start__step-text">
+								{ step.text }
+							</span>
+							<span className="wr-start__action">
+								{ step.action }
+							</span>
+						</span>
+					</li>
+				) ) }
+			</ol>
+		</div>
+	);
+};
 
 export const WidgetsList = ( { navigate } ) => {
 	const toasts = useToasts();
@@ -123,6 +388,12 @@ export const WidgetsList = ( { navigate } ) => {
 	const [ confirming, setConfirming ] = useState( null );
 	const [ deleting, setDeleting ] = useState( false );
 	const [ busyId, setBusyId ] = useState( 0 );
+	const [ hasReels, setHasReels ] = useState( null );
+	const [ addingReel, setAddingReel ] = useState( false );
+	const [ sort, setSort ] = useState( {
+		column: 'created_at',
+		direction: 'desc',
+	} );
 
 	const term = useDebounced( search, 300 );
 
@@ -150,6 +421,61 @@ export const WidgetsList = ( { navigate } ) => {
 	useEffect( () => {
 		load();
 	}, [ load ] );
+
+	// Whether there is anything to build a widget from, for the first-run guide.
+	useEffect( () => {
+		let cancelled = false;
+
+		reelsApi
+			.list( { per_page: 1 } )
+			.then( ( page ) => {
+				if ( ! cancelled ) {
+					setHasReels( page.total > 0 );
+				}
+			} )
+			.catch( () => {
+				if ( ! cancelled ) {
+					setHasReels( true );
+				}
+			} );
+
+		return () => {
+			cancelled = true;
+		};
+	}, [] );
+
+	const sorted = useMemo( () => {
+		const sign = sort.direction === 'asc' ? 1 : -1;
+		const collator = new Intl.Collator( locale(), {
+			sensitivity: 'base',
+			numeric: true,
+		} );
+
+		return [ ...items ].sort( ( a, b ) => {
+			switch ( sort.column ) {
+				case 'name':
+					return collator.compare( a.name, b.name ) * sign;
+				case 'reel_count':
+				case 'view_total':
+				case 'click_total':
+					return ( a[ sort.column ] - b[ sort.column ] ) * sign;
+				case 'ctr':
+					return ( ctrOf( a ) - ctrOf( b ) ) * sign;
+				default:
+					return ( a.id - b.id ) * sign;
+			}
+		} );
+	}, [ items, sort ] );
+
+	const toggleSort = ( column ) =>
+		setSort( ( current ) =>
+			current.column === column
+				? {
+						column,
+						direction: current.direction === 'asc' ? 'desc' : 'asc',
+				  }
+				: { column, direction: column === 'name' ? 'asc' : 'desc' }
+		);
 
 	const duplicate = async ( widget ) => {
 		setBusyId( widget.id );
@@ -181,6 +507,7 @@ export const WidgetsList = ( { navigate } ) => {
 	};
 
 	const isEmpty = ! loading && items.length === 0;
+	const firstRun = isEmpty && search === '' && hasReels !== null;
 
 	return (
 		<>
@@ -208,8 +535,14 @@ export const WidgetsList = ( { navigate } ) => {
 						placeholder={ __( 'Search widgets…', 'wooreels' ) }
 					/>
 					<Button
-						variant="primary"
 						icon={ IconPlus }
+						onClick={ () => setAddingReel( true ) }
+					>
+						{ __( 'Add Reel', 'wooreels' ) }
+					</Button>
+					<Button
+						variant="primary"
+						icon={ IconLayout }
 						onClick={ () => navigate( '#/widgets/new' ) }
 					>
 						{ __( 'Create Widget', 'wooreels' ) }
@@ -226,6 +559,12 @@ export const WidgetsList = ( { navigate } ) => {
 						</Button>
 					</div>
 				) }
+
+				{ error === '' &&
+					! firstRun &&
+					( loading || items.length > 0 ) && (
+						<Overview items={ items } loading={ loading } />
+					) }
 
 				{ error === '' && isEmpty && search !== '' && (
 					<div className="wr-card">
@@ -247,58 +586,68 @@ export const WidgetsList = ( { navigate } ) => {
 					</div>
 				) }
 
-				{ error === '' && isEmpty && search === '' && (
-					<div className="wr-card">
-						<EmptyState
-							title={ __(
-								"You haven't created any widget yet!",
-								'wooreels'
-							) }
-							text={ __(
-								'A widget groups your reels, carries the styling, and gives you one shortcode to place anywhere on the site.',
-								'wooreels'
-							) }
-							action={
-								<Button
-									variant="primary"
-									icon={ IconPlus }
-									onClick={ () =>
-										navigate( '#/widgets/new' )
-									}
-								>
-									{ __( 'Create Widget', 'wooreels' ) }
-								</Button>
-							}
-						/>
-					</div>
+				{ error === '' && firstRun && (
+					<GettingStarted
+						hasReels={ hasReels }
+						onAddReel={ () => setAddingReel( true ) }
+						onCreate={ () => navigate( '#/widgets/new' ) }
+					/>
 				) }
 
 				{ error === '' && ( loading || items.length > 0 ) && (
 					<div className="wr-card wr-table-card">
-						<table className="wr-table">
+						<table className="wr-table wr-table--widgets">
 							<thead>
 								<tr>
-									<th scope="col">
-										{ __( 'Widget Name', 'wooreels' ) }
-									</th>
-									<th scope="col">
-										{ __( 'Reels', 'wooreels' ) }
-									</th>
+									<SortHeader
+										column="name"
+										label={ __(
+											'Widget Name',
+											'wooreels'
+										) }
+										sort={ sort }
+										onSort={ toggleSort }
+									/>
+									<SortHeader
+										column="reel_count"
+										label={ __( 'Reels', 'wooreels' ) }
+										sort={ sort }
+										onSort={ toggleSort }
+										numeric
+									/>
 									<th scope="col">
 										{ __( 'Shortcode', 'wooreels' ) }
 									</th>
-									<th scope="col">
-										{ __( 'Views', 'wooreels' ) }
-									</th>
-									<th scope="col">
-										{ __( 'Clicks', 'wooreels' ) }
-									</th>
-									<th scope="col">
-										{ __( 'Created', 'wooreels' ) }
-									</th>
+									<SortHeader
+										column="view_total"
+										label={ __( 'Views', 'wooreels' ) }
+										sort={ sort }
+										onSort={ toggleSort }
+										numeric
+									/>
+									<SortHeader
+										column="click_total"
+										label={ __( 'Clicks', 'wooreels' ) }
+										sort={ sort }
+										onSort={ toggleSort }
+										numeric
+									/>
+									<SortHeader
+										column="ctr"
+										label={ __( 'CTR', 'wooreels' ) }
+										sort={ sort }
+										onSort={ toggleSort }
+										numeric
+									/>
+									<SortHeader
+										column="created_at"
+										label={ __( 'Created', 'wooreels' ) }
+										sort={ sort }
+										onSort={ toggleSort }
+									/>
 									<th scope="col">
 										<span className="wr-screen-reader-text">
-											{ __( 'Edit', 'wooreels' ) }
+											{ __( 'Actions', 'wooreels' ) }
 										</span>
 									</th>
 								</tr>
@@ -307,7 +656,7 @@ export const WidgetsList = ( { navigate } ) => {
 								{ loading ? (
 									<SkeletonRows />
 								) : (
-									items.map( ( widget ) => (
+									sorted.map( ( widget ) => (
 										<tr
 											key={ widget.id }
 											className="wr-table__row"
@@ -315,14 +664,42 @@ export const WidgetsList = ( { navigate } ) => {
 											<td>
 												<button
 													type="button"
-													className="wr-table__name"
+													className="wr-table__widget"
 													onClick={ () =>
 														navigate(
 															`#/widgets/${ widget.id }`
 														)
 													}
 												>
-													{ widget.name }
+													<PosterStack
+														posters={
+															widget.posters || []
+														}
+														count={
+															widget.reel_count
+														}
+													/>
+													<span className="wr-table__widget-text">
+														<span className="wr-table__name">
+															{ widget.name }
+														</span>
+														<span className="wr-table__widget-meta">
+															<span className="wr-badge wr-badge--template">
+																{ TEMPLATE_LABELS[
+																	widget
+																		.template
+																] ||
+																	widget.template }
+															</span>
+															<span>
+																#{ widget.id }
+															</span>
+														</span>
+													</span>
+													<IconChevronRight
+														size={ 14 }
+														className="wr-table__widget-go"
+													/>
 												</button>
 											</td>
 											<td className="wr-table__num">
@@ -352,6 +729,13 @@ export const WidgetsList = ( { navigate } ) => {
 												{ formatNumber(
 													widget.click_total
 												) }
+											</td>
+											<td className="wr-table__num wr-table__muted">
+												{ widget.view_total > 0
+													? formatPercent(
+															ctrOf( widget )
+													  )
+													: '—' }
 											</td>
 											<td className="wr-table__muted">
 												{ formatDate(
@@ -398,6 +782,24 @@ export const WidgetsList = ( { navigate } ) => {
 														}
 													/>
 													<IconButton
+														icon={ IconCopy }
+														label={ __(
+															'Copy shortcode',
+															'wooreels'
+														) }
+														onClick={ async () => {
+															await copyText(
+																`[wooreels id="${ widget.id }"]`
+															);
+															toasts.success(
+																__(
+																	'Copied!',
+																	'wooreels'
+																)
+															);
+														} }
+													/>
+													<IconButton
 														icon={ IconTrash }
 														label={ __(
 															'Delete',
@@ -420,6 +822,17 @@ export const WidgetsList = ( { navigate } ) => {
 					</div>
 				) }
 			</div>
+
+			{ addingReel && (
+				<ReelEditor
+					reelId={ 0 }
+					onClose={ () => setAddingReel( false ) }
+					onSaved={ () => {
+						setAddingReel( false );
+						setHasReels( true );
+					} }
+				/>
+			) }
 
 			{ confirming && (
 				<ConfirmDialog

@@ -8,6 +8,8 @@
 
 import { useMemo, useRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import { boot } from './api';
+import { IconExternal } from './components/icons';
 import { useHashRoute, useSubmenuHighlight } from './hooks/use-hash-route';
 import { UnsavedContext } from './hooks/use-unsaved-guard';
 import { ConfirmDialog } from './components/ui/Modal';
@@ -17,6 +19,122 @@ import { Settings } from './screens/Settings';
 import { Statistics } from './screens/Statistics';
 import { WidgetEditor } from './screens/WidgetEditor';
 import { WidgetsList } from './screens/WidgetsList';
+
+const DOCS_URL = 'https://bestwebexpert.com/wooreels';
+
+const BrandMark = () => (
+	<svg
+		viewBox="0 0 24 24"
+		width="18"
+		height="18"
+		fill="none"
+		aria-hidden="true"
+		focusable="false"
+	>
+		<rect
+			x="3"
+			y="4"
+			width="8"
+			height="16"
+			rx="2"
+			stroke="currentColor"
+			strokeWidth="1.6"
+			opacity=".45"
+		/>
+		<rect
+			x="9"
+			y="2"
+			width="12"
+			height="20"
+			rx="2.5"
+			fill="currentColor"
+			fillOpacity=".15"
+			stroke="currentColor"
+			strokeWidth="1.6"
+		/>
+		<path d="M13.5 8.5v7l5.5-3.5-5.5-3.5Z" fill="currentColor" />
+	</svg>
+);
+
+/**
+ * The bar above every list screen: who this is, where you are, where the
+ * other sections are. The editor draws its own header and hides this one.
+ *
+ * @param {Object}   props          Props.
+ * @param {Object}   props.route    The current route.
+ * @param {Function} props.navigate Hash navigation.
+ * @return {Object} The bar.
+ */
+const AppBar = ( { route, navigate } ) => {
+	const tabs = [
+		{
+			hash: '#/widgets',
+			match: [ 'widgets', 'widget-stats' ],
+			label: __( 'All Widgets', 'wooreels' ),
+		},
+		{
+			hash: '#/reels',
+			match: [ 'reels' ],
+			label: __( 'All Reels', 'wooreels' ),
+		},
+		{
+			hash: '#/settings',
+			match: [ 'settings' ],
+			label: __( 'Settings', 'wooreels' ),
+		},
+	];
+
+	return (
+		<header className="wr-appbar">
+			<button
+				type="button"
+				className="wr-appbar__brand"
+				onClick={ () => navigate( '#/widgets' ) }
+			>
+				<span className="wr-appbar__mark">
+					<BrandMark />
+				</span>
+				<span className="wr-appbar__name">WooReels</span>
+				<span className="wr-appbar__version">v{ boot.version }</span>
+			</button>
+
+			<nav
+				className="wr-appbar__tabs"
+				aria-label={ __( 'WooReels sections', 'wooreels' ) }
+			>
+				{ tabs.map( ( tab ) => {
+					const current = tab.match.includes( route.name );
+
+					return (
+						<button
+							key={ tab.hash }
+							type="button"
+							className={ `wr-appbar__tab${
+								current ? ' is-current' : ''
+							}` }
+							aria-current={ current ? 'page' : undefined }
+							onClick={ () => navigate( tab.hash ) }
+						>
+							{ tab.label }
+						</button>
+					);
+				} ) }
+			</nav>
+
+			<div className="wr-appbar__links">
+				<a
+					className="wr-appbar__link"
+					href={ DOCS_URL }
+					target="_blank"
+					rel="noopener noreferrer"
+				>
+					{ __( 'Documentation', 'wooreels' ) }
+					<IconExternal size={ 12 } />
+				</a>
+			</div>
+		</header>
+	);
+};
 
 const Screen = ( { route, navigate } ) => {
 	switch ( route.name ) {
@@ -77,6 +195,10 @@ const App = () => {
 		<ToastProvider>
 			<UnsavedContext.Provider value={ unsaved }>
 				<div className="wr-app">
+					{ route.name !== 'widget-new' &&
+						route.name !== 'widget-edit' && (
+							<AppBar route={ route } navigate={ navigate } />
+						) }
 					<Screen route={ route } navigate={ navigate } />
 				</div>
 
