@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-09-11T14:42:27+00:00\n"
+"POT-Creation-Date: 2026-09-11T15:23:00+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: wooreels\n"
@@ -51,18 +51,20 @@ msgstr ""
 
 #: admin/class-wooreels-admin.php:102
 #: admin/class-wooreels-admin.php:103
+#: admin/src/screens/WidgetEditor.js:583
 #: admin/src/screens/WidgetsList.js:190
 msgid "All Widgets"
 msgstr ""
 
 #: admin/class-wooreels-admin.php:110
 #: admin/src/screens/ReelsLibrary.js:323
-#: admin/src/screens/WidgetEditor.js:553
-#: admin/src/screens/WidgetEditor.js:557
+#: admin/src/screens/WidgetEditor.js:695
+#: admin/src/screens/WidgetEditor.js:699
 msgid "All Reels"
 msgstr ""
 
 #: admin/class-wooreels-admin.php:111
+#: admin/src/screens/WidgetEditor.js:590
 #: admin/src/screens/WidgetsList.js:215
 #: admin/src/screens/WidgetsList.js:269
 #: block/src/index.js:157
@@ -136,9 +138,9 @@ msgstr ""
 
 #: includes/integrations/widgets/class-wooreels-elementor-widget.php:145
 #: admin/src/screens/ReelsLibrary.js:138
-#: admin/src/screens/WidgetEditor.js:186
-#: admin/src/screens/WidgetEditor.js:612
-#: admin/src/screens/WidgetEditor.js:617
+#: admin/src/screens/WidgetEditor.js:195
+#: admin/src/screens/WidgetEditor.js:774
+#: admin/src/screens/WidgetEditor.js:779
 msgid "Preview"
 msgstr ""
 
@@ -245,7 +247,7 @@ msgid "Opacity"
 msgstr ""
 
 #: admin/src/components/ui/Fields.js:71
-#: admin/src/screens/ReelEditor.js:737
+#: admin/src/screens/ReelEditor.js:738
 #: admin/src/screens/ReelsLibrary.js:414
 #: admin/src/screens/WidgetsList.js:243
 msgid "Clear"
@@ -257,33 +259,33 @@ msgstr ""
 #: admin/src/screens/LinkDialog.js:347
 #: admin/src/screens/PosterCapture.js:81
 #: admin/src/screens/ReelEditor.js:249
-#: admin/src/screens/ReelEditor.js:564
+#: admin/src/screens/ReelEditor.js:565
 #: src/shared/templates/Popup.jsx:108
 msgid "Cancel"
 msgstr ""
 
 #: admin/src/components/ui/Modal.js:120
 #: admin/src/screens/ReelEditor.js:378
-#: admin/src/screens/ReelEditor.js:656
+#: admin/src/screens/ReelEditor.js:657
 #: admin/src/screens/ReelsLibrary.js:148
-#: admin/src/screens/WidgetEditor.js:193
-#: admin/src/screens/WidgetEditor.js:529
+#: admin/src/screens/WidgetEditor.js:202
+#: admin/src/screens/WidgetEditor.js:645
 #: admin/src/screens/WidgetsList.js:402
 msgid "Delete"
 msgstr ""
 
 #: admin/src/components/ui/Sliders.js:15
-#: admin/src/screens/WidgetEditor.js:70
+#: admin/src/screens/WidgetEditor.js:79
 msgid "Desktop"
 msgstr ""
 
 #: admin/src/components/ui/Sliders.js:16
-#: admin/src/screens/WidgetEditor.js:76
+#: admin/src/screens/WidgetEditor.js:85
 msgid "Tablet"
 msgstr ""
 
 #: admin/src/components/ui/Sliders.js:17
-#: admin/src/screens/WidgetEditor.js:82
+#: admin/src/screens/WidgetEditor.js:91
 msgid "Mobile"
 msgstr ""
 
@@ -293,7 +295,7 @@ msgid "Reset"
 msgstr ""
 
 #: admin/src/components/ui/Sliders.js:103
-#: admin/src/screens/WidgetEditor.js:630
+#: admin/src/screens/WidgetEditor.js:792
 msgid "Device"
 msgstr ""
 
@@ -304,7 +306,7 @@ msgstr ""
 #: admin/src/screens/LinkDialog.js:64
 #: admin/src/screens/ReelEditor.js:356
 #: admin/src/screens/Statistics.js:457
-#: admin/src/screens/StylePanel.js:836
+#: admin/src/screens/StylePanel.js:924
 msgid "Button Text"
 msgstr ""
 
@@ -341,7 +343,7 @@ msgid "Open in new tab"
 msgstr ""
 
 #: admin/src/screens/LinkDialog.js:101
-#: admin/src/screens/StylePanel.js:893
+#: admin/src/screens/StylePanel.js:987
 msgid "Custom class"
 msgstr ""
 
@@ -370,7 +372,7 @@ msgstr ""
 #: admin/src/screens/LinkDialog.js:274
 #: admin/src/screens/LinkDialog.js:341
 #: admin/src/screens/LinkDialog.js:369
-#: admin/src/screens/ReelEditor.js:768
+#: admin/src/screens/ReelEditor.js:769
 msgid "Add Custom Link"
 msgstr ""
 
@@ -392,15 +394,15 @@ msgid "Campaign name is required!"
 msgstr ""
 
 #: admin/src/screens/LinkDialog.js:328
-#: admin/src/screens/ReelEditor.js:573
+#: admin/src/screens/ReelEditor.js:574
 #: admin/src/screens/Settings.js:172
-#: admin/src/screens/WidgetEditor.js:543
+#: admin/src/screens/WidgetEditor.js:679
 msgid "Save"
 msgstr ""
 
 #: admin/src/screens/LinkDialog.js:331
-#: admin/src/screens/ReelEditor.js:574
-#: admin/src/screens/WidgetEditor.js:542
+#: admin/src/screens/ReelEditor.js:575
+#: admin/src/screens/WidgetEditor.js:678
 msgid "Update"
 msgstr ""
 
@@ -412,7 +414,7 @@ msgstr ""
 #: admin/src/screens/ReelEditor.js:41
 #: admin/src/screens/ReelEditor.js:122
 #: admin/src/screens/ReelEditor.js:124
-#: admin/src/screens/ReelEditor.js:711
+#: admin/src/screens/ReelEditor.js:712
 msgid "Choose from Media"
 msgstr ""
 
@@ -422,10 +424,10 @@ msgstr ""
 
 #: admin/src/screens/PosterCapture.js:117
 #: admin/src/screens/PosterCapture.js:130
-#: admin/src/screens/StylePanel.js:284
-#: admin/src/screens/StylePanel.js:320
-#: admin/src/screens/StylePanel.js:442
-#: admin/src/screens/StylePanel.js:683
+#: admin/src/screens/StylePanel.js:344
+#: admin/src/screens/StylePanel.js:411
+#: admin/src/screens/StylePanel.js:533
+#: admin/src/screens/StylePanel.js:780
 msgid "Position"
 msgstr ""
 
@@ -454,7 +456,7 @@ msgstr ""
 #: admin/src/screens/ReelEditor.js:85
 #: admin/src/screens/ReelEditor.js:152
 #: admin/src/screens/ReelEditor.js:266
-#: admin/src/screens/ReelEditor.js:588
+#: admin/src/screens/ReelEditor.js:589
 msgid "Add Videos"
 msgstr ""
 
@@ -463,7 +465,7 @@ msgid "Move down"
 msgstr ""
 
 #: admin/src/screens/ReelEditor.js:371
-#: admin/src/screens/ReelEditor.js:554
+#: admin/src/screens/ReelEditor.js:555
 #: admin/src/screens/ReelsLibrary.js:143
 #: admin/src/screens/Statistics.js:212
 #: admin/src/screens/Statistics.js:281
@@ -473,59 +475,60 @@ msgstr ""
 msgid "Edit"
 msgstr ""
 
-#: admin/src/screens/ReelEditor.js:526
+#: admin/src/screens/ReelEditor.js:527
 msgid "Reel created successfully!"
 msgstr ""
 
-#: admin/src/screens/ReelEditor.js:531
+#: admin/src/screens/ReelEditor.js:532
 msgid "Reel updated successfully!"
 msgstr ""
 
-#: admin/src/screens/ReelEditor.js:553
+#: admin/src/screens/ReelEditor.js:554
 #: admin/src/screens/ReelsLibrary.js:361
 #: admin/src/screens/ReelsLibrary.js:410
+#: admin/src/screens/WidgetEditor.js:715
 msgid "Add Reel"
 msgstr ""
 
-#: admin/src/screens/ReelEditor.js:619
+#: admin/src/screens/ReelEditor.js:620
 msgid "Click or drag and drop files here"
 msgstr ""
 
 #. translators: %d: number of videos that may not play on Safari.
-#: admin/src/screens/ReelEditor.js:680
+#: admin/src/screens/ReelEditor.js:681
 #, js-format
 msgid "%d video may not play reliably on iOS/macOS Safari. Recommended format: MP4 (H.264/AAC)."
 msgid_plural "%d video(s) may not play reliably on iOS/macOS Safari. Recommended format: MP4 (H.264/AAC)."
 msgstr[0] ""
 msgstr[1] ""
 
-#: admin/src/screens/ReelEditor.js:693
+#: admin/src/screens/ReelEditor.js:694
 #: admin/src/screens/Statistics.js:301
-#: admin/src/screens/StylePanel.js:485
+#: admin/src/screens/StylePanel.js:577
 msgid "Thumbnail"
 msgstr ""
 
-#: admin/src/screens/ReelEditor.js:724
+#: admin/src/screens/ReelEditor.js:725
 msgid "Capture frame"
 msgstr ""
 
-#: admin/src/screens/ReelEditor.js:747
+#: admin/src/screens/ReelEditor.js:748
 #: admin/src/screens/Statistics.js:309
 #: admin/src/screens/Statistics.js:448
-#: admin/src/screens/StylePanel.js:511
-#: admin/src/screens/StylePanel.js:674
+#: admin/src/screens/StylePanel.js:605
+#: admin/src/screens/StylePanel.js:771
 msgid "Reel Title"
 msgstr ""
 
-#: admin/src/screens/ReelEditor.js:748
+#: admin/src/screens/ReelEditor.js:749
 msgid "Enter reel title"
 msgstr ""
 
-#: admin/src/screens/ReelEditor.js:759
+#: admin/src/screens/ReelEditor.js:760
 msgid "Links"
 msgstr ""
 
-#: admin/src/screens/ReelEditor.js:774
+#: admin/src/screens/ReelEditor.js:775
 msgid "Add a button or tag a product and it appears over the video in the player."
 msgstr ""
 
@@ -566,7 +569,7 @@ msgid "Delete Selected (%d)"
 msgstr ""
 
 #: admin/src/screens/ReelsLibrary.js:354
-#: admin/src/screens/WidgetEditor.js:571
+#: admin/src/screens/WidgetEditor.js:720
 msgid "Search reels…"
 msgstr ""
 
@@ -699,7 +702,7 @@ msgid "Deleting the plugin will permanently drop every WooReels table — all wi
 msgstr ""
 
 #: admin/src/screens/Statistics.js:187
-#: admin/src/screens/WidgetEditor.js:488
+#: admin/src/screens/WidgetEditor.js:570
 msgid "Back"
 msgstr ""
 
@@ -769,458 +772,496 @@ msgstr ""
 msgid "No button has been clicked yet."
 msgstr ""
 
-#: admin/src/screens/StylePanel.js:185
-#: admin/src/screens/StylePanel.js:189
-msgid "Layout"
+#: admin/src/screens/StylePanel.js:203
+msgid "Normal"
 msgstr ""
 
-#: admin/src/screens/StylePanel.js:195
-msgid "Grid"
+#: admin/src/screens/StylePanel.js:204
+msgid "Hover"
 msgstr ""
 
-#: admin/src/screens/StylePanel.js:200
-msgid "Carousel"
-msgstr ""
-
-#: admin/src/screens/StylePanel.js:205
-msgid "Marquee"
-msgstr ""
-
-#: admin/src/screens/StylePanel.js:210
-msgid "Stacked"
+#: admin/src/screens/StylePanel.js:208
+msgid "Background"
 msgstr ""
 
 #: admin/src/screens/StylePanel.js:215
+msgid "Icon Color"
+msgstr ""
+
+#: admin/src/screens/StylePanel.js:244
+#: admin/src/screens/StylePanel.js:249
+msgid "Layout"
+msgstr ""
+
+#: admin/src/screens/StylePanel.js:255
+msgid "Grid"
+msgstr ""
+
+#: admin/src/screens/StylePanel.js:260
+msgid "Carousel"
+msgstr ""
+
+#: admin/src/screens/StylePanel.js:265
+msgid "Marquee"
+msgstr ""
+
+#: admin/src/screens/StylePanel.js:270
+msgid "Stacked"
+msgstr ""
+
+#: admin/src/screens/StylePanel.js:275
 msgid "Popup"
 msgstr ""
 
-#: admin/src/screens/StylePanel.js:222
+#: admin/src/screens/StylePanel.js:282
 msgid "Shape"
 msgstr ""
 
-#: admin/src/screens/StylePanel.js:228
+#: admin/src/screens/StylePanel.js:288
 msgid "Rectangle"
 msgstr ""
 
-#: admin/src/screens/StylePanel.js:233
+#: admin/src/screens/StylePanel.js:293
 msgid "Circle"
 msgstr ""
 
-#: admin/src/screens/StylePanel.js:240
-#: admin/src/screens/StylePanel.js:467
+#: admin/src/screens/StylePanel.js:300
+#: admin/src/screens/StylePanel.js:558
 msgid "Size"
 msgstr ""
 
-#: admin/src/screens/StylePanel.js:257
+#: admin/src/screens/StylePanel.js:317
 msgid "Gap"
 msgstr ""
 
-#: admin/src/screens/StylePanel.js:274
+#: admin/src/screens/StylePanel.js:334
 msgid "Top/bottom spacing"
 msgstr ""
 
-#: admin/src/screens/StylePanel.js:285
+#: admin/src/screens/StylePanel.js:345
 msgid "Where the previous and next buttons sit on the rail."
 msgstr ""
 
-#: admin/src/screens/StylePanel.js:296
+#: admin/src/screens/StylePanel.js:356
 msgid "Inside"
 msgstr ""
 
-#: admin/src/screens/StylePanel.js:300
+#: admin/src/screens/StylePanel.js:360
 msgid "Outside"
 msgstr ""
 
-#: admin/src/screens/StylePanel.js:309
-msgid "Speed"
+#: admin/src/screens/StylePanel.js:369
+msgid "Carousel buttons"
 msgstr ""
 
-#: admin/src/screens/StylePanel.js:328
-#: admin/src/screens/StylePanel.js:852
-msgid "Left"
-msgstr ""
-
-#: admin/src/screens/StylePanel.js:332
-#: admin/src/screens/StylePanel.js:854
-msgid "Right"
-msgstr ""
-
-#: admin/src/screens/StylePanel.js:337
-msgid "Pause on hover"
-msgstr ""
-
-#: admin/src/screens/StylePanel.js:349
-msgid "Depth"
-msgstr ""
-
-#: admin/src/screens/StylePanel.js:360
-msgid "Offset"
-msgstr ""
-
-#: admin/src/screens/StylePanel.js:370
-msgid "Scale"
-msgstr ""
-
-#: admin/src/screens/StylePanel.js:387
-msgid "Trigger"
-msgstr ""
-
-#: admin/src/screens/StylePanel.js:395
-msgid "Initial Page Load"
-msgstr ""
-
-#: admin/src/screens/StylePanel.js:402
-msgid "After Some Time"
-msgstr ""
-
-#: admin/src/screens/StylePanel.js:406
-msgid "After Scrolling Distance"
-msgstr ""
-
-#: admin/src/screens/StylePanel.js:415
-msgid "Delay"
-msgstr ""
-
-#: admin/src/screens/StylePanel.js:428
-msgid "Scroll"
-msgstr ""
-
-#: admin/src/screens/StylePanel.js:450
-msgid "Bottom right"
-msgstr ""
-
-#: admin/src/screens/StylePanel.js:454
-msgid "Bottom left"
-msgstr ""
-
-#: admin/src/screens/StylePanel.js:458
-msgid "Top right"
-msgstr ""
-
-#: admin/src/screens/StylePanel.js:462
-msgid "Top left"
-msgstr ""
-
-#: admin/src/screens/StylePanel.js:475
-msgid "Show on mobile"
-msgstr ""
-
-#: admin/src/screens/StylePanel.js:487
+#: admin/src/screens/StylePanel.js:372
 #: admin/src/screens/StylePanel.js:650
-msgid "Appearance"
-msgstr ""
-
-#: admin/src/screens/StylePanel.js:493
-#: admin/src/screens/StylePanel.js:656
-msgid "Overlay"
-msgstr ""
-
-#: admin/src/screens/StylePanel.js:498
-#: admin/src/screens/StylePanel.js:661
-msgid "Only Title"
-msgstr ""
-
-#: admin/src/screens/StylePanel.js:503
-#: admin/src/screens/StylePanel.js:528
-#: admin/src/screens/StylePanel.js:666
-msgid "None"
-msgstr ""
-
-#: admin/src/screens/StylePanel.js:512
-msgid "Show the reel title when it has no button to show instead."
-msgstr ""
-
-#: admin/src/screens/StylePanel.js:524
-msgid "Hover effect"
-msgstr ""
-
-#: admin/src/screens/StylePanel.js:531
-msgid "Zoom in"
-msgstr ""
-
-#: admin/src/screens/StylePanel.js:535
-msgid "Zoom out"
-msgstr ""
-
-#: admin/src/screens/StylePanel.js:541
-msgid "Border Width"
-msgstr ""
-
-#: admin/src/screens/StylePanel.js:550
-msgid "Border Color"
-msgstr ""
-
-#: admin/src/screens/StylePanel.js:556
-#: admin/src/screens/StylePanel.js:780
+#: admin/src/screens/StylePanel.js:865
 msgid "Border Radius"
 msgstr ""
 
-#: admin/src/screens/StylePanel.js:579
+#: admin/src/screens/StylePanel.js:384
+#: admin/src/screens/StylePanel.js:854
+msgid "Button Colors"
+msgstr ""
+
+#: admin/src/screens/StylePanel.js:400
+msgid "Speed"
+msgstr ""
+
+#: admin/src/screens/StylePanel.js:419
+#: admin/src/screens/StylePanel.js:943
+msgid "Left"
+msgstr ""
+
+#: admin/src/screens/StylePanel.js:423
+#: admin/src/screens/StylePanel.js:945
+msgid "Right"
+msgstr ""
+
+#: admin/src/screens/StylePanel.js:428
+msgid "Pause on hover"
+msgstr ""
+
+#: admin/src/screens/StylePanel.js:440
+msgid "Depth"
+msgstr ""
+
+#: admin/src/screens/StylePanel.js:451
+msgid "Offset"
+msgstr ""
+
+#: admin/src/screens/StylePanel.js:461
+msgid "Scale"
+msgstr ""
+
+#: admin/src/screens/StylePanel.js:478
+msgid "Trigger"
+msgstr ""
+
+#: admin/src/screens/StylePanel.js:486
+msgid "Initial Page Load"
+msgstr ""
+
+#: admin/src/screens/StylePanel.js:493
+msgid "After Some Time"
+msgstr ""
+
+#: admin/src/screens/StylePanel.js:497
+msgid "After Scrolling Distance"
+msgstr ""
+
+#: admin/src/screens/StylePanel.js:506
+msgid "Delay"
+msgstr ""
+
+#: admin/src/screens/StylePanel.js:519
+msgid "Scroll"
+msgstr ""
+
+#: admin/src/screens/StylePanel.js:541
+msgid "Bottom right"
+msgstr ""
+
+#: admin/src/screens/StylePanel.js:545
+msgid "Bottom left"
+msgstr ""
+
+#: admin/src/screens/StylePanel.js:549
+msgid "Top right"
+msgstr ""
+
+#: admin/src/screens/StylePanel.js:553
+msgid "Top left"
+msgstr ""
+
+#: admin/src/screens/StylePanel.js:566
+msgid "Show on mobile"
+msgstr ""
+
+#: admin/src/screens/StylePanel.js:581
+#: admin/src/screens/StylePanel.js:747
+msgid "Appearance"
+msgstr ""
+
+#: admin/src/screens/StylePanel.js:587
+#: admin/src/screens/StylePanel.js:753
+msgid "Overlay"
+msgstr ""
+
+#: admin/src/screens/StylePanel.js:592
+#: admin/src/screens/StylePanel.js:758
+msgid "Only Title"
+msgstr ""
+
+#: admin/src/screens/StylePanel.js:597
+#: admin/src/screens/StylePanel.js:622
+#: admin/src/screens/StylePanel.js:763
+msgid "None"
+msgstr ""
+
+#: admin/src/screens/StylePanel.js:606
+msgid "Show the reel title when it has no button to show instead."
+msgstr ""
+
+#: admin/src/screens/StylePanel.js:618
+msgid "Hover effect"
+msgstr ""
+
+#: admin/src/screens/StylePanel.js:625
+msgid "Zoom in"
+msgstr ""
+
+#: admin/src/screens/StylePanel.js:629
+msgid "Zoom out"
+msgstr ""
+
+#: admin/src/screens/StylePanel.js:635
+msgid "Border Width"
+msgstr ""
+
+#: admin/src/screens/StylePanel.js:644
+msgid "Border Color"
+msgstr ""
+
+#: admin/src/screens/StylePanel.js:673
 msgid "Shadow"
 msgstr ""
 
-#: admin/src/screens/StylePanel.js:588
+#: admin/src/screens/StylePanel.js:682
 msgid "Card background"
 msgstr ""
 
-#: admin/src/screens/StylePanel.js:589
+#: admin/src/screens/StylePanel.js:683
 msgid "Supports transparency."
 msgstr ""
 
-#: admin/src/screens/StylePanel.js:595
+#: admin/src/screens/StylePanel.js:689
 msgid "Show Play Button"
 msgstr ""
 
-#: admin/src/screens/StylePanel.js:603
+#: admin/src/screens/StylePanel.js:697
 msgid "Play Icon Size"
 msgstr ""
 
-#: admin/src/screens/StylePanel.js:613
+#: admin/src/screens/StylePanel.js:707
 msgid "Play icon colour"
 msgstr ""
 
-#: admin/src/screens/StylePanel.js:623
+#: admin/src/screens/StylePanel.js:717
 msgid "Show Views"
 msgstr ""
 
-#: admin/src/screens/StylePanel.js:631
+#: admin/src/screens/StylePanel.js:725
 msgid "Views background"
 msgstr ""
 
-#: admin/src/screens/StylePanel.js:638
+#: admin/src/screens/StylePanel.js:732
 msgid "Views text"
 msgstr ""
 
-#: admin/src/screens/StylePanel.js:648
+#: admin/src/screens/StylePanel.js:743
 msgid "Player"
 msgstr ""
 
-#: admin/src/screens/StylePanel.js:689
+#: admin/src/screens/StylePanel.js:786
 msgid "Horizontal"
 msgstr ""
 
-#: admin/src/screens/StylePanel.js:693
+#: admin/src/screens/StylePanel.js:790
 msgid "Vertical"
 msgstr ""
 
-#: admin/src/screens/StylePanel.js:699
+#: admin/src/screens/StylePanel.js:796
 msgid "Play behaviour"
 msgstr ""
 
-#: admin/src/screens/StylePanel.js:703
+#: admin/src/screens/StylePanel.js:800
 msgid "On click"
 msgstr ""
 
-#: admin/src/screens/StylePanel.js:706
+#: admin/src/screens/StylePanel.js:803
 msgid "Autoplay"
 msgstr ""
 
-#: admin/src/screens/StylePanel.js:710
+#: admin/src/screens/StylePanel.js:807
 msgid "Play on Hover"
 msgstr ""
 
-#: admin/src/screens/StylePanel.js:716
+#: admin/src/screens/StylePanel.js:813
 msgid "Play with sound"
 msgstr ""
 
-#: admin/src/screens/StylePanel.js:717
+#: admin/src/screens/StylePanel.js:814
 msgid "Play with sound by default. Visitors can still mute or unmute anytime while watching."
 msgstr ""
 
-#: admin/src/screens/StylePanel.js:726
+#: admin/src/screens/StylePanel.js:823
 msgid "Loop"
 msgstr ""
 
-#: admin/src/screens/StylePanel.js:732
+#: admin/src/screens/StylePanel.js:829
 msgid "Show seekbar"
 msgstr ""
 
-#: admin/src/screens/StylePanel.js:738
+#: admin/src/screens/StylePanel.js:835
 msgid "Show volume control"
 msgstr ""
 
-#: admin/src/screens/StylePanel.js:744
+#: admin/src/screens/StylePanel.js:841
 msgid "Disable preview"
 msgstr ""
 
-#: admin/src/screens/StylePanel.js:745
+#: admin/src/screens/StylePanel.js:842
 msgid "Turn off previews for a cleaner, more focused browse."
 msgstr ""
 
-#: admin/src/screens/StylePanel.js:754
-msgid "Button background"
+#: admin/src/screens/StylePanel.js:851
+msgid "Navigation buttons"
 msgstr ""
 
-#: admin/src/screens/StylePanel.js:759
-msgid "Button icon"
-msgstr ""
-
-#: admin/src/screens/StylePanel.js:766
-msgid "Button hover background"
-msgstr ""
-
-#: admin/src/screens/StylePanel.js:773
-msgid "Button hover icon"
-msgstr ""
-
-#: admin/src/screens/StylePanel.js:791
-#: admin/src/screens/StylePanel.js:793
+#: admin/src/screens/StylePanel.js:877
+#: admin/src/screens/StylePanel.js:881
 msgid "Product Card"
 msgstr ""
 
-#: admin/src/screens/StylePanel.js:799
+#: admin/src/screens/StylePanel.js:887
 msgid "Modern"
 msgstr ""
 
-#: admin/src/screens/StylePanel.js:800
+#: admin/src/screens/StylePanel.js:888
 msgid "Image, name and price on one compact row."
 msgstr ""
 
-#: admin/src/screens/StylePanel.js:808
+#: admin/src/screens/StylePanel.js:896
 msgid "Classic"
 msgstr ""
 
-#: admin/src/screens/StylePanel.js:809
+#: admin/src/screens/StylePanel.js:897
 msgid "Larger card with the image above the details."
 msgstr ""
 
-#: admin/src/screens/StylePanel.js:819
+#: admin/src/screens/StylePanel.js:907
 msgid "Show Ratings"
 msgstr ""
 
-#: admin/src/screens/StylePanel.js:820
+#: admin/src/screens/StylePanel.js:908
 msgid "Control whether product ratings are visible."
 msgstr ""
 
-#: admin/src/screens/StylePanel.js:829
+#: admin/src/screens/StylePanel.js:917
 msgid "Show Add to Cart"
 msgstr ""
 
-#: admin/src/screens/StylePanel.js:843
+#: admin/src/screens/StylePanel.js:932
 msgid "Widget Title"
 msgstr ""
 
-#: admin/src/screens/StylePanel.js:845
+#: admin/src/screens/StylePanel.js:936
 msgid "Alignment"
 msgstr ""
 
-#: admin/src/screens/StylePanel.js:851
+#: admin/src/screens/StylePanel.js:942
 msgid "Hidden"
 msgstr ""
 
-#: admin/src/screens/StylePanel.js:853
+#: admin/src/screens/StylePanel.js:944
 msgid "Center"
 msgstr ""
 
-#: admin/src/screens/StylePanel.js:861
+#: admin/src/screens/StylePanel.js:952
 msgid "Font size"
 msgstr ""
 
-#: admin/src/screens/StylePanel.js:871
+#: admin/src/screens/StylePanel.js:962
 msgid "Title Color"
 msgstr ""
 
-#: admin/src/screens/StylePanel.js:881
+#: admin/src/screens/StylePanel.js:973
 msgid "Advanced"
 msgstr ""
 
-#: admin/src/screens/StylePanel.js:883
+#: admin/src/screens/StylePanel.js:977
 msgid "Lazy load videos"
 msgstr ""
 
-#: admin/src/screens/StylePanel.js:884
+#: admin/src/screens/StylePanel.js:978
 msgid "Defers video loading to reduce initial page weight."
 msgstr ""
 
-#: admin/src/screens/StylePanel.js:894
+#: admin/src/screens/StylePanel.js:988
 msgid "Added to the widget wrapper, for your own CSS. Separate several with spaces."
 msgstr ""
 
 #. translators: %s: reel title.
-#: admin/src/screens/WidgetEditor.js:163
+#: admin/src/screens/WidgetEditor.js:172
 #, js-format
 msgid "Reorder %s"
 msgstr ""
 
-#: admin/src/screens/WidgetEditor.js:398
-#: admin/src/screens/WidgetEditor.js:462
+#: admin/src/screens/WidgetEditor.js:458
+#: admin/src/screens/WidgetEditor.js:544
 #: admin/src/screens/WidgetsList.js:159
 msgid "Widget created successfully!"
 msgstr ""
 
-#: admin/src/screens/WidgetEditor.js:399
+#: admin/src/screens/WidgetEditor.js:459
 msgid "Changes saved successfully!"
 msgstr ""
 
-#: admin/src/screens/WidgetEditor.js:416
+#: admin/src/screens/WidgetEditor.js:498
 #: admin/src/screens/WidgetsList.js:173
 msgid "Widget deleted successfully!"
 msgstr ""
 
-#: admin/src/screens/WidgetEditor.js:440
+#: admin/src/screens/WidgetEditor.js:522
 #: admin/src/screens/WidgetsList.js:338
 msgid "Copied!"
 msgstr ""
 
-#: admin/src/screens/WidgetEditor.js:495
+#: admin/src/screens/WidgetEditor.js:576
+msgid "Breadcrumb"
+msgstr ""
+
+#: admin/src/screens/WidgetEditor.js:589
+msgid "Untitled widget"
+msgstr ""
+
+#: admin/src/screens/WidgetEditor.js:597
 msgid "Enter widget title"
 msgstr ""
 
-#: admin/src/screens/WidgetEditor.js:496
+#: admin/src/screens/WidgetEditor.js:601
 #: admin/src/screens/WidgetsList.js:282
 msgid "Widget Name"
 msgstr ""
 
-#: admin/src/screens/WidgetEditor.js:520
+#: admin/src/screens/WidgetEditor.js:613
+msgid "Discard changes"
+msgstr ""
+
+#: admin/src/screens/WidgetEditor.js:636
 #: admin/src/screens/WidgetsList.js:389
 msgid "Duplicate"
 msgstr ""
 
-#: admin/src/screens/WidgetEditor.js:560
+#: admin/src/screens/WidgetEditor.js:655
+msgid "Hide customization"
+msgstr ""
+
+#: admin/src/screens/WidgetEditor.js:656
+msgid "Show customization"
+msgstr ""
+
+#: admin/src/screens/WidgetEditor.js:702
 msgid "Choose reels to attach in this widget"
 msgstr ""
 
-#: admin/src/screens/WidgetEditor.js:589
+#: admin/src/screens/WidgetEditor.js:738
 msgid "No reels are available to add."
 msgstr ""
 
-#: admin/src/screens/WidgetEditor.js:620
+#: admin/src/screens/WidgetEditor.js:765
+msgid "Load more"
+msgstr ""
+
+#: admin/src/screens/WidgetEditor.js:782
 msgid "This is a representation of how the widget will appear to visitors."
 msgstr ""
 
-#: admin/src/screens/WidgetEditor.js:669
+#: admin/src/screens/WidgetEditor.js:831
 #: block/src/index.js:279
 msgid "No reels have been added to this widget yet."
 msgstr ""
 
-#: admin/src/screens/WidgetEditor.js:673
+#: admin/src/screens/WidgetEditor.js:835
 msgid "Select some from the list on the left to get started."
 msgstr ""
 
-#: admin/src/screens/WidgetEditor.js:704
+#: admin/src/screens/WidgetEditor.js:866
 msgid "Attached videos"
 msgstr ""
 
-#: admin/src/screens/WidgetEditor.js:707
+#: admin/src/screens/WidgetEditor.js:869
 msgid "These reels will be shown in this reel widget"
 msgstr ""
 
-#: admin/src/screens/WidgetEditor.js:741
-#: admin/src/screens/WidgetEditor.js:745
-#: admin/src/screens/WidgetEditor.js:771
+#: admin/src/screens/WidgetEditor.js:903
+#: admin/src/screens/WidgetEditor.js:907
+#: admin/src/screens/WidgetEditor.js:933
 msgid "Customization"
 msgstr ""
 
-#: admin/src/screens/WidgetEditor.js:748
+#: admin/src/screens/WidgetEditor.js:910
 msgid "Customize your widget however you like"
 msgstr ""
 
-#: admin/src/screens/WidgetEditor.js:788
+#: admin/src/screens/WidgetEditor.js:958
 #: admin/src/screens/WidgetsList.js:426
 msgid "Are you sure you want to delete this widget?"
 msgstr ""
 
-#: admin/src/screens/WidgetEditor.js:795
+#: admin/src/screens/WidgetEditor.js:965
 msgid "This widget and its click statistics will be removed. Its reels stay in your library and keep working in any other widget."
 msgstr ""
 

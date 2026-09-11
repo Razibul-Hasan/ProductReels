@@ -91,6 +91,7 @@ export const Notice = ( { tone = 'info', children } ) => {
 
 export const CollapsibleSection = ( {
 	title,
+	icon: Icon,
 	defaultOpen = false,
 	children,
 } ) => {
@@ -108,6 +109,11 @@ export const CollapsibleSection = ( {
 					size={ 14 }
 					className="wr-collapse__chevron"
 				/>
+				{ Icon && (
+					<span className="wr-collapse__icon">
+						<Icon size={ 15 } />
+					</span>
+				) }
 				<span className="wr-section-label">{ title }</span>
 			</button>
 			{ open && <div className="wr-collapse__body">{ children }</div> }

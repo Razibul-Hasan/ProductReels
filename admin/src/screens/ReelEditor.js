@@ -519,20 +519,21 @@ export const ReelEditor = ( { reelId, onClose, onSaved } ) => {
 
 		try {
 			const payload = { title, thumbnail, links, files };
+			let saved;
 
 			if ( isNew ) {
-				await reelsApi.create( payload );
+				saved = await reelsApi.create( payload );
 				toasts.success(
 					__( 'Reel created successfully!', 'wooreels' )
 				);
 			} else {
-				await reelsApi.update( reelId, payload );
+				saved = await reelsApi.update( reelId, payload );
 				toasts.success(
 					__( 'Reel updated successfully!', 'wooreels' )
 				);
 			}
 
-			onSaved();
+			onSaved( saved );
 		} catch ( error ) {
 			toasts.error( error.message );
 		} finally {

@@ -38,20 +38,25 @@ import { CSS } from '@dnd-kit/utilities';
 import { WidgetRenderer } from '@shared/WidgetRenderer';
 import { posterOf } from '@shared/format';
 import { Player } from '@shared/player/Player';
+import { useMediaQuery } from '@shared/hooks/useMediaQuery';
 import { boot, reels as reelsApi, widgets as widgetsApi } from '../api';
 import { editorServices } from '../preview-services';
 import {
 	IconCheck,
 	IconChevronLeft,
+	IconChevronRight,
 	IconCopy,
 	IconDesktop,
 	IconDuplicate,
 	IconGrip,
 	IconMobile,
+	IconPanel,
 	IconPlay,
 	IconPlus,
+	IconSave,
 	IconTablet,
 	IconTrash,
+	IconUndo,
 	IconVideo,
 } from '../components/icons';
 import { Button, IconButton } from '../components/ui/Button';
@@ -61,7 +66,11 @@ import { ConfirmDialog } from '../components/ui/Modal';
 import { useToasts } from '../components/ui/Toasts';
 import { useDebounced } from '../hooks/use-debounced';
 import { useUnsavedChanges } from '../hooks/use-unsaved-guard';
+import { ReelEditor } from './ReelEditor';
 import { StylePanel } from './StylePanel';
+
+/** How many reels the picker fetches per page. */
+const PICKER_PAGE = 24;
 
 const DEVICES = [
 	{
@@ -219,10 +228,17 @@ export const WidgetEditor = ( { widgetId, navigate } ) => {
 	const [ search, setSearch ] = useState( '' );
 	const [ available, setAvailable ] = useState( [] );
 	const [ picking, setPicking ] = useState( true );
+	const [ pickerPage, setPickerPage ] = useState( 1 );
+	const [ pickerPages, setPickerPages ] = useState( 1 );
+	const [ loadingMore, setLoadingMore ] = useState( false );
+	const [ creating, setCreating ] = useState( false );
 	const [ panelOpen, setPanelOpen ] = useState( false );
+	const [ panelHidden, setPanelHidden ] = useState( false );
 
 	const term = useDebounced( search, 300 );
 	const baseline = useRef( '' );
+	const saved = useRef( { name: '', styles: boot.defaults, attached: [] } );
+	const narrow = useMediaQuery( '(max-width: 1180px)' );
 
 	useUnsavedChanges( dirty );
 
@@ -265,6 +281,11 @@ export const WidgetEditor = ( { widgetId, navigate } ) => {
 				setStyles( widget.styles );
 				setAttached( widget.reels );
 				setSavedId( widget.id );
+				saved.current = {
+					name: widget.name,
+					styles: widget.styles,
+					attached: widget.reels,
+				};
 				baseline.current = snapshot(
 					widget.name,
 					widget.styles,
@@ -284,26 +305,36 @@ export const WidgetEditor = ( { widgetId, navigate } ) => {
 	}, [ widgetId, isNew, snapshot, toasts ] );
 
 	// Anything the picker offers must not already be in the widget.
+	const loadPicker = useCallback(
+		( page ) => {
+			return reelsApi.list( {
+				search: term,
+				page,
+				per_page: PICKER_PAGE,
+				orderby: 'id',
+				order: 'DESC',
+			} );
+		},
+		[ term ]
+	);
+
 	useEffect( () => {
 		let cancelled = false;
 
 		setPicking( true );
 
-		reelsApi
-			.list( {
-				search: term,
-				per_page: 60,
-				orderby: 'id',
-				order: 'DESC',
-			} )
+		loadPicker( 1 )
 			.then( ( page ) => {
 				if ( ! cancelled ) {
 					setAvailable( page.items );
+					setPickerPage( 1 );
+					setPickerPages( page.pages );
 				}
 			} )
 			.catch( () => {
 				if ( ! cancelled ) {
 					setAvailable( [] );
+					setPickerPages( 1 );
 				}
 			} )
 			.finally( () => {
@@ -315,7 +346,31 @@ export const WidgetEditor = ( { widgetId, navigate } ) => {
 		return () => {
 			cancelled = true;
 		};
-	}, [ term ] );
+	}, [ loadPicker ] );
+
+	const loadMore = async () => {
+		const next = pickerPage + 1;
+
+		setLoadingMore( true );
+
+		try {
+			const page = await loadPicker( next );
+
+			setAvailable( ( current ) => {
+				const seen = new Set( current.map( ( reel ) => reel.id ) );
+
+				return current.concat(
+					page.items.filter( ( reel ) => ! seen.has( reel.id ) )
+				);
+			} );
+			setPickerPage( next );
+			setPickerPages( page.pages );
+		} catch ( error ) {
+			toasts.error( error.message );
+		} finally {
+			setLoadingMore( false );
+		}
+	};
 
 	const markDirty = useCallback(
 		( nextName, nextStyles, nextAttached ) => {
@@ -386,6 +441,11 @@ export const WidgetEditor = ( { widgetId, navigate } ) => {
 			setStyles( widget.styles );
 			setAttached( widget.reels );
 			setSavedId( widget.id );
+			saved.current = {
+				name: widget.name,
+				styles: widget.styles,
+				attached: widget.reels,
+			};
 			baseline.current = snapshot(
 				widget.name,
 				widget.styles,
@@ -406,6 +466,28 @@ export const WidgetEditor = ( { widgetId, navigate } ) => {
 			toasts.error( error.message );
 		} finally {
 			setSaving( false );
+		}
+	};
+
+	/** Put everything back the way it was at the last save. */
+	const discard = () => {
+		setName( saved.current.name );
+		setStyles( saved.current.styles );
+		setAttached( saved.current.attached );
+		setDirty( false );
+	};
+
+	/**
+	 * A reel created from inside the editor joins the widget straight away —
+	 * that is why someone reached for "Add Reel" here rather than in the library.
+	 *
+	 * @param {Object} reel The reel the editor just created.
+	 */
+	const onReelCreated = ( reel ) => {
+		setCreating( false );
+
+		if ( reel && reel.id ) {
+			add( reel );
 		}
 	};
 
@@ -488,17 +570,51 @@ export const WidgetEditor = ( { widgetId, navigate } ) => {
 						label={ __( 'Back', 'wooreels' ) }
 						onClick={ () => navigate( '#/widgets' ) }
 					/>
-					<input
-						type="text"
-						className="wr-editor-head__name"
-						value={ name }
-						placeholder={ __( 'Enter widget title', 'wooreels' ) }
-						aria-label={ __( 'Widget Name', 'wooreels' ) }
-						onChange={ ( event ) => rename( event.target.value ) }
-					/>
+					<div className="wr-editor-head__titles">
+						<nav
+							className="wr-crumbs"
+							aria-label={ __( 'Breadcrumb', 'wooreels' ) }
+						>
+							<button
+								type="button"
+								className="wr-crumbs__link"
+								onClick={ () => navigate( '#/widgets' ) }
+							>
+								{ __( 'All Widgets', 'wooreels' ) }
+							</button>
+							<IconChevronRight size={ 12 } />
+							<span className="wr-crumbs__current">
+								{ savedId > 0
+									? name ||
+									  __( 'Untitled widget', 'wooreels' )
+									: __( 'Create Widget', 'wooreels' ) }
+							</span>
+						</nav>
+						<input
+							type="text"
+							className="wr-editor-head__name"
+							value={ name }
+							placeholder={ __(
+								'Enter widget title',
+								'wooreels'
+							) }
+							aria-label={ __( 'Widget Name', 'wooreels' ) }
+							onChange={ ( event ) =>
+								rename( event.target.value )
+							}
+						/>
+					</div>
 				</div>
 
 				<div className="wr-page-head__actions">
+					{ dirty && (
+						<IconButton
+							icon={ IconUndo }
+							label={ __( 'Discard changes', 'wooreels' ) }
+							onClick={ discard }
+						/>
+					) }
+
 					{ savedId > 0 && (
 						<button
 							type="button"
@@ -532,8 +648,28 @@ export const WidgetEditor = ( { widgetId, navigate } ) => {
 						/>
 					) }
 
+					<IconButton
+						icon={ IconPanel }
+						label={
+							( narrow ? panelOpen : ! panelHidden )
+								? __( 'Hide customization', 'wooreels' )
+								: __( 'Show customization', 'wooreels' )
+						}
+						aria-pressed={
+							( narrow ? panelOpen : ! panelHidden )
+								? 'true'
+								: 'false'
+						}
+						onClick={ () =>
+							narrow
+								? setPanelOpen( ! panelOpen )
+								: setPanelHidden( ! panelHidden )
+						}
+					/>
+
 					<Button
 						variant="primary"
+						icon={ IconSave }
 						busy={ saving }
 						disabled={ saving || ( ! dirty && savedId > 0 ) }
 						onClick={ save }
@@ -546,7 +682,13 @@ export const WidgetEditor = ( { widgetId, navigate } ) => {
 			</div>
 
 			<div
-				className={ `wr-editor${ panelOpen ? ' is-panel-open' : '' }` }
+				className={ [
+					'wr-editor',
+					panelOpen ? 'is-panel-open' : '',
+					panelHidden ? 'is-panel-hidden' : '',
+				]
+					.filter( Boolean )
+					.join( ' ' ) }
 			>
 				<section
 					className="wr-editor__pane wr-editor__picker"
@@ -565,6 +707,13 @@ export const WidgetEditor = ( { widgetId, navigate } ) => {
 					</header>
 
 					<div className="wr-editor__pane-tools">
+						<Button
+							className="wr-editor__add-reel"
+							icon={ IconPlus }
+							onClick={ () => setCreating( true ) }
+						>
+							{ __( 'Add Reel', 'wooreels' ) }
+						</Button>
 						<SearchInput
 							value={ search }
 							onChange={ setSearch }
@@ -602,6 +751,19 @@ export const WidgetEditor = ( { widgetId, navigate } ) => {
 										onAdd={ add }
 									/>
 								) ) }
+							</div>
+						) }
+
+						{ ! picking && pickerPage < pickerPages && (
+							<div className="wr-editor__more">
+								<Button
+									size="sm"
+									busy={ loadingMore }
+									disabled={ loadingMore }
+									onClick={ loadMore }
+								>
+									{ __( 'Load more', 'wooreels' ) }
+								</Button>
 							</div>
 						) }
 					</div>
@@ -771,6 +933,14 @@ export const WidgetEditor = ( { widgetId, navigate } ) => {
 					{ __( 'Customization', 'wooreels' ) }
 				</button>
 			</div>
+
+			{ creating && (
+				<ReelEditor
+					reelId={ 0 }
+					onClose={ () => setCreating( false ) }
+					onSaved={ onReelCreated }
+				/>
+			) }
 
 			{ playing && (
 				<Player

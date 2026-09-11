@@ -236,3 +236,67 @@ export const IconCamera = ( p ) => (
 		<circle cx="12" cy="13" r="3.4" />
 	</Svg>
 );
+
+export const IconSave = ( p ) => (
+	<Svg { ...p }>
+		<path d="M5 4h11l3 3v13H5V4Z" />
+		<path d="M8 4v5h7V4" />
+		<path d="M8 20v-6h8v6" />
+	</Svg>
+);
+
+export const IconPanel = ( p ) => (
+	<Svg { ...p }>
+		<rect x="3.5" y="4.5" width="17" height="15" rx="2" />
+		<path d="M15 4.5v15" />
+	</Svg>
+);
+
+export const IconLayout = ( p ) => (
+	<Svg { ...p }>
+		<rect x="3.5" y="3.5" width="7" height="7" rx="1.5" />
+		<rect x="13.5" y="3.5" width="7" height="7" rx="1.5" />
+		<rect x="3.5" y="13.5" width="7" height="7" rx="1.5" />
+		<rect x="13.5" y="13.5" width="7" height="7" rx="1.5" />
+	</Svg>
+);
+
+export const IconSliders = ( p ) => (
+	<Svg { ...p }>
+		<path d="M4 7h10M18 7h2M4 17h4M12 17h8" />
+		<circle cx="16" cy="7" r="2" />
+		<circle cx="10" cy="17" r="2" />
+	</Svg>
+);
+
+export const IconType = ( p ) => (
+	<Svg { ...p }>
+		<path d="M5 6V4h14v2" />
+		<path d="M12 4v16" />
+		<path d="M9 20h6" />
+	</Svg>
+);
+
+export const IconCart = ( p ) => (
+	<Svg { ...p }>
+		<path d="M3 4h2l2.4 11h11.2L21 7H6" />
+		<circle cx="9" cy="19" r="1.4" />
+		<circle cx="17" cy="19" r="1.4" />
+	</Svg>
+);
+
+export const IconUndo = ( p ) => (
+	<Svg { ...p }>
+		<path d="M8 8H4V4" />
+		<path d="M4.5 8.5A8 8 0 1 1 4 13" />
+	</Svg>
+);
+
+export const IconPalette = ( p ) => (
+	<Svg { ...p }>
+		<path d="M12 3.5a8.5 8.5 0 1 0 0 17c1.5 0 2-.9 2-2 0-1.2-.6-1.6-.6-2.5 0-1 .8-1.5 1.8-1.5h1.6a3.7 3.7 0 0 0 3.7-3.7C20.5 6.9 16.7 3.5 12 3.5Z" />
+		<circle cx="8" cy="10" r="1.2" fill="currentColor" stroke="none" />
+		<circle cx="12" cy="7.5" r="1.2" fill="currentColor" stroke="none" />
+		<circle cx="16" cy="10" r="1.2" fill="currentColor" stroke="none" />
+	</Svg>
+);

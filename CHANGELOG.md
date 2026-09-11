@@ -22,3 +22,4 @@ uses [Semantic Versioning](https://semver.org/).
 - Render payload caching with generation-based invalidation and public cache headers.
 - Conditional asset loading: the public bundle is enqueued only on pages that print a widget, and the player is a separate chunk.
 - Full RTL support, `prefers-reduced-motion` support, and translation-ready strings with a generated POT file.
+- Widget editor conveniences: breadcrumb, discard unsaved changes, a header toggle that folds the style panel away on desktop, "Add Reel" inside the reel picker (the new reel joins the widget immediately), "Load more" in the picker, section icons, and Normal/Hover colour tabs for the carousel and player navigation buttons.

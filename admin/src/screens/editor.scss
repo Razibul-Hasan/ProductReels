@@ -24,6 +24,49 @@
 		min-width: 0;
 	}
 
+	.wr-editor-head__titles {
+		display: flex;
+		flex: 1;
+		flex-direction: column;
+		gap: 2px;
+		min-width: 0;
+	}
+
+	/* Breadcrumb: where this widget sits, in the app's quietest type. */
+	.wr-crumbs {
+		display: flex;
+		align-items: center;
+		gap: 4px;
+		padding-inline-start: 10px;
+		font-size: 12px;
+		color: var(--wr-fg-subtle);
+	}
+
+	.wr-crumbs__link {
+		margin: 0;
+		padding: 0;
+		font: inherit;
+		color: var(--wr-fg-muted);
+		background: none;
+		border: 0;
+		border-radius: var(--wr-radius-sm);
+		cursor: pointer;
+	}
+
+	.wr-crumbs__link:hover {
+		color: var(--wr-primary);
+		text-decoration: underline;
+	}
+
+	.wr-crumbs__current {
+		overflow: hidden;
+		max-width: 280px;
+		font-weight: 500;
+		color: var(--wr-fg-muted);
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+
 	/* The name is edited in place — it is the page title, not a form field. */
 	.wr-editor-head__name {
 		flex: 1;
@@ -96,6 +139,29 @@
 
 	.wr-editor__pane-tools {
 		padding: 0 16px 12px;
+	}
+
+	/* "Add Reel" inside the picker: outlined, full width, unmistakably primary. */
+	.wr-editor__add-reel.wr-btn {
+		justify-content: center;
+		width: 100%;
+		height: 38px;
+		margin-block-end: 8px;
+		color: var(--wr-primary);
+		background: var(--wr-bg);
+		border: 1.5px solid var(--wr-primary);
+	}
+
+	.wr-editor__add-reel.wr-btn:hover {
+		color: var(--wr-primary-hover);
+		background: var(--wr-primary-subtle);
+		border-color: var(--wr-primary-hover);
+	}
+
+	.wr-editor__more {
+		display: flex;
+		justify-content: center;
+		padding-block: 12px 4px;
 	}
 
 	.wr-editor__pane-tools .wr-search {
@@ -317,16 +383,53 @@
 		padding-block-start: 0;
 	}
 
+	/* A quiet sub-heading inside a section, e.g. "Carousel buttons". */
+	.wr-style-panel__group {
+		margin: 8px 0 -4px;
+		padding-block-start: 12px;
+		font-size: 11px;
+		font-weight: 600;
+		text-transform: uppercase;
+		letter-spacing: 0.06em;
+		color: var(--wr-fg-subtle);
+		border-block-start: 1px solid var(--wr-border);
+	}
+
+	.wr-button-colors {
+		display: flex;
+		flex-direction: column;
+		gap: 10px;
+	}
+
+	.wr-button-colors > .wr-field__label {
+		margin-block-end: -4px;
+	}
+
 	.wr-editor__panel-toggle {
 		border: 0;
+		display: none;
+	}
+
+	/* The header's panel button folds the style panel away on a desktop, so the
+	   preview can take the whole width while someone checks a layout. */
+	.wr-editor.is-panel-hidden {
+		grid-template-columns: 280px minmax(0, 1fr);
+	}
+
+	.wr-editor.is-panel-hidden .wr-editor__style {
 		display: none;
 	}
 
 	/* Below three panes' worth of room, the style panel becomes a drawer so the
 	   preview keeps the width it needs to be useful. */
 	@media (max-width: 1180px) {
-		.wr-editor {
+		.wr-editor,
+		.wr-editor.is-panel-hidden {
 			grid-template-columns: 240px minmax(0, 1fr);
+		}
+
+		.wr-editor.is-panel-hidden .wr-editor__style {
+			display: flex;
 		}
 
 		.wr-editor__style {

@@ -11,12 +11,23 @@
  * the panel are always looking at the same object.
  */
 
+import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { IconCircle, IconRectangle } from '../components/icons';
+import {
+	IconCart,
+	IconCircle,
+	IconImage,
+	IconLayout,
+	IconPlay,
+	IconRectangle,
+	IconSliders,
+	IconType,
+} from '../components/icons';
 import { ColorPicker } from '../components/ui/ColorPicker';
 import {
 	IconToggleGroup,
 	Select,
+	Tabs,
 	VisualOptionCards,
 } from '../components/ui/Choice';
 import { CollapsibleSection } from '../components/ui/Feedback';
@@ -163,6 +174,54 @@ const AppearanceArt = ( { kind } ) => (
 	</svg>
 );
 
+/**
+ * Background and icon colour for a button, in its normal and hover states.
+ *
+ * Two tabs instead of four stacked pickers: the pair a store owner is
+ * matching is always "this state's background and icon", and the tab keeps
+ * that pair together.
+ *
+ * @param {Object}   props        Props.
+ * @param {string}   props.label  Section label.
+ * @param {Object}   props.styles The whole style object.
+ * @param {Function} props.set    Style setter.
+ * @param {Object}   props.keys   {bg, fg, hoverBg, hoverFg} style keys.
+ * @return {Object} The control.
+ */
+const ButtonColors = ( { label, styles, set, keys } ) => {
+	const [ state, setState ] = useState( 'normal' );
+	const hover = state === 'hover';
+
+	return (
+		<div className="wr-button-colors">
+			<span className="wr-field__label">{ label }</span>
+			<Tabs
+				label={ label }
+				value={ state }
+				onChange={ setState }
+				tabs={ [
+					{ value: 'normal', label: __( 'Normal', 'wooreels' ) },
+					{ value: 'hover', label: __( 'Hover', 'wooreels' ) },
+				] }
+			/>
+			<ColorPicker
+				label={ __( 'Background', 'wooreels' ) }
+				value={ styles[ hover ? keys.hoverBg : keys.bg ] }
+				onChange={ ( value ) =>
+					set( hover ? keys.hoverBg : keys.bg, value )
+				}
+			/>
+			<ColorPicker
+				label={ __( 'Icon Color', 'wooreels' ) }
+				value={ styles[ hover ? keys.hoverFg : keys.fg ] }
+				onChange={ ( value ) =>
+					set( hover ? keys.hoverFg : keys.fg, value )
+				}
+			/>
+		</div>
+	);
+};
+
 export const StylePanel = ( { styles, set, setDevice } ) => {
 	const template = styles.template;
 
@@ -183,6 +242,7 @@ export const StylePanel = ( { styles, set, setDevice } ) => {
 		<div className="wr-style-panel">
 			<CollapsibleSection
 				title={ __( 'Layout', 'wooreels' ) }
+				icon={ IconLayout }
 				defaultOpen
 			>
 				<VisualOptionCards
@@ -301,6 +361,37 @@ export const StylePanel = ( { styles, set, setDevice } ) => {
 							},
 						] }
 					/>
+				) }
+
+				{ ( 'carousel' === template || 'stacked' === template ) && (
+					<>
+						<p className="wr-style-panel__group">
+							{ __( 'Carousel buttons', 'wooreels' ) }
+						</p>
+						<Slider
+							label={ __( 'Border Radius', 'wooreels' ) }
+							min={ 0 }
+							max={ 100 }
+							value={ styles.carouselBtnBorderRadius }
+							onChange={ ( value ) =>
+								set( 'carouselBtnBorderRadius', value )
+							}
+							onReset={ () =>
+								set( 'carouselBtnBorderRadius', 40 )
+							}
+						/>
+						<ButtonColors
+							label={ __( 'Button Colors', 'wooreels' ) }
+							styles={ styles }
+							set={ set }
+							keys={ {
+								bg: 'carouselBtnBgColor',
+								fg: 'carouselBtnIconColor',
+								hoverBg: 'carouselBtnHoverBgColor',
+								hoverFg: 'carouselBtnHoverIconColor',
+							} }
+						/>
+					</>
 				) }
 
 				{ 'marquee' === template && (
@@ -482,7 +573,10 @@ export const StylePanel = ( { styles, set, setDevice } ) => {
 				) }
 			</CollapsibleSection>
 
-			<CollapsibleSection title={ __( 'Thumbnail', 'wooreels' ) }>
+			<CollapsibleSection
+				title={ __( 'Thumbnail', 'wooreels' ) }
+				icon={ IconImage }
+			>
 				<VisualOptionCards
 					label={ __( 'Appearance', 'wooreels' ) }
 					value={ styles.appearance }
@@ -645,7 +739,10 @@ export const StylePanel = ( { styles, set, setDevice } ) => {
 				) }
 			</CollapsibleSection>
 
-			<CollapsibleSection title={ __( 'Player', 'wooreels' ) }>
+			<CollapsibleSection
+				title={ __( 'Player', 'wooreels' ) }
+				icon={ IconPlay }
+			>
 				<VisualOptionCards
 					label={ __( 'Appearance', 'wooreels' ) }
 					value={ styles.playerAppearance }
@@ -750,31 +847,19 @@ export const StylePanel = ( { styles, set, setDevice } ) => {
 					onChange={ ( value ) => set( 'disablePreview', value ) }
 				/>
 
-				<ColorPicker
-					label={ __( 'Button background', 'wooreels' ) }
-					value={ styles.previewBtnBgColor }
-					onChange={ ( value ) => set( 'previewBtnBgColor', value ) }
-				/>
-				<ColorPicker
-					label={ __( 'Button icon', 'wooreels' ) }
-					value={ styles.previewBtnIconColor }
-					onChange={ ( value ) =>
-						set( 'previewBtnIconColor', value )
-					}
-				/>
-				<ColorPicker
-					label={ __( 'Button hover background', 'wooreels' ) }
-					value={ styles.previewBtnHoverBgColor }
-					onChange={ ( value ) =>
-						set( 'previewBtnHoverBgColor', value )
-					}
-				/>
-				<ColorPicker
-					label={ __( 'Button hover icon', 'wooreels' ) }
-					value={ styles.previewBtnHoverIconColor }
-					onChange={ ( value ) =>
-						set( 'previewBtnHoverIconColor', value )
-					}
+				<p className="wr-style-panel__group">
+					{ __( 'Navigation buttons', 'wooreels' ) }
+				</p>
+				<ButtonColors
+					label={ __( 'Button Colors', 'wooreels' ) }
+					styles={ styles }
+					set={ set }
+					keys={ {
+						bg: 'previewBtnBgColor',
+						fg: 'previewBtnIconColor',
+						hoverBg: 'previewBtnHoverBgColor',
+						hoverFg: 'previewBtnHoverIconColor',
+					} }
 				/>
 				<Slider
 					label={ __( 'Border Radius', 'wooreels' ) }
@@ -788,7 +873,10 @@ export const StylePanel = ( { styles, set, setDevice } ) => {
 				/>
 			</CollapsibleSection>
 
-			<CollapsibleSection title={ __( 'Product Card', 'wooreels' ) }>
+			<CollapsibleSection
+				title={ __( 'Product Card', 'wooreels' ) }
+				icon={ IconCart }
+			>
 				<VisualOptionCards
 					label={ __( 'Product Card', 'wooreels' ) }
 					value={ styles.productCardStyle }
@@ -840,7 +928,10 @@ export const StylePanel = ( { styles, set, setDevice } ) => {
 				) }
 			</CollapsibleSection>
 
-			<CollapsibleSection title={ __( 'Widget Title', 'wooreels' ) }>
+			<CollapsibleSection
+				title={ __( 'Widget Title', 'wooreels' ) }
+				icon={ IconType }
+			>
 				<Select
 					label={ __( 'Alignment', 'wooreels' ) }
 					value={ styles.widgetTitle.alignment }
@@ -878,7 +969,10 @@ export const StylePanel = ( { styles, set, setDevice } ) => {
 				) }
 			</CollapsibleSection>
 
-			<CollapsibleSection title={ __( 'Advanced', 'wooreels' ) }>
+			<CollapsibleSection
+				title={ __( 'Advanced', 'wooreels' ) }
+				icon={ IconSliders }
+			>
 				<Switch
 					label={ __( 'Lazy load videos', 'wooreels' ) }
 					help={ __(
