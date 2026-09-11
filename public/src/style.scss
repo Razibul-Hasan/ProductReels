@@ -1,0 +1,14 @@
+/**
+ * The public stylesheet.
+ *
+ * The same embed and player rules the admin preview loads — that is the
+ * whole point — plus the loading placeholder only a real page needs.
+ */
+
+@use '../../src/shared/styles/embed';
+@use '../../src/shared/styles/player';
+
+.wooreels-embed .wr-embed-loading {
+	/* One row of thumbnails' worth of height, so the page settles before the payload lands. */
+	min-height: 120px;
+}

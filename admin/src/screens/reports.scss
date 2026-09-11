@@ -1,0 +1,247 @@
+/**
+ * Statistics and Settings screens.
+ *
+ * Both are read-mostly pages: tiles and tables on one, cards and a handful
+ * of fields on the other. They lean on the shell (.wr-card, .wr-table,
+ * .wr-page-head) and only add what those do not have.
+ */
+
+#wooreels-admin-app {
+	/* ------------------------------------------------------------ Header */
+
+	.wr-page-head__titles--with-back {
+		flex-direction: row;
+		gap: 10px;
+		align-items: center;
+	}
+
+	.wr-page-head__crumb {
+		padding-inline-start: 10px;
+		font-size: 14px;
+		font-weight: 500;
+		color: var(--wr-fg-muted);
+		border-inline-start: 1px solid var(--wr-border-strong);
+	}
+
+	/* ------------------------------------------------------------- Tiles */
+
+	.wr-tiles {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+		gap: 16px;
+		margin-block-end: 24px;
+	}
+
+	.wr-tile {
+		display: flex;
+		flex-direction: column;
+		gap: 6px;
+		padding: 20px;
+		background: var(--wr-bg);
+		border: 1px solid var(--wr-border);
+		border-radius: var(--wr-radius);
+		box-shadow: var(--wr-shadow-sm);
+	}
+
+	.wr-tile__label {
+		font-size: 13px;
+		font-weight: 600;
+		text-transform: uppercase;
+		letter-spacing: 0.04em;
+		color: var(--wr-fg-muted);
+	}
+
+	.wr-tile__value {
+		font-size: 32px;
+		font-weight: 600;
+		font-variant-numeric: tabular-nums;
+		line-height: 1.1;
+		letter-spacing: -0.02em;
+		color: var(--wr-fg);
+	}
+
+	.wr-tile__hint {
+		font-size: 12px;
+		color: var(--wr-fg-subtle);
+	}
+
+	/* ------------------------------------------------------------ Tables */
+
+	.wr-card__head {
+		padding: 14px 16px;
+		border-block-end: 1px solid var(--wr-border);
+	}
+
+	.wr-card__empty {
+		padding: 20px 16px;
+		font-size: 13px;
+		color: var(--wr-fg-muted);
+	}
+
+	.wr-table-card + .wr-table-card {
+		margin-block-start: 24px;
+	}
+
+	.wr-sort {
+		display: inline-flex;
+		align-items: center;
+		gap: 4px;
+		margin: 0;
+		padding: 0;
+		font: inherit;
+		color: inherit;
+		text-transform: inherit;
+		letter-spacing: inherit;
+		background: none;
+		border: 0;
+		border-radius: var(--wr-radius-sm);
+		cursor: pointer;
+	}
+
+	.wr-sort svg {
+		opacity: 0;
+		transition: opacity 150ms var(--wr-ease), rotate 150ms var(--wr-ease);
+	}
+
+	.wr-sort:hover svg,
+	.wr-sort.is-active svg {
+		opacity: 1;
+	}
+
+	.wr-sort.is-asc svg {
+		rotate: 180deg;
+	}
+
+	.wr-sort.is-active {
+		color: var(--wr-fg);
+	}
+
+	.wr-table--stats th.wr-table__num {
+		text-align: end;
+	}
+
+	.wr-table__thumb-cell {
+		width: 44px;
+	}
+
+	.wr-table__thumb {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: 28px;
+		aspect-ratio: 9 / 16;
+		overflow: hidden;
+		color: var(--wr-fg-subtle);
+		background: var(--wr-bg-sunken);
+		border-radius: 5px;
+	}
+
+	.wr-table__thumb img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+	}
+
+	.wr-table__url {
+		max-width: 260px;
+	}
+
+	.wr-table__url a {
+		display: inline-flex;
+		gap: 4px;
+		align-items: center;
+		max-width: 100%;
+		color: var(--wr-fg-muted);
+		text-decoration: none;
+	}
+
+	.wr-table__url a:hover {
+		color: var(--wr-primary);
+	}
+
+	.wr-table__url a span {
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+
+	/* ---------------------------------------------------------- Settings */
+
+	.wr-settings {
+		display: flex;
+		flex-direction: column;
+		gap: 16px;
+		max-width: 760px;
+	}
+
+	.wr-settings-card {
+		display: flex;
+		flex-direction: column;
+	}
+
+	.wr-settings-card__head {
+		padding: 18px 20px 14px;
+		border-block-end: 1px solid var(--wr-border);
+	}
+
+	.wr-settings-card__title {
+		font-size: 16px;
+		font-weight: 600;
+		letter-spacing: -0.01em;
+	}
+
+	.wr-settings-card__text {
+		margin-block-start: 4px;
+		font-size: 13px;
+		line-height: 1.5;
+		color: var(--wr-fg-muted);
+	}
+
+	.wr-settings-card__body {
+		display: flex;
+		flex-direction: column;
+		gap: 16px;
+		padding: 18px 20px 20px;
+	}
+
+	.wr-settings-card__body .wr-switch-row {
+		padding: 0;
+	}
+
+	.wr-settings-row {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+		gap: 16px;
+	}
+
+	.wr-settings-row--narrow {
+		max-width: 260px;
+	}
+
+	.wr-settings-summary {
+		display: inline-flex;
+		gap: 6px;
+		align-items: center;
+		padding: 8px 12px;
+		font-size: 12px;
+		color: var(--wr-fg-muted);
+		background: var(--wr-bg-muted);
+		border-radius: var(--wr-radius-sm);
+	}
+
+	.wr-settings .wr-notice--warning {
+		color: #92400e;
+		background: #fffbeb;
+		border-color: #fde68a;
+	}
+
+	@media (max-width: 782px) {
+		.wr-tile__value {
+			font-size: 26px;
+		}
+
+		.wr-table--stats thead {
+			display: none;
+		}
+	}
+}

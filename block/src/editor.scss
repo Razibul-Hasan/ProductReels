@@ -1,0 +1,133 @@
+/**
+ * Block editor styles for wooreels/reels.
+ *
+ * Scoped to the block's own wrapper. Colours follow the editor's neutrals so
+ * the block reads as part of the canvas, not a foreign panel.
+ */
+
+.wp-block-wooreels-reels.wr-block {
+	--wr-b-fg: #1e1e1e;
+	--wr-b-muted: #757575;
+	--wr-b-border: #ddd;
+	--wr-b-bg: #fff;
+	--wr-b-accent: #2563eb;
+
+	.wr-block__picker {
+		width: 100%;
+		max-width: 420px;
+	}
+
+	.wr-block__loading {
+		display: flex;
+		justify-content: center;
+		padding: 24px;
+	}
+
+	.wr-block__card {
+		overflow: hidden;
+		color: var(--wr-b-fg);
+		background: var(--wr-b-bg);
+		border: 1px solid var(--wr-b-border);
+		border-radius: 8px;
+	}
+
+	.wr-block__head {
+		display: flex;
+		align-items: center;
+		gap: 10px;
+		padding: 10px 14px;
+		border-block-end: 1px solid var(--wr-b-border);
+	}
+
+	.wr-block__icon {
+		display: inline-flex;
+		flex: none;
+		align-items: center;
+		justify-content: center;
+		width: 32px;
+		height: 32px;
+		color: var(--wr-b-accent);
+		background: #eff6ff;
+		border-radius: 8px;
+	}
+
+	.wr-block__titles {
+		display: flex;
+		flex: 1;
+		flex-direction: column;
+		min-width: 0;
+		line-height: 1.3;
+	}
+
+	.wr-block__name {
+		overflow: hidden;
+		font-size: 13px;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+
+	.wr-block__meta {
+		font-size: 12px;
+		color: var(--wr-b-muted);
+		text-transform: capitalize;
+	}
+
+	.wr-block__edit {
+		flex: none;
+		font-size: 12px;
+	}
+
+	.wr-block__strip {
+		display: flex;
+		gap: 8px;
+		align-items: center;
+		padding: 14px;
+		overflow: hidden;
+	}
+
+	.wr-block__frame {
+		flex: none;
+		width: 54px;
+		aspect-ratio: 9 / 16;
+		overflow: hidden;
+		background: #f0f0f0;
+		border-radius: 6px;
+	}
+
+	.wr-block__strip--circle .wr-block__frame {
+		aspect-ratio: 1 / 1;
+		border-radius: 50%;
+	}
+
+	.wr-block__frame img,
+	.wr-block__frame-blank {
+		display: block;
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+	}
+
+	.wr-block__frame-blank {
+		background: linear-gradient(135deg, #e5e7eb, #f3f4f6);
+	}
+
+	.wr-block__more {
+		padding: 4px 8px;
+		font-size: 12px;
+		font-weight: 600;
+		color: var(--wr-b-muted);
+		background: #f0f0f0;
+		border-radius: 999px;
+	}
+
+	.wr-block__empty {
+		margin: 0;
+		padding: 14px;
+		font-size: 13px;
+		color: var(--wr-b-muted);
+	}
+}
+
+.wr-block__open {
+	margin: 12px 0 0;
+}

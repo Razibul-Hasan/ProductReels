@@ -1,0 +1,45 @@
+/**
+ * Design tokens.
+ *
+ * Defined once, here. No component in this app hardcodes a colour, a radius or
+ * a shadow — if a value is worth using twice it is worth being a token.
+ */
+
+#wooreels-admin-app {
+	--wr-primary: #2563eb;
+	--wr-primary-fg: #ffffff;
+	--wr-primary-hover: #1d4ed8;
+	--wr-primary-subtle: #eff6ff;
+
+	--wr-fg: #111827;
+	--wr-fg-muted: #6b7280;
+	--wr-fg-subtle: #9ca3af;
+
+	--wr-bg: #ffffff;
+	--wr-bg-muted: #f9fafb;
+	--wr-bg-sunken: #f3f4f6;
+
+	--wr-border: #e5e7eb;
+	--wr-border-strong: #d1d5db;
+	--wr-ring: #60a5fa;
+
+	--wr-danger: #dc2626;
+	--wr-danger-subtle: #fef2f2;
+	--wr-success: #16a34a;
+	--wr-warning: #d97706;
+
+	--wr-radius-sm: 6px;
+	--wr-radius: 10px;
+	--wr-radius-lg: 16px;
+
+	--wr-shadow-sm: 0 1px 2px rgb(0 0 0 / 0.05);
+	--wr-shadow: 0 4px 12px rgb(0 0 0 / 0.08);
+	--wr-shadow-lg: 0 16px 48px rgb(0 0 0 / 0.16);
+
+	--wr-font: 'Inter', -apple-system, 'Segoe UI', system-ui, sans-serif;
+	--wr-font-mono: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
+	--wr-ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+
+	/* Derived, used only by overlays and scrims. */
+	--wr-scrim: rgb(17 24 39 / 0.45);
+}

@@ -1,0 +1,479 @@
+/**
+ * The embed stylesheet.
+ *
+ * Everything here is scoped under .wooreels-embed and is loaded by both the
+ * admin preview and the public bundle — the same rules paint both, which is
+ * what stops the editor's preview drifting from what a visitor sees.
+ *
+ * Sizes and colours arrive as custom properties from WidgetRenderer.styleVars(),
+ * so this file never needs to know the shape of the style object.
+ */
+
+.wooreels-embed {
+	--wr-e-fg: #111827;
+	--wr-e-bg: #ffffff;
+	--wr-e-muted: #6b7280;
+	--wr-e-ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+
+	box-sizing: border-box;
+	padding-block: var(--wr-pad-block, 0);
+	color: var(--wr-e-fg);
+	font-family: inherit;
+
+	*,
+	*::before,
+	*::after {
+		box-sizing: border-box;
+	}
+
+	/**
+	 * Deliberately does NOT reset background or border.
+	 *
+	 * `.wooreels-embed button` out-specifies `.wr-thumb`, so clearing those two
+	 * here silently removed the border and card background from every
+	 * thumbnail — on the frontend as well as in the editor preview. Each
+	 * component below clears its own instead.
+	 */
+	button {
+		margin: 0;
+		padding: 0;
+		font: inherit;
+		color: inherit;
+		cursor: pointer;
+	}
+
+	:focus-visible {
+		outline: 2px solid #60a5fa;
+		outline-offset: 2px;
+	}
+
+	img,
+	video {
+		display: block;
+		max-width: 100%;
+	}
+}
+
+/* The frontend follows the visitor's preference; the admin preview does not,
+   because it sits inside a light admin screen. */
+@media (prefers-color-scheme: dark) {
+	.wooreels-embed:not(.wooreels-embed--in-editor) {
+		--wr-e-fg: #f3f4f6;
+		--wr-e-bg: #111827;
+		--wr-e-muted: #9ca3af;
+	}
+}
+
+.wr-widget-title {
+	margin: 0 0 12px;
+	font-size: var(--wr-title-size, 24px);
+	font-weight: 600;
+	line-height: 1.25;
+	color: var(--wr-title-color, currentColor);
+}
+
+/* ------------------------------------------------------------------ Thumbnail */
+
+.wr-thumb {
+	position: relative;
+	display: block;
+	flex: none;
+	width: var(--wr-size, 200px);
+	background: var(--wr-card-bg, transparent);
+	border: var(--wr-border-w, 0) solid var(--wr-border-c, transparent);
+	border-radius: var(--wr-radius, 0);
+	box-shadow: 0 4px var(--wr-shadow-size, 0) rgb(0 0 0 / 0.16);
+	transition: box-shadow 200ms var(--wr-e-ease);
+}
+
+.wr-thumb__media {
+	position: relative;
+	display: block;
+	/* Declared up front so nothing reflows when the poster or video arrives. */
+	aspect-ratio: 9 / 16;
+	overflow: hidden;
+	background: #e5e7eb;
+	border-radius: inherit;
+}
+
+.wr-thumb--circle {
+	width: var(--wr-size, 200px);
+	border-radius: 50%;
+}
+
+.wr-thumb--circle .wr-thumb__media {
+	aspect-ratio: 1 / 1;
+	border-radius: 50%;
+}
+
+.wr-thumb__video,
+.wr-thumb__img,
+.wr-thumb__blank {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	/* The button is the target; a click on the media must not focus the media. */
+	pointer-events: none;
+	/* The media scales inside the clipped box — never the box itself, so a
+	   hover can never reflow the grid around it. */
+	transition: scale 240ms var(--wr-e-ease);
+}
+
+.wr-thumb__blank {
+	display: block;
+	background: linear-gradient(135deg, #e5e7eb, #f3f4f6);
+}
+
+.wr-thumb--hover-zoom-in:hover .wr-thumb__video,
+.wr-thumb--hover-zoom-in:hover .wr-thumb__img {
+	scale: 1.08;
+}
+
+.wr-thumb--hover-zoom-out .wr-thumb__video,
+.wr-thumb--hover-zoom-out .wr-thumb__img {
+	scale: 1.08;
+}
+
+.wr-thumb--hover-zoom-out:hover .wr-thumb__video,
+.wr-thumb--hover-zoom-out:hover .wr-thumb__img {
+	scale: 1;
+}
+
+.wr-thumb__play {
+	position: absolute;
+	inset-block-start: 50%;
+	inset-inline-start: 50%;
+	translate: -50% -50%;
+	pointer-events: none;
+}
+
+.wr-thumb__scrim {
+	position: absolute;
+	inset-inline: 0;
+	inset-block-end: 0;
+	display: flex;
+	align-items: flex-end;
+	min-height: 46%;
+	padding: 10px;
+	background: linear-gradient(to top, rgb(0 0 0 / 0.72), rgb(0 0 0 / 0));
+	border-end-start-radius: inherit;
+	border-end-end-radius: inherit;
+	pointer-events: none;
+}
+
+.wr-thumb--circle .wr-thumb__scrim {
+	border-radius: 0 0 50% 50%;
+}
+
+.wr-thumb__caption {
+	overflow: hidden;
+	width: 100%;
+	font-size: 13px;
+	font-weight: 600;
+	line-height: 1.3;
+	text-align: start;
+	color: #fff;
+	text-shadow: 0 1px 2px rgb(0 0 0 / 0.4);
+	display: -webkit-box;
+	-webkit-line-clamp: 2;
+	-webkit-box-orient: vertical;
+}
+
+.wr-thumb__below {
+	display: block;
+	margin-block-start: 8px;
+	overflow: hidden;
+	font-size: 13px;
+	font-weight: 500;
+	line-height: 1.35;
+	text-align: center;
+	color: var(--wr-e-fg);
+	display: -webkit-box;
+	-webkit-line-clamp: 2;
+	-webkit-box-orient: vertical;
+}
+
+/* --------------------------------------------------------------- Views badge */
+
+.wr-views {
+	position: absolute;
+	display: inline-flex;
+	align-items: center;
+	gap: 4px;
+	padding: 3px 7px;
+	font-size: 11px;
+	font-weight: 600;
+	font-variant-numeric: tabular-nums;
+	line-height: 1;
+	border-radius: 999px;
+}
+
+/**
+ * Top of the frame, not the bottom.
+ *
+ * The overlay caption occupies the bottom of a thumbnail, and a badge tucked
+ * into the same corner sat on top of the words — a two-line product name came
+ * out as a fragment. The top corner is always free.
+ */
+.wr-views--rectangle {
+	inset-block-start: 8px;
+	inset-inline-start: 8px;
+}
+
+/* A circle has no corner to tuck into without clipping, so it sits underneath. */
+.wr-views--circle {
+	inset-block-end: -10px;
+	inset-inline-start: 50%;
+	translate: -50% 0;
+}
+
+/* -------------------------------------------------------------------- Grid */
+
+.wr-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(var(--wr-size, 200px), 1fr));
+	gap: var(--wr-gap, 16px);
+	justify-items: center;
+}
+
+.wr-grid .wr-thumb {
+	width: 100%;
+	max-width: var(--wr-size, 200px);
+}
+
+/* ---------------------------------------------------------------- Carousel */
+
+.wr-carousel {
+	position: relative;
+	display: flex;
+	align-items: center;
+	gap: 8px;
+}
+
+.wr-carousel__rail {
+	display: flex;
+	gap: var(--wr-gap, 16px);
+	flex: 1;
+	min-width: 0;
+	padding-block: 4px;
+	overflow-x: auto;
+	scroll-snap-type: x mandatory;
+	scrollbar-width: none;
+	overscroll-behavior-x: contain;
+}
+
+.wr-carousel__rail::-webkit-scrollbar {
+	display: none;
+}
+
+.wr-carousel__rail > .wr-thumb {
+	scroll-snap-align: start;
+}
+
+.wr-nav {
+	border: 0;
+	display: inline-flex;
+	flex: none;
+	align-items: center;
+	justify-content: center;
+	width: 36px;
+	height: 36px;
+	color: var(--wr-nav-fg, #1f2937);
+	background: var(--wr-nav-bg, #fff);
+	border-radius: var(--wr-nav-radius, 40px);
+	box-shadow: 0 2px 8px rgb(0 0 0 / 0.14);
+	transition: background-color 150ms var(--wr-e-ease), color 150ms var(--wr-e-ease), opacity 150ms var(--wr-e-ease);
+}
+
+.wr-nav:hover:not([disabled]) {
+	color: var(--wr-nav-fg-hover, #1f2937);
+	background: var(--wr-nav-bg-hover, #dbeafe);
+}
+
+.wr-nav[disabled] {
+	opacity: 0.35;
+	cursor: default;
+}
+
+/* Inside: the buttons float over the rail rather than taking room beside it. */
+.wr-carousel--nav-inside .wr-nav {
+	position: absolute;
+	z-index: 2;
+}
+
+.wr-carousel--nav-inside .wr-nav--prev {
+	inset-inline-start: 6px;
+}
+
+.wr-carousel--nav-inside .wr-nav--next {
+	inset-inline-end: 6px;
+}
+
+/* The chevrons are direction-aware, so mirror them for RTL. */
+[dir='rtl'] .wr-nav svg {
+	scale: -1 1;
+}
+
+/* ----------------------------------------------------------------- Marquee */
+
+.wr-marquee {
+	overflow: hidden;
+}
+
+.wr-marquee__track {
+	display: flex;
+	gap: var(--wr-gap, 16px);
+	width: max-content;
+	will-change: transform;
+}
+
+.wr-marquee.is-static .wr-marquee__track {
+	width: auto;
+	overflow-x: auto;
+	transform: none !important;
+}
+
+/* ----------------------------------------------------------------- Stacked */
+
+.wr-stacked {
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+	align-items: center;
+	touch-action: pan-y;
+}
+
+.wr-stacked__deck {
+	position: relative;
+	width: var(--wr-size, 200px);
+	/* The deck reserves the front card's height plus room for the offsets. */
+	min-height: calc(var(--wr-size, 200px) * 16 / 9);
+}
+
+.wr-stacked__card {
+	position: absolute;
+	inset-inline-start: 0;
+	inset-block-start: 0;
+	width: 100%;
+	transform-origin: top center;
+	transition: translate 320ms var(--wr-e-ease), scale 320ms var(--wr-e-ease), opacity 320ms var(--wr-e-ease);
+}
+
+.wr-stacked.is-static .wr-stacked__card {
+	transition: none;
+}
+
+.wr-stacked__nav {
+	display: flex;
+	gap: 10px;
+	align-items: center;
+}
+
+.wr-stacked__count {
+	font-size: 12px;
+	font-variant-numeric: tabular-nums;
+	color: var(--wr-e-muted);
+}
+
+/* ------------------------------------------------------------------- Popup */
+
+.wr-popup {
+	position: fixed;
+	z-index: 99990;
+	width: var(--wr-popup-size, 180px);
+}
+
+.wr-popup .wr-thumb {
+	width: 100%;
+}
+
+.wr-popup--bottom-right {
+	inset-block-end: 20px;
+	inset-inline-end: 20px;
+}
+
+.wr-popup--bottom-left {
+	inset-block-end: 20px;
+	inset-inline-start: 20px;
+}
+
+.wr-popup--top-right {
+	inset-block-start: 20px;
+	inset-inline-end: 20px;
+}
+
+.wr-popup--top-left {
+	inset-block-start: 20px;
+	inset-inline-start: 20px;
+}
+
+/* In the editor the bubble is shown in place, not pinned to the viewport. */
+.wr-popup--inline {
+	position: relative;
+	inset: auto;
+	margin-inline: auto;
+}
+
+.wr-popup__close {
+	border: 0;
+	position: absolute;
+	inset-block-start: -8px;
+	inset-inline-end: -8px;
+	z-index: 2;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 24px;
+	height: 24px;
+	color: #111827;
+	background: #fff;
+	border-radius: 50%;
+	box-shadow: 0 2px 8px rgb(0 0 0 / 0.2);
+}
+
+@media (max-width: 782px) {
+	.wr-popup--desktop-only {
+		display: none;
+	}
+}
+
+/* ------------------------------------------------- Responsive style buckets */
+
+@media (max-width: 1024px) {
+	.wooreels-embed {
+		--wr-size: var(--wr-size-tab);
+		--wr-gap: var(--wr-gap-tab);
+		--wr-radius: var(--wr-radius-tab);
+	}
+}
+
+@media (max-width: 600px) {
+	.wooreels-embed {
+		--wr-size: var(--wr-size-mob);
+		--wr-gap: var(--wr-gap-mob);
+		--wr-radius: var(--wr-radius-mob);
+	}
+}
+
+/* The editor's device toggle drives the same buckets by class, because the
+   preview pane is narrower than the viewport it is standing in for. */
+.wooreels-embed--tablet {
+	--wr-size: var(--wr-size-tab);
+	--wr-gap: var(--wr-gap-tab);
+	--wr-radius: var(--wr-radius-tab);
+}
+
+.wooreels-embed--mobile {
+	--wr-size: var(--wr-size-mob);
+	--wr-gap: var(--wr-gap-mob);
+	--wr-radius: var(--wr-radius-mob);
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.wooreels-embed *,
+	.wooreels-embed *::before,
+	.wooreels-embed *::after {
+		animation-duration: 0.01ms !important;
+		transition-duration: 0.01ms !important;
+	}
+}

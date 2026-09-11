@@ -1,0 +1,211 @@
+/**
+ * App shell, typography and the handful of WordPress overrides needed to stop
+ * wp-admin styling from leaking into the app.
+ *
+ * Everything is scoped under #wooreels-admin-app. This stylesheet must never
+ * change a pixel outside it.
+ */
+
+.wooreels-wrap {
+	margin-inline: 0;
+	padding-inline-end: 20px;
+}
+
+#wooreels-admin-app {
+	box-sizing: border-box;
+	margin-inline-start: -20px;
+	min-height: calc(100vh - 32px);
+	background: var(--wr-bg-muted);
+	color: var(--wr-fg);
+	font-family: var(--wr-font);
+	font-size: 14px;
+	line-height: 1.5;
+	-webkit-font-smoothing: antialiased;
+
+	*,
+	*::before,
+	*::after {
+		box-sizing: border-box;
+	}
+
+	/* One focus treatment, applied everywhere, never removed. */
+	:focus-visible {
+		outline: 2px solid var(--wr-ring);
+		outline-offset: 2px;
+		border-radius: var(--wr-radius-sm);
+	}
+
+	/**
+	 * Deliberately does NOT reset background or border.
+	 *
+	 * This selector is `#wooreels-admin-app button`, which out-specifies any
+	 * class the shared embed styles can reasonably use — so resetting those two
+	 * here silently stripped the border and card background off every thumbnail
+	 * in the live preview, and the editor lied about what the frontend would
+	 * render. Each admin control clears its own instead.
+	 */
+	button {
+		margin: 0;
+		font: inherit;
+		color: inherit;
+		cursor: pointer;
+	}
+
+	button[disabled] {
+		cursor: not-allowed;
+	}
+
+	input,
+	textarea {
+		font: inherit;
+		color: inherit;
+	}
+
+	/* wp-admin sets these globally and they fight the app's own controls. */
+	input[type='text'],
+	input[type='url'],
+	input[type='number'],
+	input[type='search'],
+	textarea {
+		box-shadow: none;
+		border-radius: var(--wr-radius-sm);
+		min-height: 0;
+	}
+
+	a {
+		color: var(--wr-primary);
+		text-decoration: none;
+	}
+
+	a:hover {
+		color: var(--wr-primary-hover);
+	}
+
+	h1,
+	h2,
+	h3,
+	p {
+		margin: 0;
+		padding: 0;
+		font-weight: inherit;
+		color: inherit;
+	}
+
+	svg {
+		display: block;
+		flex: none;
+	}
+}
+
+.wr-app {
+	display: flex;
+	flex-direction: column;
+	min-height: calc(100vh - 32px);
+}
+
+.wr-app__body {
+	flex: 1;
+	padding: 24px 24px 48px;
+}
+
+/* Page header: title, count and actions on one dense line. */
+.wr-page-head {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 16px;
+	align-items: center;
+	justify-content: space-between;
+	padding: 20px 24px;
+	background: var(--wr-bg);
+	border-block-end: 1px solid var(--wr-border);
+}
+
+.wr-page-head__titles {
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+	min-width: 0;
+}
+
+.wr-page-head__title {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	font-size: 20px;
+	font-weight: 600;
+	letter-spacing: -0.01em;
+}
+
+.wr-page-head__sub {
+	font-size: 13px;
+	color: var(--wr-fg-muted);
+}
+
+.wr-page-head__actions {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+	align-items: center;
+}
+
+.wr-count-chip {
+	padding: 2px 8px;
+	font-size: 12px;
+	font-weight: 500;
+	font-variant-numeric: tabular-nums;
+	color: var(--wr-fg-muted);
+	background: var(--wr-bg-sunken);
+	border-radius: 999px;
+}
+
+/* Section label: 13px uppercase, the app's quietest heading. */
+.wr-section-label {
+	font-size: 13px;
+	font-weight: 600;
+	text-transform: uppercase;
+	letter-spacing: 0.04em;
+	color: var(--wr-fg-muted);
+}
+
+.wr-card {
+	background: var(--wr-bg);
+	border: 1px solid var(--wr-border);
+	border-radius: var(--wr-radius);
+	box-shadow: var(--wr-shadow-sm);
+}
+
+.wr-screen-reader-text {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	margin: -1px;
+	padding: 0;
+	overflow: hidden;
+	clip-path: inset(50%);
+	white-space: nowrap;
+	border: 0;
+}
+
+@media (max-width: 782px) {
+	#wooreels-admin-app {
+		margin-inline-start: -10px;
+	}
+
+	.wr-app__body {
+		padding: 16px 16px 48px;
+	}
+
+	.wr-page-head {
+		padding: 16px;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	#wooreels-admin-app *,
+	#wooreels-admin-app *::before,
+	#wooreels-admin-app *::after {
+		animation-duration: 0.01ms !important;
+		animation-iteration-count: 1 !important;
+		transition-duration: 0.01ms !important;
+	}
+}

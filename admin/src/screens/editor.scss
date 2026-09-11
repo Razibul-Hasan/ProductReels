@@ -1,0 +1,379 @@
+/**
+ * The widget editor's three-pane layout.
+ *
+ * Picker and style panel are fixed rails; the preview takes whatever is left,
+ * which is what lets the device toggle actually mean something. Each pane
+ * scrolls independently so the header and the preview never leave the screen
+ * while someone is deep in the style accordion.
+ */
+
+#wooreels-admin-app {
+
+	.wr-editor-head {
+		position: sticky;
+		inset-block-start: 32px;
+		z-index: 20;
+		gap: 12px;
+	}
+
+	.wr-editor-head__left {
+		display: flex;
+		flex: 1;
+		gap: 8px;
+		align-items: center;
+		min-width: 0;
+	}
+
+	/* The name is edited in place — it is the page title, not a form field. */
+	.wr-editor-head__name {
+		flex: 1;
+		max-width: 420px;
+		height: 36px;
+		padding-inline: 10px;
+		font-size: 18px;
+		font-weight: 600;
+		letter-spacing: -0.01em;
+		background: transparent;
+		border: 1px solid transparent;
+		border-radius: var(--wr-radius-sm);
+		transition: background-color 150ms var(--wr-ease), border-color 150ms var(--wr-ease);
+	}
+
+	.wr-editor-head__name::placeholder {
+		font-weight: 500;
+		color: var(--wr-fg-subtle);
+	}
+
+	.wr-editor-head__name:hover {
+		background: var(--wr-bg-muted);
+	}
+
+	.wr-editor-head__name:focus {
+		background: var(--wr-bg);
+		border-color: var(--wr-border-strong);
+	}
+
+	.wr-editor {
+		display: grid;
+		grid-template-columns: 280px minmax(0, 1fr) 320px;
+		gap: 1px;
+		min-height: calc(100vh - 120px);
+		background: var(--wr-border);
+	}
+
+	.wr-editor__pane {
+		display: flex;
+		flex-direction: column;
+		min-width: 0;
+		background: var(--wr-bg);
+	}
+
+	/* Title over subtitle. Only the preview head needs a row, because it has the
+	   device toggle to place opposite the text. */
+	.wr-editor__pane-head {
+		display: block;
+		padding: 16px 16px 12px;
+	}
+
+	.wr-editor__preview-head {
+		display: flex;
+		gap: 12px;
+		align-items: flex-start;
+		justify-content: space-between;
+	}
+
+	.wr-editor__pane-title {
+		font-size: 15px;
+		font-weight: 600;
+	}
+
+	.wr-editor__pane-sub {
+		margin-block-start: 2px;
+		font-size: 12px;
+		line-height: 1.45;
+		color: var(--wr-fg-muted);
+	}
+
+	.wr-editor__pane-tools {
+		padding: 0 16px 12px;
+	}
+
+	.wr-editor__pane-tools .wr-search {
+		min-width: 0;
+		width: 100%;
+	}
+
+	.wr-editor__pane-body {
+		flex: 1;
+		padding: 0 16px 24px;
+		overflow-y: auto;
+		/* Each rail scrolls on its own rather than dragging the page with it. */
+		max-height: calc(100vh - 200px);
+	}
+
+	.wr-editor__empty {
+		padding-block: 32px;
+		font-size: 13px;
+		text-align: center;
+		color: var(--wr-fg-muted);
+	}
+
+	/* ------------------------------------------------------------- Picker */
+
+	.wr-pick-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(104px, 1fr));
+		gap: 10px;
+	}
+
+	.wr-pick {
+		background: none;
+		border: 0;
+		display: flex;
+		flex-direction: column;
+		gap: 6px;
+		padding: 0;
+		text-align: start;
+	}
+
+	.wr-pick__frame {
+		position: relative;
+		display: block;
+		aspect-ratio: 9 / 16;
+		overflow: hidden;
+		background: var(--wr-bg-sunken);
+		border: 1px solid var(--wr-border);
+		border-radius: var(--wr-radius-sm);
+		transition: border-color 150ms var(--wr-ease);
+	}
+
+	.wr-pick__frame img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+	}
+
+	.wr-pick__blank {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: 100%;
+		height: 100%;
+		color: var(--wr-fg-subtle);
+	}
+
+	.wr-pick__add {
+		position: absolute;
+		inset-block-end: 6px;
+		inset-inline-end: 6px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: 22px;
+		height: 22px;
+		color: var(--wr-primary-fg);
+		background: var(--wr-primary);
+		border-radius: 50%;
+		opacity: 0;
+		scale: 0.85;
+		transition: opacity 150ms var(--wr-ease), scale 150ms var(--wr-ease);
+	}
+
+	.wr-pick:hover .wr-pick__frame,
+	.wr-pick:focus-visible .wr-pick__frame {
+		border-color: var(--wr-primary);
+	}
+
+	.wr-pick:hover .wr-pick__add,
+	.wr-pick:focus-visible .wr-pick__add {
+		opacity: 1;
+		scale: 1;
+	}
+
+	.wr-pick__title {
+		overflow: hidden;
+		font-size: 12px;
+		line-height: 1.35;
+		white-space: nowrap;
+		text-overflow: ellipsis;
+		color: var(--wr-fg-muted);
+	}
+
+	/* ------------------------------------------------------------ Preview */
+
+	.wr-editor__preview {
+		background: var(--wr-bg-muted);
+	}
+
+	.wr-editor__preview-head {
+		background: var(--wr-bg);
+		border-block-end: 1px solid var(--wr-border);
+	}
+
+	.wr-editor__stage {
+		display: flex;
+		flex: 1;
+		align-items: flex-start;
+		justify-content: center;
+		padding: 24px;
+		overflow: auto;
+	}
+
+	.wr-editor__stage-inner {
+		max-width: 100%;
+		/* The device toggle animates the stage width, so the change reads as a
+		   resize rather than a jump cut. */
+		transition: width 240ms var(--wr-ease);
+	}
+
+	.wr-editor__attached {
+		padding: 14px 16px 18px;
+		background: var(--wr-bg);
+		border-block-start: 1px solid var(--wr-border);
+	}
+
+	.wr-editor__attached-head {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 4px 10px;
+		align-items: baseline;
+		margin-block-end: 10px;
+	}
+
+	.wr-attached-list {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 8px;
+		margin: 0;
+		padding: 0;
+		list-style: none;
+	}
+
+	.wr-attached {
+		display: flex;
+		gap: 8px;
+		align-items: center;
+		padding: 6px 8px 6px 6px;
+		background: var(--wr-bg);
+		border: 1px solid var(--wr-border);
+		border-radius: var(--wr-radius-sm);
+	}
+
+	.wr-attached.is-dragging {
+		z-index: 2;
+		box-shadow: var(--wr-shadow-lg);
+	}
+
+	.wr-attached__grip {
+		background: none;
+		border: 0;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		width: 22px;
+		height: 26px;
+		color: var(--wr-fg-subtle);
+		border-radius: 4px;
+		cursor: grab;
+		touch-action: none;
+	}
+
+	.wr-attached__grip:active {
+		cursor: grabbing;
+	}
+
+	.wr-attached__frame {
+		display: block;
+		flex: none;
+		width: 24px;
+		height: 32px;
+		overflow: hidden;
+		background: var(--wr-bg-sunken);
+		border-radius: 4px;
+	}
+
+	.wr-attached__frame img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+	}
+
+	.wr-attached__title {
+		max-width: 150px;
+		overflow: hidden;
+		font-size: 12px;
+		font-weight: 500;
+		white-space: nowrap;
+		text-overflow: ellipsis;
+	}
+
+	/* -------------------------------------------------------- Style panel */
+
+	.wr-editor__style .wr-editor__pane-body {
+		padding-block-start: 0;
+	}
+
+	.wr-style-panel .wr-collapse:first-child .wr-collapse__trigger {
+		padding-block-start: 0;
+	}
+
+	.wr-editor__panel-toggle {
+		border: 0;
+		display: none;
+	}
+
+	/* Below three panes' worth of room, the style panel becomes a drawer so the
+	   preview keeps the width it needs to be useful. */
+	@media (max-width: 1180px) {
+		.wr-editor {
+			grid-template-columns: 240px minmax(0, 1fr);
+		}
+
+		.wr-editor__style {
+			position: fixed;
+			inset-block: 32px 0;
+			inset-inline-end: 0;
+			z-index: 30;
+			width: 320px;
+			max-width: 88vw;
+			translate: 100% 0;
+			box-shadow: var(--wr-shadow-lg);
+			transition: translate 240ms var(--wr-ease);
+		}
+
+		.wr-editor.is-panel-open .wr-editor__style {
+			translate: 0 0;
+		}
+
+		.wr-editor__panel-toggle {
+			position: fixed;
+			inset-block-end: 24px;
+			inset-inline-end: 24px;
+			z-index: 31;
+			display: inline-flex;
+			align-items: center;
+			height: 40px;
+			padding-inline: 16px;
+			font-size: 13px;
+			font-weight: 500;
+			color: var(--wr-primary-fg);
+			background: var(--wr-primary);
+			border-radius: 999px;
+			box-shadow: var(--wr-shadow-lg);
+		}
+	}
+
+	@media (max-width: 860px) {
+		.wr-editor {
+			grid-template-columns: minmax(0, 1fr);
+		}
+
+		.wr-editor__picker {
+			border-block-end: 1px solid var(--wr-border);
+		}
+
+		.wr-editor__pane-body {
+			max-height: 320px;
+		}
+	}
+}

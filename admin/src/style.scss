@@ -1,0 +1,17 @@
+/**
+ * The admin stylesheet.
+ *
+ * Tokens first, then the shell, then the primitives, then the screens — so a
+ * later rule can only ever refine an earlier one, never fight it. The embed
+ * styles come last and are the same file the public bundle loads, which is
+ * what keeps the editor's preview honest.
+ */
+
+@use 'styles/tokens';
+@use 'styles/base';
+@use 'components/ui/ui';
+@use 'screens/screens';
+@use 'screens/editor';
+@use 'screens/reports';
+@use '../../src/shared/styles/embed';
+@use '../../src/shared/styles/player';
