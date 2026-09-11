@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-09-11T15:23:00+00:00\n"
+"POT-Creation-Date: 2026-09-11T15:51:10+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: wooreels\n"
@@ -222,7 +222,7 @@ msgid "You have unsaved changes. Leave this page without saving?"
 msgstr ""
 
 #: admin/src/App.js:89
-#: admin/src/screens/ReelEditor.js:258
+#: admin/src/screens/ReelEditor.js:378
 #: admin/src/screens/ReelsLibrary.js:371
 #: admin/src/screens/Statistics.js:222
 #: admin/src/screens/WidgetsList.js:225
@@ -247,26 +247,26 @@ msgid "Opacity"
 msgstr ""
 
 #: admin/src/components/ui/Fields.js:71
-#: admin/src/screens/ReelEditor.js:738
+#: admin/src/screens/ReelEditor.js:1077
 #: admin/src/screens/ReelsLibrary.js:414
 #: admin/src/screens/WidgetsList.js:243
 msgid "Clear"
 msgstr ""
 
-#: admin/src/components/ui/Modal.js:106
-#: admin/src/components/ui/Modal.js:132
+#: admin/src/components/ui/Modal.js:111
+#: admin/src/components/ui/Modal.js:137
 #: admin/src/components/ui/Toasts.js:152
-#: admin/src/screens/LinkDialog.js:347
+#: admin/src/screens/LinkDialog.js:359
 #: admin/src/screens/PosterCapture.js:81
-#: admin/src/screens/ReelEditor.js:249
-#: admin/src/screens/ReelEditor.js:565
+#: admin/src/screens/ReelEditor.js:369
+#: admin/src/screens/ReelEditor.js:748
 #: src/shared/templates/Popup.jsx:108
 msgid "Cancel"
 msgstr ""
 
-#: admin/src/components/ui/Modal.js:120
-#: admin/src/screens/ReelEditor.js:378
-#: admin/src/screens/ReelEditor.js:657
+#: admin/src/components/ui/Modal.js:125
+#: admin/src/screens/ReelEditor.js:498
+#: admin/src/screens/ReelEditor.js:981
 #: admin/src/screens/ReelsLibrary.js:148
 #: admin/src/screens/WidgetEditor.js:202
 #: admin/src/screens/WidgetEditor.js:645
@@ -304,7 +304,7 @@ msgid "Notifications"
 msgstr ""
 
 #: admin/src/screens/LinkDialog.js:64
-#: admin/src/screens/ReelEditor.js:356
+#: admin/src/screens/ReelEditor.js:476
 #: admin/src/screens/Statistics.js:457
 #: admin/src/screens/StylePanel.js:924
 msgid "Button Text"
@@ -315,8 +315,8 @@ msgid "e.g Buy Now"
 msgstr ""
 
 #: admin/src/screens/LinkDialog.js:73
-#: admin/src/screens/ReelEditor.js:46
-#: admin/src/screens/ReelEditor.js:275
+#: admin/src/screens/ReelEditor.js:166
+#: admin/src/screens/ReelEditor.js:395
 #: admin/src/screens/Statistics.js:474
 msgid "Url"
 msgstr ""
@@ -360,7 +360,7 @@ msgid "No products are available to add."
 msgstr ""
 
 #: admin/src/screens/LinkDialog.js:200
-#: admin/src/screens/LinkDialog.js:333
+#: admin/src/screens/LinkDialog.js:345
 msgid "Select Products"
 msgstr ""
 
@@ -369,41 +369,48 @@ msgstr ""
 msgid "Out of stock"
 msgstr ""
 
-#: admin/src/screens/LinkDialog.js:274
-#: admin/src/screens/LinkDialog.js:341
-#: admin/src/screens/LinkDialog.js:369
-#: admin/src/screens/ReelEditor.js:769
+#: admin/src/screens/LinkDialog.js:279
+#: admin/src/screens/LinkDialog.js:353
+#: admin/src/screens/LinkDialog.js:381
+#: admin/src/screens/ReelEditor.js:1170
 msgid "Add Custom Link"
 msgstr ""
 
-#: admin/src/screens/LinkDialog.js:275
-#: admin/src/screens/LinkDialog.js:340
+#: admin/src/screens/LinkDialog.js:280
+#: admin/src/screens/LinkDialog.js:352
+#: admin/src/screens/ReelEditor.js:1187
 msgid "Tag Products"
 msgstr ""
 
-#: admin/src/screens/LinkDialog.js:297
+#: admin/src/screens/LinkDialog.js:302
 msgid "Button text is required!"
 msgstr ""
 
-#: admin/src/screens/LinkDialog.js:301
+#: admin/src/screens/LinkDialog.js:306
 msgid "A valid url is required!"
 msgstr ""
 
-#: admin/src/screens/LinkDialog.js:305
+#: admin/src/screens/LinkDialog.js:310
 msgid "Campaign name is required!"
 msgstr ""
 
-#: admin/src/screens/LinkDialog.js:328
-#: admin/src/screens/ReelEditor.js:574
+#: admin/src/screens/LinkDialog.js:333
+#: admin/src/screens/ReelEditor.js:757
 #: admin/src/screens/Settings.js:172
 #: admin/src/screens/WidgetEditor.js:679
 msgid "Save"
 msgstr ""
 
-#: admin/src/screens/LinkDialog.js:331
-#: admin/src/screens/ReelEditor.js:575
+#: admin/src/screens/LinkDialog.js:336
+#: admin/src/screens/ReelEditor.js:758
 #: admin/src/screens/WidgetEditor.js:678
 msgid "Update"
+msgstr ""
+
+#. translators: %d: number of selected products.
+#: admin/src/screens/LinkDialog.js:342
+#, js-format
+msgid "Select Products (%d)"
 msgstr ""
 
 #: admin/src/screens/PosterCapture.js:64
@@ -411,14 +418,16 @@ msgid "This frame could not be captured. Videos hosted on another domain are blo
 msgstr ""
 
 #: admin/src/screens/PosterCapture.js:76
-#: admin/src/screens/ReelEditor.js:41
-#: admin/src/screens/ReelEditor.js:122
-#: admin/src/screens/ReelEditor.js:124
-#: admin/src/screens/ReelEditor.js:712
+#: admin/src/screens/ReelEditor.js:161
+#: admin/src/screens/ReelEditor.js:242
+#: admin/src/screens/ReelEditor.js:244
+#: admin/src/screens/ReelEditor.js:1088
+#: admin/src/screens/ReelEditor.js:1119
 msgid "Choose from Media"
 msgstr ""
 
 #: admin/src/screens/PosterCapture.js:90
+#: admin/src/screens/ReelEditor.js:1102
 msgid "Upload"
 msgstr ""
 
@@ -431,41 +440,51 @@ msgstr ""
 msgid "Position"
 msgstr ""
 
-#: admin/src/screens/ReelEditor.js:52
+#: admin/src/screens/ReelEditor.js:40
+#: admin/src/screens/ReelEditor.js:821
+msgid "Media Library"
+msgstr ""
+
+#: admin/src/screens/ReelEditor.js:41
+#: admin/src/screens/ReelEditor.js:857
+msgid "Video URL"
+msgstr ""
+
+#: admin/src/screens/ReelEditor.js:172
 msgid "Enter a valid Vimeo video URL."
 msgstr ""
 
-#: admin/src/screens/ReelEditor.js:53
-#: admin/src/screens/ReelEditor.js:61
+#: admin/src/screens/ReelEditor.js:173
+#: admin/src/screens/ReelEditor.js:181
 msgid "Paste one URL per line to add several at once."
 msgstr ""
 
-#: admin/src/screens/ReelEditor.js:60
+#: admin/src/screens/ReelEditor.js:180
 msgid "Enter a valid YouTube Shorts URL."
 msgstr ""
 
-#: admin/src/screens/ReelEditor.js:68
+#: admin/src/screens/ReelEditor.js:188
 msgid "Enter a valid video URL."
 msgstr ""
 
-#: admin/src/screens/ReelEditor.js:69
+#: admin/src/screens/ReelEditor.js:189
 msgid "For smooth playback across all browsers, use MP4 video URLs."
 msgstr ""
 
-#: admin/src/screens/ReelEditor.js:83
-#: admin/src/screens/ReelEditor.js:85
-#: admin/src/screens/ReelEditor.js:152
-#: admin/src/screens/ReelEditor.js:266
-#: admin/src/screens/ReelEditor.js:589
+#: admin/src/screens/ReelEditor.js:203
+#: admin/src/screens/ReelEditor.js:205
+#: admin/src/screens/ReelEditor.js:272
+#: admin/src/screens/ReelEditor.js:386
+#: admin/src/screens/ReelEditor.js:805
 msgid "Add Videos"
 msgstr ""
 
-#: admin/src/screens/ReelEditor.js:364
+#: admin/src/screens/ReelEditor.js:484
+#: admin/src/screens/ReelEditor.js:963
 msgid "Move down"
 msgstr ""
 
-#: admin/src/screens/ReelEditor.js:371
-#: admin/src/screens/ReelEditor.js:555
+#: admin/src/screens/ReelEditor.js:491
 #: admin/src/screens/ReelsLibrary.js:143
 #: admin/src/screens/Statistics.js:212
 #: admin/src/screens/Statistics.js:281
@@ -475,44 +494,95 @@ msgstr ""
 msgid "Edit"
 msgstr ""
 
-#: admin/src/screens/ReelEditor.js:527
+#: admin/src/screens/ReelEditor.js:662
 msgid "Reel created successfully!"
 msgstr ""
 
-#: admin/src/screens/ReelEditor.js:532
+#: admin/src/screens/ReelEditor.js:667
 msgid "Reel updated successfully!"
 msgstr ""
 
-#: admin/src/screens/ReelEditor.js:554
+#: admin/src/screens/ReelEditor.js:706
 #: admin/src/screens/ReelsLibrary.js:361
 #: admin/src/screens/ReelsLibrary.js:410
 #: admin/src/screens/WidgetEditor.js:715
 msgid "Add Reel"
 msgstr ""
 
-#: admin/src/screens/ReelEditor.js:620
+#: admin/src/screens/ReelEditor.js:707
+msgid "Edit reel"
+msgstr ""
+
+#: admin/src/screens/ReelEditor.js:714
+msgid "Add at least one video to publish this reel."
+msgstr ""
+
+#. translators: 1: number of videos, 2: number of links.
+#. translators: 1: number of reels (already pluralised), 2: template name.
+#: admin/src/screens/ReelEditor.js:720
+#: block/src/index.js:223
+#, js-format
+msgid "%1$s · %2$s"
+msgstr ""
+
+#. translators: %d: number of videos.
+#: admin/src/screens/ReelEditor.js:723
+#, js-format
+msgid "%d video"
+msgid_plural "%d videos"
+msgstr[0] ""
+msgstr[1] ""
+
+#. translators: %d: number of links.
+#: admin/src/screens/ReelEditor.js:733
+#, js-format
+msgid "%d link"
+msgid_plural "%d links"
+msgstr[0] ""
+msgstr[1] ""
+
+#: admin/src/screens/ReelEditor.js:777
+msgid "Video"
+msgstr ""
+
+#: admin/src/screens/ReelEditor.js:804
+#: admin/src/screens/ReelEditor.js:1024
+msgid "Uploading…"
+msgstr ""
+
+#: admin/src/screens/ReelEditor.js:811
 msgid "Click or drag and drop files here"
 msgstr ""
 
+#: admin/src/screens/ReelEditor.js:825
+msgid "MP4 or WebM from this site"
+msgstr ""
+
+#: admin/src/screens/ReelEditor.js:836
+msgid "Paste video links"
+msgstr ""
+
+#: admin/src/screens/ReelEditor.js:847
+msgid "Paste Shorts links"
+msgstr ""
+
+#: admin/src/screens/ReelEditor.js:861
+msgid "Hosted MP4 or WebM"
+msgstr ""
+
+#: admin/src/screens/ReelEditor.js:1028
+msgid "Add more videos, or drop them here"
+msgstr ""
+
 #. translators: %d: number of videos that may not play on Safari.
-#: admin/src/screens/ReelEditor.js:681
+#: admin/src/screens/ReelEditor.js:1040
 #, js-format
 msgid "%d video may not play reliably on iOS/macOS Safari. Recommended format: MP4 (H.264/AAC)."
 msgid_plural "%d video(s) may not play reliably on iOS/macOS Safari. Recommended format: MP4 (H.264/AAC)."
 msgstr[0] ""
 msgstr[1] ""
 
-#: admin/src/screens/ReelEditor.js:694
-#: admin/src/screens/Statistics.js:301
-#: admin/src/screens/StylePanel.js:577
-msgid "Thumbnail"
-msgstr ""
-
-#: admin/src/screens/ReelEditor.js:725
-msgid "Capture frame"
-msgstr ""
-
-#: admin/src/screens/ReelEditor.js:748
+#: admin/src/screens/ReelEditor.js:1057
 #: admin/src/screens/Statistics.js:309
 #: admin/src/screens/Statistics.js:448
 #: admin/src/screens/StylePanel.js:605
@@ -520,15 +590,33 @@ msgstr ""
 msgid "Reel Title"
 msgstr ""
 
-#: admin/src/screens/ReelEditor.js:749
+#: admin/src/screens/ReelEditor.js:1058
 msgid "Enter reel title"
 msgstr ""
 
-#: admin/src/screens/ReelEditor.js:760
+#: admin/src/screens/ReelEditor.js:1069
+#: admin/src/screens/Statistics.js:301
+#: admin/src/screens/StylePanel.js:577
+msgid "Thumbnail"
+msgstr ""
+
+#: admin/src/screens/ReelEditor.js:1132
+msgid "Capture frame"
+msgstr ""
+
+#: admin/src/screens/ReelEditor.js:1138
+msgid "Shown before the video plays. Without one, the first frame is used."
+msgstr ""
+
+#: admin/src/screens/ReelEditor.js:1150
 msgid "Links"
 msgstr ""
 
-#: admin/src/screens/ReelEditor.js:775
+#: admin/src/screens/ReelEditor.js:1197
+msgid "Product tagging needs WooCommerce to be active."
+msgstr ""
+
+#: admin/src/screens/ReelEditor.js:1206
 msgid "Add a button or tag a product and it appears over the video in the player."
 msgstr ""
 
@@ -1348,12 +1436,6 @@ msgstr ""
 #: block/src/index.js:195
 #, js-format
 msgid "Widget #%d no longer exists. Choose another one."
-msgstr ""
-
-#. translators: 1: number of reels (already pluralised), 2: template name.
-#: block/src/index.js:223
-#, js-format
-msgid "%1$s · %2$s"
 msgstr ""
 
 #. translators: %s: reel title.

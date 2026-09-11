@@ -8,10 +8,11 @@
 import apiFetch from '@wordpress/api-fetch';
 import { useEffect, useRef, useState } from '@wordpress/element';
 import { __, _n, sprintf } from '@wordpress/i18n';
-import { reels as reelsApi } from '../api';
+import { boot, reels as reelsApi } from '../api';
 import {
 	IconCamera,
 	IconChevronDown,
+	IconChevronRight,
 	IconClose,
 	IconEdit,
 	IconGrip,
@@ -34,6 +35,125 @@ import { LinkDialog, uuid } from './LinkDialog';
 import { PosterCapture } from './PosterCapture';
 
 const SAFARI_SAFE = [ 'video/mp4', 'video/webm' ];
+
+const SOURCE_LABELS = {
+	native: __( 'Media Library', 'wooreels' ),
+	hosted: __( 'Video URL', 'wooreels' ),
+	vimeo: 'Vimeo',
+	youtube: 'YouTube',
+};
+
+/**
+ * Something readable to call a file: its name for a real file, the provider
+ * and id for an embed.
+ *
+ * @param {Object} file The file.
+ * @return {string} The label.
+ */
+const fileLabel = ( file ) => {
+	if ( file.source === 'youtube' || file.source === 'vimeo' ) {
+		return `${ SOURCE_LABELS[ file.source ] } · ${ file.provider_id }`;
+	}
+
+	try {
+		const path = new URL( file.url ).pathname;
+
+		return decodeURIComponent( path.split( '/' ).pop() || file.url );
+	} catch ( error ) {
+		return file.url;
+	}
+};
+
+/** The reel-shaped illustration the empty dropzone carries. */
+const DropArt = () => (
+	<svg
+		className="wr-dropzone__art"
+		width="96"
+		height="84"
+		viewBox="0 0 96 84"
+		fill="none"
+		aria-hidden="true"
+		focusable="false"
+	>
+		<rect
+			x="6"
+			y="16"
+			width="30"
+			height="52"
+			rx="6"
+			fill="currentColor"
+			opacity=".12"
+		/>
+		<rect
+			x="60"
+			y="16"
+			width="30"
+			height="52"
+			rx="6"
+			fill="currentColor"
+			opacity=".12"
+		/>
+		<rect
+			x="31"
+			y="6"
+			width="34"
+			height="62"
+			rx="7"
+			fill="var(--wr-bg)"
+			stroke="currentColor"
+			strokeWidth="1.6"
+		/>
+		<path
+			d="M48 24v20M40 32l8-8 8 8"
+			stroke="currentColor"
+			strokeWidth="2"
+			strokeLinecap="round"
+			strokeLinejoin="round"
+		/>
+		<path
+			d="M36 76h24"
+			stroke="currentColor"
+			strokeWidth="1.6"
+			strokeLinecap="round"
+			opacity=".5"
+		/>
+	</svg>
+);
+
+/**
+ * A small source tile inside the empty dropzone.
+ *
+ * @param {Object}   props         Props.
+ * @param {Function} props.icon    Icon component.
+ * @param {string}   props.label   Source name.
+ * @param {string}   props.hint    One line on what it accepts.
+ * @param {Function} props.onClick Click handler.
+ * @return {Object} The tile.
+ */
+const SourceTile = ( { icon: Icon, label, hint, onClick } ) => (
+	<button type="button" className="wr-source-tile" onClick={ onClick }>
+		<span className="wr-source-tile__icon">
+			<Icon size={ 16 } />
+		</span>
+		<span className="wr-source-tile__text">
+			<span className="wr-source-tile__label">{ label }</span>
+			<span className="wr-source-tile__hint">{ hint }</span>
+		</span>
+	</button>
+);
+
+/**
+ * The provider or origin of a file, as a pill.
+ *
+ * @param {Object} props        Props.
+ * @param {string} props.source The file's source key.
+ * @return {Object} The badge.
+ */
+const SourceBadge = ( { source } ) => (
+	<span className={ `wr-badge wr-badge--${ source }` }>
+		{ SOURCE_LABELS[ source ] || source }
+	</span>
+);
 
 const SOURCES = [
 	{
@@ -493,6 +613,21 @@ export const ReelEditor = ( { reelId, onClose, onSaved } ) => {
 		setUploading( false );
 	};
 
+	const moveFile = ( from, to ) => {
+		if ( from === to || to < 0 || to >= files.length ) {
+			return;
+		}
+
+		setFiles( ( current ) => {
+			const next = [ ...current ];
+			const [ moved ] = next.splice( from, 1 );
+
+			next.splice( to, 0, moved );
+
+			return next;
+		} );
+	};
+
 	const moveLink = ( from, to ) => {
 		if ( from === to || to < 0 || to >= links.length ) {
 			return;
@@ -544,19 +679,67 @@ export const ReelEditor = ( { reelId, onClose, onSaved } ) => {
 	const capturable = files.find(
 		( file ) => file.source === 'native' || file.source === 'hosted'
 	);
+	const lead = files[ 0 ] || null;
+	const leadPlayable =
+		lead && ( lead.source === 'native' || lead.source === 'hosted' );
+	const leadPoster = thumbnail || ( lead && lead.poster_url ) || '';
+
+	const dragHandlers = {
+		onDragOver: ( event ) => {
+			event.preventDefault();
+			setDropping( true );
+		},
+		onDragLeave: () => setDropping( false ),
+		onDrop: ( event ) => {
+			event.preventDefault();
+			setDropping( false );
+			uploadDropped( event.dataTransfer.files );
+		},
+	};
 
 	return (
 		<>
 			<Modal
-				wide
+				size="xl"
 				title={
 					isNew
 						? __( 'Add Reel', 'wooreels' )
-						: __( 'Edit', 'wooreels' )
+						: __( 'Edit reel', 'wooreels' )
 				}
 				onClose={ onClose }
 				footer={
 					<>
+						<span className="wr-modal__foot-note">
+							{ files.length === 0
+								? __(
+										'Add at least one video to publish this reel.',
+										'wooreels'
+								  )
+								: sprintf(
+										/* translators: 1: number of videos, 2: number of links. */
+										__( '%1$s · %2$s', 'wooreels' ),
+										sprintf(
+											/* translators: %d: number of videos. */
+											_n(
+												'%d video',
+												'%d videos',
+												files.length,
+												'wooreels'
+											),
+											files.length
+										),
+										sprintf(
+											/* translators: %d: number of links. */
+											_n(
+												'%d link',
+												'%d links',
+												links.length,
+												'wooreels'
+											),
+											links.length
+										)
+								  ) }
+						</span>
 						<Button
 							variant="ghost"
 							onClick={ onClose }
@@ -583,125 +766,349 @@ export const ReelEditor = ( { reelId, onClose, onSaved } ) => {
 					</p>
 				) : (
 					<div className="wr-reel-editor">
-						<div className="wr-reel-editor__media">
+						<div
+							className={ `wr-reel-editor__media${
+								dropping ? ' is-over' : ''
+							}` }
+							{ ...dragHandlers }
+						>
 							<div className="wr-reel-editor__bar">
 								<span className="wr-section-label">
-									{ __( 'Add Videos', 'wooreels' ) }
+									{ __( 'Video', 'wooreels' ) }
 								</span>
-								<SourcePicker onPick={ pickSource } />
+								{ files.length > 0 && (
+									<SourcePicker onPick={ pickSource } />
+								) }
 							</div>
 
-							<div
-								className={ `wr-dropzone${
-									dropping ? ' is-over' : ''
-								}` }
-								onDragOver={ ( event ) => {
-									event.preventDefault();
-									setDropping( true );
-								} }
-								onDragLeave={ () => setDropping( false ) }
-								onDrop={ ( event ) => {
-									event.preventDefault();
-									setDropping( false );
-									uploadDropped( event.dataTransfer.files );
-								} }
-							>
-								<button
-									type="button"
-									className="wr-dropzone__hit"
-									onClick={ () => pickSource( 'library' ) }
+							{ files.length === 0 && (
+								<div
+									className={ `wr-dropzone wr-dropzone--hero${
+										dropping ? ' is-over' : ''
+									}` }
 								>
-									{ uploading ? (
-										<IconSpinner size={ 20 } />
-									) : (
-										<IconUpload size={ 20 } />
-									) }
-									<span>
-										{ __(
-											'Click or drag and drop files here',
-											'wooreels'
+									<button
+										type="button"
+										className="wr-dropzone__hit"
+										onClick={ () =>
+											pickSource( 'library' )
+										}
+									>
+										{ uploading ? (
+											<IconSpinner size={ 28 } />
+										) : (
+											<DropArt />
 										) }
-									</span>
-								</button>
-							</div>
+										<span className="wr-dropzone__title">
+											{ uploading
+												? __( 'Uploading…', 'wooreels' )
+												: __(
+														'Add Videos',
+														'wooreels'
+												  ) }
+										</span>
+										<span className="wr-dropzone__text">
+											{ __(
+												'Click or drag and drop files here',
+												'wooreels'
+											) }
+										</span>
+									</button>
+
+									<div className="wr-source-tiles">
+										<SourceTile
+											icon={ IconUpload }
+											label={ __(
+												'Media Library',
+												'wooreels'
+											) }
+											hint={ __(
+												'MP4 or WebM from this site',
+												'wooreels'
+											) }
+											onClick={ () =>
+												pickSource( 'library' )
+											}
+										/>
+										<SourceTile
+											icon={ IconVideo }
+											label="Vimeo"
+											hint={ __(
+												'Paste video links',
+												'wooreels'
+											) }
+											onClick={ () =>
+												pickSource( 'vimeo' )
+											}
+										/>
+										<SourceTile
+											icon={ IconVideo }
+											label="YouTube Shorts"
+											hint={ __(
+												'Paste Shorts links',
+												'wooreels'
+											) }
+											onClick={ () =>
+												pickSource( 'youtube' )
+											}
+										/>
+										<SourceTile
+											icon={ IconLink }
+											label={ __(
+												'Video URL',
+												'wooreels'
+											) }
+											hint={ __(
+												'Hosted MP4 or WebM',
+												'wooreels'
+											) }
+											onClick={ () =>
+												pickSource( 'hosted' )
+											}
+										/>
+									</div>
+								</div>
+							) }
 
 							{ files.length > 0 && (
-								<ul className="wr-file-list">
-									{ files.map( ( file, index ) => (
-										<li
-											key={ file.file_uuid }
-											className="wr-file-row"
-										>
-											{ file.poster_url ? (
-												<img
-													className="wr-file-row__thumb"
-													src={ file.poster_url }
-													alt=""
-												/>
-											) : (
-												<span className="wr-file-row__thumb wr-file-row__thumb--empty">
-													<IconVideo size={ 15 } />
-												</span>
-											) }
-											<span className="wr-file-row__text">
-												<span className="wr-file-row__url">
-													{ file.url }
-												</span>
-												<span className="wr-file-row__meta">
-													{ file.source } ·{ ' ' }
-													{ file.mime_type }
-												</span>
-											</span>
-											<IconButton
-												icon={ IconTrash }
-												label={ __(
-													'Delete',
-													'wooreels'
-												) }
-												tone="danger"
-												size={ 14 }
-												onClick={ () =>
-													setFiles(
-														files.filter(
-															( entry, at ) =>
-																at !== index
-														)
-													)
+								<div className="wr-media-stage">
+									<div className="wr-media-stage__preview">
+										{ leadPlayable && (
+											<video
+												key={ lead.file_uuid }
+												className="wr-media-stage__video"
+												src={ lead.url }
+												poster={
+													leadPoster || undefined
 												}
+												controls
+												muted
+												playsInline
+												preload="metadata"
 											/>
-										</li>
-									) ) }
-								</ul>
-							) }
+										) }
+										{ ! leadPlayable && leadPoster && (
+											<img
+												className="wr-media-stage__img"
+												src={ leadPoster }
+												alt=""
+											/>
+										) }
+										{ ! leadPlayable && ! leadPoster && (
+											<span className="wr-media-stage__blank">
+												<IconVideo size={ 28 } />
+											</span>
+										) }
+										<span className="wr-media-stage__badge">
+											<SourceBadge
+												source={ lead.source }
+											/>
+										</span>
+									</div>
 
-							{ risky > 0 && (
-								<Notice tone="warning">
-									{ sprintf(
-										/* translators: %d: number of videos that may not play on Safari. */
-										_n(
-											'%d video may not play reliably on iOS/macOS Safari. Recommended format: MP4 (H.264/AAC).',
-											'%d video(s) may not play reliably on iOS/macOS Safari. Recommended format: MP4 (H.264/AAC).',
-											risky,
-											'wooreels'
-										),
-										risky
+									<div className="wr-media-stage__side">
+										<ul className="wr-file-list">
+											{ files.map( ( file, index ) => (
+												<li
+													key={ file.file_uuid }
+													className={ `wr-file-row${
+														index === 0
+															? ' is-lead'
+															: ''
+													}` }
+												>
+													{ file.poster_url ? (
+														<img
+															className="wr-file-row__thumb"
+															src={
+																file.poster_url
+															}
+															alt=""
+														/>
+													) : (
+														<span className="wr-file-row__thumb wr-file-row__thumb--empty">
+															<IconVideo
+																size={ 15 }
+															/>
+														</span>
+													) }
+													<span className="wr-file-row__text">
+														<span className="wr-file-row__name">
+															{ fileLabel(
+																file
+															) }
+														</span>
+														<span className="wr-file-row__meta">
+															<SourceBadge
+																source={
+																	file.source
+																}
+															/>
+															{ file.duration >
+																0 && (
+																<span>
+																	{
+																		file.duration
+																	}
+																	s
+																</span>
+															) }
+														</span>
+													</span>
+													<span className="wr-file-row__tools">
+														<IconButton
+															icon={
+																IconChevronDown
+															}
+															label={ __(
+																'Move down',
+																'wooreels'
+															) }
+															size={ 13 }
+															disabled={
+																index ===
+																files.length - 1
+															}
+															onClick={ () =>
+																moveFile(
+																	index,
+																	index + 1
+																)
+															}
+														/>
+														<IconButton
+															icon={ IconTrash }
+															label={ __(
+																'Delete',
+																'wooreels'
+															) }
+															tone="danger"
+															size={ 14 }
+															onClick={ () =>
+																setFiles(
+																	files.filter(
+																		(
+																			entry,
+																			at
+																		) =>
+																			at !==
+																			index
+																	)
+																)
+															}
+														/>
+													</span>
+												</li>
+											) ) }
+										</ul>
+
+										<div
+											className={ `wr-dropzone wr-dropzone--compact${
+												dropping ? ' is-over' : ''
+											}` }
+										>
+											<button
+												type="button"
+												className="wr-dropzone__hit"
+												onClick={ () =>
+													pickSource( 'library' )
+												}
+											>
+												{ uploading ? (
+													<IconSpinner size={ 16 } />
+												) : (
+													<IconPlus size={ 16 } />
+												) }
+												<span>
+													{ uploading
+														? __(
+																'Uploading…',
+																'wooreels'
+														  )
+														: __(
+																'Add more videos, or drop them here',
+																'wooreels'
+														  ) }
+												</span>
+											</button>
+										</div>
+
+										{ risky > 0 && (
+											<Notice tone="warning">
+												{ sprintf(
+													/* translators: %d: number of videos that may not play on Safari. */
+													_n(
+														'%d video may not play reliably on iOS/macOS Safari. Recommended format: MP4 (H.264/AAC).',
+														'%d video(s) may not play reliably on iOS/macOS Safari. Recommended format: MP4 (H.264/AAC).',
+														risky,
+														'wooreels'
+													),
+													risky
+												) }
+											</Notice>
+										) }
+									</div>
+								</div>
+							) }
+						</div>
+
+						<div className="wr-reel-editor__meta">
+							<TextField
+								label={ __( 'Reel Title', 'wooreels' ) }
+								placeholder={ __(
+									'Enter reel title',
+									'wooreels'
+								) }
+								value={ title }
+								onChange={ setTitle }
+							/>
+
+							<div className="wr-poster-card">
+								<div className="wr-reel-editor__bar">
+									<span className="wr-section-label">
+										{ __( 'Thumbnail', 'wooreels' ) }
+									</span>
+									{ thumbnail && (
+										<Button
+											size="sm"
+											variant="ghost"
+											onClick={ () => setThumbnail( '' ) }
+										>
+											{ __( 'Clear', 'wooreels' ) }
+										</Button>
 									) }
-								</Notice>
-							) }
+								</div>
 
-							<div className="wr-poster">
-								<span className="wr-section-label">
-									{ __( 'Thumbnail', 'wooreels' ) }
-								</span>
-								<div className="wr-poster__row">
-									<span className="wr-poster__preview">
+								<div className="wr-poster-card__row">
+									<button
+										type="button"
+										className={ `wr-poster-card__frame${
+											thumbnail ? ' has-image' : ''
+										}` }
+										aria-label={ __(
+											'Choose from Media',
+											'wooreels'
+										) }
+										onClick={ () =>
+											openPosterFrame( setThumbnail )
+										}
+									>
 										{ thumbnail ? (
 											<img src={ thumbnail } alt="" />
 										) : (
-											<IconImage size={ 18 } />
+											<>
+												<IconImage size={ 22 } />
+												<span>
+													{ __(
+														'Upload',
+														'wooreels'
+													) }
+												</span>
+											</>
 										) }
-									</span>
-									<div className="wr-poster__tools">
+									</button>
+
+									<div className="wr-poster-card__tools">
 										<Button
 											size="sm"
 											icon={ IconImage }
@@ -727,48 +1134,72 @@ export const ReelEditor = ( { reelId, onClose, onSaved } ) => {
 												'wooreels'
 											) }
 										</Button>
-										{ thumbnail && (
-											<Button
-												size="sm"
-												variant="ghost"
-												onClick={ () =>
-													setThumbnail( '' )
-												}
-											>
-												{ __( 'Clear', 'wooreels' ) }
-											</Button>
-										) }
+										<p className="wr-field__help">
+											{ __(
+												'Shown before the video plays. Without one, the first frame is used.',
+												'wooreels'
+											) }
+										</p>
 									</div>
 								</div>
 							</div>
-						</div>
-
-						<div className="wr-reel-editor__meta">
-							<TextField
-								label={ __( 'Reel Title', 'wooreels' ) }
-								placeholder={ __(
-									'Enter reel title',
-									'wooreels'
-								) }
-								value={ title }
-								onChange={ setTitle }
-							/>
 
 							<div className="wr-reel-editor__links">
 								<div className="wr-reel-editor__bar">
 									<span className="wr-section-label">
 										{ __( 'Links', 'wooreels' ) }
 									</span>
+									{ links.length > 0 && (
+										<span className="wr-count-chip">
+											{ links.length }
+										</span>
+									) }
+								</div>
+
+								<div className="wr-link-actions">
 									<Button
-										size="sm"
-										icon={ IconPlus }
+										className="wr-btn--outline"
+										icon={ IconLink }
 										onClick={ () =>
-											setLinkDialog( { editing: null } )
+											setLinkDialog( {
+												editing: null,
+												tab: 'custom',
+											} )
 										}
 									>
 										{ __( 'Add Custom Link', 'wooreels' ) }
+										<IconChevronRight
+											size={ 13 }
+											className="wr-btn__end"
+										/>
+									</Button>
+									<Button
+										className="wr-btn--outline"
+										icon={ IconTag }
+										disabled={ ! boot.hasWoo }
+										onClick={ () =>
+											setLinkDialog( {
+												editing: null,
+												tab: 'product',
+											} )
+										}
+									>
+										{ __( 'Tag Products', 'wooreels' ) }
+										<IconChevronRight
+											size={ 13 }
+											className="wr-btn__end"
+										/>
 									</Button>
 								</div>
+
+								{ ! boot.hasWoo && (
+									<p className="wr-field__help">
+										{ __(
+											'Product tagging needs WooCommerce to be active.',
+											'wooreels'
+										) }
+									</p>
+								) }
 
 								{ links.length === 0 ? (
 									<p className="wr-field__help">
@@ -788,6 +1219,7 @@ export const ReelEditor = ( { reelId, onClose, onSaved } ) => {
 												onEdit={ () =>
 													setLinkDialog( {
 														editing: link,
+														tab: 'custom',
 													} )
 												}
 												onRemove={ () =>
@@ -820,6 +1252,7 @@ export const ReelEditor = ( { reelId, onClose, onSaved } ) => {
 			{ linkDialog && (
 				<LinkDialog
 					editing={ linkDialog.editing }
+					initialTab={ linkDialog.tab }
 					onClose={ () => setLinkDialog( null ) }
 					onAdd={ ( incoming ) => {
 						setLinks( ( current ) => {

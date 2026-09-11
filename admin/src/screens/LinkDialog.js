@@ -8,7 +8,7 @@
  */
 
 import { useEffect, useMemo, useState } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { boot, products as productsApi } from '../api';
 import { IconTag } from '../components/icons';
 import { Button } from '../components/ui/Button';
@@ -257,8 +257,13 @@ const ProductsTab = ( { chosen, setChosen } ) => {
 	);
 };
 
-export const LinkDialog = ( { editing, onAdd, onClose } ) => {
-	const [ tab, setTab ] = useState( 'custom' );
+export const LinkDialog = ( {
+	editing,
+	onAdd,
+	onClose,
+	initialTab = 'custom',
+} ) => {
+	const [ tab, setTab ] = useState( initialTab );
 	const [ chosen, setChosen ] = useState( [] );
 	const [ errors, setErrors ] = useState( {} );
 	const [ draft, setDraft ] = useState( () => ( {
@@ -330,7 +335,14 @@ export const LinkDialog = ( { editing, onAdd, onClose } ) => {
 	if ( editing ) {
 		confirmLabel = __( 'Update', 'wooreels' );
 	} else if ( tab === 'product' ) {
-		confirmLabel = __( 'Select Products', 'wooreels' );
+		confirmLabel =
+			chosen.length > 0
+				? sprintf(
+						/* translators: %d: number of selected products. */
+						__( 'Select Products (%d)', 'wooreels' ),
+						chosen.length
+				  )
+				: __( 'Select Products', 'wooreels' );
 	}
 
 	return (

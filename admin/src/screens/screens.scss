@@ -252,8 +252,18 @@
 
 	.wr-reel-editor {
 		display: grid;
-		grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
-		gap: 24px;
+		grid-template-columns: minmax(0, 1fr) 320px;
+		gap: 28px;
+	}
+
+	.wr-reel-editor__media {
+		border-radius: var(--wr-radius);
+		transition: box-shadow 150ms var(--wr-ease);
+	}
+
+	/* Dropping anywhere on the media column counts, not just on the dashed box. */
+	.wr-reel-editor__media.is-over {
+		box-shadow: 0 0 0 2px var(--wr-primary-subtle);
 	}
 
 	.wr-reel-editor__media,
@@ -327,6 +337,220 @@
 		color: var(--wr-fg-muted);
 	}
 
+	/* The empty state: one big, calm target with the four ways in laid out
+	   underneath it, so nobody has to discover a dropdown. */
+	.wr-dropzone--hero {
+		display: flex;
+		flex-direction: column;
+		gap: 4px;
+		padding: 8px 8px 12px;
+		background:
+			radial-gradient(circle at 50% 30%, var(--wr-primary-subtle), transparent 60%),
+			var(--wr-bg-muted);
+		border-color: var(--wr-border-strong);
+	}
+
+	.wr-dropzone--hero .wr-dropzone__hit {
+		gap: 6px;
+		padding: 36px 16px 24px;
+		color: var(--wr-primary);
+		border-radius: var(--wr-radius-sm);
+		transition: background-color 150ms var(--wr-ease);
+	}
+
+	.wr-dropzone--hero .wr-dropzone__hit:hover {
+		background: rgb(255 255 255 / 0.6);
+	}
+
+	.wr-dropzone__art {
+		margin-block-end: 8px;
+		transition: translate 200ms var(--wr-ease);
+	}
+
+	.wr-dropzone--hero .wr-dropzone__hit:hover .wr-dropzone__art,
+	.wr-dropzone--hero.is-over .wr-dropzone__art {
+		translate: 0 -3px;
+	}
+
+	.wr-dropzone__title {
+		font-size: 15px;
+		font-weight: 600;
+		color: var(--wr-fg);
+	}
+
+	.wr-dropzone__text {
+		font-size: 13px;
+		color: var(--wr-fg-muted);
+	}
+
+	.wr-source-tiles {
+		display: grid;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		gap: 8px;
+	}
+
+	.wr-source-tile {
+		display: flex;
+		gap: 10px;
+		align-items: center;
+		min-height: 56px;
+		padding: 10px 12px;
+		text-align: start;
+		background: var(--wr-bg);
+		border: 1px solid var(--wr-border);
+		border-radius: var(--wr-radius-sm);
+		box-shadow: var(--wr-shadow-sm);
+		cursor: pointer;
+		transition: border-color 150ms var(--wr-ease), box-shadow 150ms var(--wr-ease), translate 150ms var(--wr-ease);
+	}
+
+	.wr-source-tile:hover {
+		border-color: var(--wr-primary);
+		box-shadow: var(--wr-shadow);
+		translate: 0 -1px;
+	}
+
+	.wr-source-tile__icon {
+		display: inline-flex;
+		flex: none;
+		align-items: center;
+		justify-content: center;
+		width: 32px;
+		height: 32px;
+		color: var(--wr-primary);
+		background: var(--wr-primary-subtle);
+		border-radius: 8px;
+	}
+
+	.wr-source-tile__text {
+		display: flex;
+		flex-direction: column;
+		gap: 1px;
+		min-width: 0;
+	}
+
+	.wr-source-tile__label {
+		font-size: 13px;
+		font-weight: 600;
+		color: var(--wr-fg);
+	}
+
+	.wr-source-tile__hint {
+		overflow: hidden;
+		font-size: 12px;
+		color: var(--wr-fg-muted);
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+
+	/* With files in place the dropzone shrinks to a strip under the list. */
+	.wr-dropzone--compact .wr-dropzone__hit {
+		flex-direction: row;
+		gap: 8px;
+		padding: 12px 14px;
+	}
+
+	/* ---------------------------------------------------------- Media stage */
+
+	.wr-media-stage {
+		display: grid;
+		grid-template-columns: 190px minmax(0, 1fr);
+		gap: 16px;
+		align-items: start;
+	}
+
+	.wr-media-stage__preview {
+		position: relative;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		aspect-ratio: 9 / 16;
+		overflow: hidden;
+		color: var(--wr-fg-subtle);
+		background: #0b1220;
+		border-radius: var(--wr-radius);
+		box-shadow: var(--wr-shadow);
+	}
+
+	.wr-media-stage__video,
+	.wr-media-stage__img {
+		width: 100%;
+		height: 100%;
+		object-fit: contain;
+		background: #000;
+	}
+
+	.wr-media-stage__blank {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: 100%;
+		height: 100%;
+		color: rgb(255 255 255 / 0.4);
+	}
+
+	.wr-media-stage__badge {
+		position: absolute;
+		inset-block-start: 8px;
+		inset-inline-start: 8px;
+	}
+
+	.wr-media-stage__side {
+		display: flex;
+		flex-direction: column;
+		gap: 10px;
+		min-width: 0;
+	}
+
+	.wr-badge {
+		display: inline-flex;
+		align-items: center;
+		height: 18px;
+		padding-inline: 7px;
+		font-size: 11px;
+		font-weight: 600;
+		line-height: 1;
+		letter-spacing: 0.02em;
+		color: var(--wr-fg-muted);
+		background: var(--wr-bg-sunken);
+		border-radius: 999px;
+	}
+
+	.wr-badge--youtube {
+		color: #b91c1c;
+		background: #fef2f2;
+	}
+
+	.wr-badge--vimeo {
+		color: #0e7490;
+		background: #ecfeff;
+	}
+
+	.wr-badge--native {
+		color: var(--wr-primary);
+		background: var(--wr-primary-subtle);
+	}
+
+	.wr-file-row.is-lead {
+		border-color: var(--wr-primary);
+	}
+
+	.wr-file-row__name {
+		overflow: hidden;
+		font-size: 13px;
+		font-weight: 500;
+		color: var(--wr-fg);
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+
+	.wr-file-row__tools {
+		display: inline-flex;
+		flex: none;
+		gap: 2px;
+		align-items: center;
+	}
+
 	.wr-file-list,
 	.wr-url-rows,
 	.wr-chips,
@@ -397,44 +621,87 @@
 
 	/* --------------------------------------------------------------- Poster */
 
-	.wr-poster {
+	.wr-poster-card {
 		display: flex;
 		flex-direction: column;
-		gap: 8px;
+		gap: 10px;
 		padding-block-start: 16px;
 		border-block-start: 1px solid var(--wr-border);
 	}
 
-	.wr-poster__row {
+	.wr-poster-card__row {
 		display: flex;
-		gap: 12px;
+		gap: 14px;
 		align-items: flex-start;
 	}
 
-	.wr-poster__preview {
+	/* The poster is a real 9:16 card, so what you pick is what a visitor sees. */
+	.wr-poster-card__frame {
 		display: flex;
 		flex: none;
+		flex-direction: column;
+		gap: 6px;
 		align-items: center;
 		justify-content: center;
-		width: 54px;
+		width: 104px;
 		aspect-ratio: 9 / 16;
+		padding: 0;
 		overflow: hidden;
-		color: var(--wr-fg-subtle);
-		background: var(--wr-bg-sunken);
-		border: 1px solid var(--wr-border);
-		border-radius: var(--wr-radius-sm);
+		font-size: 12px;
+		font-weight: 500;
+		color: var(--wr-fg-muted);
+		background: var(--wr-bg-muted);
+		border: 1px dashed var(--wr-border-strong);
+		border-radius: var(--wr-radius);
+		cursor: pointer;
+		transition: border-color 150ms var(--wr-ease), color 150ms var(--wr-ease);
 	}
 
-	.wr-poster__preview img {
+	.wr-poster-card__frame:hover {
+		color: var(--wr-primary);
+		border-color: var(--wr-primary);
+	}
+
+	.wr-poster-card__frame.has-image {
+		border-style: solid;
+		border-color: var(--wr-border);
+	}
+
+	.wr-poster-card__frame img {
 		width: 100%;
 		height: 100%;
 		object-fit: cover;
 	}
 
-	.wr-poster__tools {
+	.wr-poster-card__tools {
 		display: flex;
-		flex-wrap: wrap;
+		flex: 1;
+		flex-direction: column;
 		gap: 6px;
+		align-items: flex-start;
+		min-width: 0;
+	}
+
+	.wr-poster-card__tools .wr-btn {
+		width: 100%;
+		justify-content: flex-start;
+	}
+
+	.wr-link-actions {
+		display: flex;
+		flex-direction: column;
+		gap: 8px;
+	}
+
+	.wr-link-actions .wr-btn {
+		width: 100%;
+		height: 40px;
+		justify-content: flex-start;
+	}
+
+	.wr-link-actions .wr-btn__end {
+		margin-inline-start: auto;
+		color: var(--wr-fg-subtle);
 	}
 
 	.wr-capture__video {
@@ -563,6 +830,14 @@
 
 	@media (max-width: 860px) {
 		.wr-reel-editor {
+			grid-template-columns: minmax(0, 1fr);
+		}
+
+		.wr-media-stage {
+			grid-template-columns: 140px minmax(0, 1fr);
+		}
+
+		.wr-source-tiles {
 			grid-template-columns: minmax(0, 1fr);
 		}
 	}

@@ -21,6 +21,7 @@ export const Modal = ( {
 	children,
 	footer,
 	wide = false,
+	size = '',
 	labelledBy,
 } ) => {
 	const panel = useRef( null );
@@ -95,9 +96,13 @@ export const Modal = ( {
 				aria-label={ labelledBy ? undefined : title }
 				aria-labelledby={ labelledBy }
 				tabIndex={ -1 }
-				className={ `wr-modal__panel${
-					wide ? ' wr-modal__panel--wide' : ''
-				}` }
+				className={ [
+					'wr-modal__panel',
+					wide ? 'wr-modal__panel--wide' : '',
+					size ? `wr-modal__panel--${ size }` : '',
+				]
+					.filter( Boolean )
+					.join( ' ' ) }
 			>
 				<div className="wr-modal__head">
 					<h2 className="wr-modal__title">{ title }</h2>
