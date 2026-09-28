@@ -131,16 +131,16 @@ export const useHashRoute = ( dirtyRef ) => {
  */
 export const useSubmenuHighlight = ( route ) => {
 	useEffect( () => {
-		const menu = document.querySelector( '#toplevel_page_wooreels' );
+		const menu = document.querySelector( '#toplevel_page_productreels' );
 
 		if ( ! menu ) {
 			return;
 		}
 
 		const wanted = {
-			reels: 'wooreels-reels',
-			'widget-new': 'wooreels-new-widget',
-			settings: 'wooreels-settings',
+			reels: 'productreels-reels',
+			'widget-new': 'productreels-new-widget',
+			settings: 'productreels-settings',
 		}[ route.name ];
 
 		menu.querySelectorAll( '.wp-submenu li' ).forEach( ( item ) => {
@@ -153,10 +153,36 @@ export const useSubmenuHighlight = ( route ) => {
 			const href = link.getAttribute( 'href' ) || '';
 			const isCurrent = wanted
 				? href.indexOf( `page=${ wanted }` ) !== -1
-				: /page=wooreels(&|#|$)/.test( href );
+				: /page=productreels(&|#|$)/.test( href );
 
 			item.classList.toggle( 'current', isCurrent );
 			link.classList.toggle( 'current', isCurrent );
 		} );
 	}, [ route.name ] );
+};
+
+/**
+ * Keep the browser tab in step with the hash.
+ *
+ * WordPress names the tab once, after the one submenu item it knows about,
+ * and the name never moves again. Every route here is a page in its own
+ * right — it deserves its own name in the tab, the history menu and any
+ * bookmark. The site name and " — WordPress" tail are whatever WordPress
+ * printed, so the format follows the site's language.
+ *
+ * @param {string} label The screen name, e.g. "All Widgets".
+ */
+export const useDocumentTitle = ( label ) => {
+	useEffect( () => {
+		if ( ! label ) {
+			return;
+		}
+
+		const current = document.title;
+		const tail = current.indexOf( ' ‹ ' );
+
+		document.title = `ProductReels - ${ label }${
+			tail === -1 ? '' : current.slice( tail )
+		}`;
+	}, [ label ] );
 };

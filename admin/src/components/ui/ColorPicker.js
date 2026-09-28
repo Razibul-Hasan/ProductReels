@@ -34,7 +34,7 @@ const remember = ( value ) => {
  * @param {string} value A hex colour.
  * @return {{hex: string, alpha: number}} The solid colour and its alpha.
  */
-export const splitColor = ( value ) => {
+const splitColor = ( value ) => {
 	const hex = typeof value === 'string' ? value.trim() : '';
 
 	if ( /^#[0-9a-f]{8}$/i.test( hex ) ) {
@@ -70,7 +70,13 @@ const joinColor = ( rgb, alpha ) => {
 	);
 };
 
-export const ColorPicker = ( { label, help, value, onChange } ) => {
+export const ColorPicker = ( {
+	label,
+	help,
+	value,
+	onChange,
+	disabled = false,
+} ) => {
 	const [ open, setOpen ] = useState( false );
 	const [ draft, setDraft ] = useState( null );
 	const ref = useRef( null );
@@ -98,6 +104,7 @@ export const ColorPicker = ( { label, help, value, onChange } ) => {
 					aria-haspopup="dialog"
 					aria-expanded={ open ? 'true' : 'false' }
 					aria-label={ `${ label }: ${ value }` }
+					disabled={ disabled }
 					onClick={ () => setOpen( ! open ) }
 				>
 					<span className="wr-color__swatch">
@@ -119,7 +126,10 @@ export const ColorPicker = ( { label, help, value, onChange } ) => {
 							type="color"
 							className="wr-color__native"
 							value={ rgb }
-							aria-label={ __( 'Pick a colour', 'wooreels' ) }
+							aria-label={ __(
+								'Pick a colour',
+								'productreels-shoppable-video-reels-for-woocommerce'
+							) }
 							onChange={ ( event ) =>
 								commit( joinColor( event.target.value, alpha ) )
 							}
@@ -130,7 +140,10 @@ export const ColorPicker = ( { label, help, value, onChange } ) => {
 							className="wr-input"
 							value={ shown }
 							spellCheck="false"
-							aria-label={ __( 'Hex value', 'wooreels' ) }
+							aria-label={ __(
+								'Hex value',
+								'productreels-shoppable-video-reels-for-woocommerce'
+							) }
 							onChange={ ( event ) =>
 								setDraft( event.target.value )
 							}
@@ -150,7 +163,10 @@ export const ColorPicker = ( { label, help, value, onChange } ) => {
 
 						<div className="wr-color__alpha">
 							<span className="wr-field__help">
-								{ __( 'Opacity', 'wooreels' ) }
+								{ __(
+									'Opacity',
+									'productreels-shoppable-video-reels-for-woocommerce'
+								) }
 							</span>
 							<input
 								type="range"
@@ -158,7 +174,10 @@ export const ColorPicker = ( { label, help, value, onChange } ) => {
 								min="0"
 								max="100"
 								value={ alpha }
-								aria-label={ __( 'Opacity', 'wooreels' ) }
+								aria-label={ __(
+									'Opacity',
+									'productreels-shoppable-video-reels-for-woocommerce'
+								) }
 								onChange={ ( event ) =>
 									commit(
 										joinColor(

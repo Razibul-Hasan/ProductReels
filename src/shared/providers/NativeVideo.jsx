@@ -15,17 +15,7 @@ import {
 
 export const NativeVideo = forwardRef(
 	(
-		{
-			file,
-			poster,
-			muted,
-			loop,
-			onTime,
-			onPlayState,
-			onEnded,
-			onReady,
-			tracks = [],
-		},
+		{ file, poster, muted, loop, onTime, onPlayState, onEnded, onReady },
 		ref
 	) => {
 		const video = useRef( null );
@@ -134,19 +124,7 @@ export const NativeVideo = forwardRef(
 				muted={ muted }
 				playsInline
 				preload="metadata"
-				crossOrigin={ tracks.length ? 'anonymous' : undefined }
-			>
-				{ tracks.map( ( track ) => (
-					<track
-						key={ track.src }
-						kind={ track.kind || 'captions' }
-						src={ track.src }
-						srcLang={ track.lang }
-						label={ track.label }
-						default={ track.default }
-					/>
-				) ) }
-			</video>
+			/>
 		);
 	}
 );

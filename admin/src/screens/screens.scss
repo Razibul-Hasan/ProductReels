@@ -2,7 +2,7 @@
  * Screen-level layout: the widgets table, the reels grid, and the reel editor.
  */
 
-#wooreels-admin-app {
+#productreels-admin-app {
 
 	.wr-error-card {
 		display: flex;
@@ -137,6 +137,12 @@
 		display: grid;
 		grid-template-columns: repeat(auto-fill, minmax(168px, 1fr));
 		gap: 16px;
+	}
+
+	.wr-load-more {
+		display: flex;
+		justify-content: center;
+		padding-block: 20px 4px;
 	}
 
 	.wr-reel-card {

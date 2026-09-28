@@ -46,7 +46,10 @@ export const PlayerNav = ( { direction, onPrev, onNext, hidden } ) => {
 			<button
 				type="button"
 				className="wr-player__nav wr-player__nav--prev"
-				aria-label={ __( 'Previous', 'wooreels' ) }
+				aria-label={ __(
+					'Previous',
+					'productreels-shoppable-video-reels-for-woocommerce'
+				) }
 				data-wr-no-swipe=""
 				onClick={ onPrev }
 			>
@@ -55,7 +58,10 @@ export const PlayerNav = ( { direction, onPrev, onNext, hidden } ) => {
 			<button
 				type="button"
 				className="wr-player__nav wr-player__nav--next"
-				aria-label={ __( 'Next', 'wooreels' ) }
+				aria-label={ __(
+					'Next',
+					'productreels-shoppable-video-reels-for-woocommerce'
+				) }
 				data-wr-no-swipe=""
 				onClick={ onNext }
 			>

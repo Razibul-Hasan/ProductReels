@@ -108,13 +108,19 @@ export const Seekbar = ( { current, duration, onSeek } ) => {
 			className={ `wr-seek${ scrub !== null ? ' is-scrubbing' : '' }` }
 			role="slider"
 			tabIndex={ 0 }
-			aria-label={ __( 'Seek', 'wooreels' ) }
+			aria-label={ __(
+				'Seek',
+				'productreels-shoppable-video-reels-for-woocommerce'
+			) }
 			aria-valuemin={ 0 }
 			aria-valuemax={ Math.round( duration ) }
 			aria-valuenow={ Math.round( shown ) }
 			aria-valuetext={ sprintf(
 				/* translators: 1: elapsed time, 2: total duration. */
-				__( '%1$s of %2$s', 'wooreels' ),
+				__(
+					'%1$s of %2$s',
+					'productreels-shoppable-video-reels-for-woocommerce'
+				),
 				formatClock( shown ),
 				formatClock( duration )
 			) }

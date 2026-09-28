@@ -2,34 +2,43 @@
  * The widget editor's three-pane layout.
  *
  * Picker and style panel are fixed rails; the preview takes whatever is left,
- * which is what lets the device toggle actually mean something. Each pane
- * scrolls independently so the header and the preview never leave the screen
- * while someone is deep in the style accordion.
+ * which is what lets the device toggle actually mean something. The shell is
+ * locked to the viewport, so the three panes are always exactly the same
+ * height and each scrolls on its own: the header and the preview never leave
+ * the screen while someone is deep in the style accordion, and a long preview
+ * never leaves the other two rails hanging above a run of blank space.
  */
 
-#wooreels-admin-app {
+#productreels-admin-app {
 
+	.wr-app--editor {
+		height: calc(100vh - 32px);
+	}
+
+	/*
+	 * Back + breadcrumb | title | actions. The side columns share the leftover
+	 * space equally, so the title sits at the true centre of the bar; each may
+	 * grow past its share only when its own content needs the room, so the
+	 * actions never wrap on a narrower screen just to keep the title centred.
+	 */
 	.wr-editor-head {
 		position: sticky;
 		inset-block-start: 32px;
 		z-index: 20;
+		display: grid;
+		grid-template-columns: minmax(max-content, 1fr) auto minmax(max-content, 1fr);
 		gap: 12px;
 	}
 
 	.wr-editor-head__left {
 		display: flex;
-		flex: 1;
 		gap: 8px;
 		align-items: center;
 		min-width: 0;
 	}
 
-	.wr-editor-head__titles {
-		display: flex;
-		flex: 1;
-		flex-direction: column;
-		gap: 2px;
-		min-width: 0;
+	.wr-editor-head .wr-page-head__actions {
+		justify-self: end;
 	}
 
 	/* Breadcrumb: where this widget sits, in the app's quietest type. */
@@ -37,7 +46,6 @@
 		display: flex;
 		align-items: center;
 		gap: 4px;
-		padding-inline-start: 10px;
 		font-size: 12px;
 		color: var(--wr-fg-subtle);
 	}
@@ -67,17 +75,28 @@
 		white-space: nowrap;
 	}
 
-	/* The name is edited in place — it is the page title, not a form field. */
+	/*
+	 * The name is edited in place, but it still reads as a field at rest. Its
+	 * appearance on the page is set from the small button tucked into the
+	 * field's trailing edge, so the two halves of "the title" stay together.
+	 */
+	.wr-editor-head__title {
+		position: relative;
+		display: flex;
+		align-items: center;
+		width: min(420px, 40vw);
+	}
+
 	.wr-editor-head__name {
-		flex: 1;
-		max-width: 420px;
+		width: 100%;
 		height: 36px;
-		padding-inline: 10px;
+		padding-inline: 40px 40px;
 		font-size: 18px;
 		font-weight: 600;
 		letter-spacing: -0.01em;
-		background: transparent;
-		border: 1px solid transparent;
+		text-align: center;
+		background: var(--wr-bg-muted);
+		border: 1px solid var(--wr-border);
 		border-radius: var(--wr-radius-sm);
 		transition: background-color 150ms var(--wr-ease), border-color 150ms var(--wr-ease);
 	}
@@ -88,19 +107,38 @@
 	}
 
 	.wr-editor-head__name:hover {
-		background: var(--wr-bg-muted);
+		border-color: var(--wr-border-strong);
 	}
 
 	.wr-editor-head__name:focus {
 		background: var(--wr-bg);
-		border-color: var(--wr-border-strong);
+		border-color: var(--wr-primary);
+	}
+
+	.wr-editor-head__title-btn {
+		position: absolute;
+		inset-inline-end: 4px;
+		width: 28px;
+		height: 28px;
+		color: var(--wr-fg-muted);
+	}
+
+	/* A hidden title is a quiet state, not an error: the glyph just dims. */
+	.wr-editor-head__title-btn[data-hidden='true'] {
+		color: var(--wr-fg-subtle);
+	}
+
+	.wr-editor-head__title-btn:hover {
+		color: var(--wr-primary);
 	}
 
 	.wr-editor {
 		display: grid;
+		flex: 1;
 		grid-template-columns: 280px minmax(0, 1fr) 320px;
 		gap: 1px;
-		min-height: calc(100vh - 120px);
+		/* Take what the header leaves, and never push the page into scrolling. */
+		min-height: 0;
 		background: var(--wr-border);
 	}
 
@@ -108,6 +146,7 @@
 		display: flex;
 		flex-direction: column;
 		min-width: 0;
+		min-height: 0;
 		background: var(--wr-bg);
 	}
 
@@ -169,12 +208,12 @@
 		width: 100%;
 	}
 
+	/* Each rail scrolls on its own rather than dragging the page with it. */
 	.wr-editor__pane-body {
 		flex: 1;
+		min-height: 0;
 		padding: 0 16px 24px;
 		overflow-y: auto;
-		/* Each rail scrolls on its own rather than dragging the page with it. */
-		max-height: calc(100vh - 200px);
 	}
 
 	.wr-editor__empty {
@@ -276,13 +315,24 @@
 		border-block-end: 1px solid var(--wr-border);
 	}
 
-	.wr-editor__stage {
+	/* Stage and attached list scroll together under the fixed preview head, so
+	   a tall grid reads like a page while the device toggle stays in reach. */
+	.wr-editor__preview-body {
 		display: flex;
 		flex: 1;
+		flex-direction: column;
+		min-height: 0;
+		overflow-y: auto;
+	}
+
+	/* Grows to fill the column when the widget is short, which keeps the
+	   attached list pinned to the bottom; never shrinks below its content. */
+	.wr-editor__stage {
+		display: flex;
+		flex: 1 0 auto;
 		align-items: flex-start;
 		justify-content: center;
 		padding: 24px;
-		overflow: auto;
 	}
 
 	.wr-editor__stage-inner {
@@ -293,6 +343,7 @@
 	}
 
 	.wr-editor__attached {
+		flex: none;
 		padding: 14px 16px 18px;
 		background: var(--wr-bg);
 		border-block-start: 1px solid var(--wr-border);
@@ -379,8 +430,32 @@
 		padding-block-start: 0;
 	}
 
-	.wr-style-panel .wr-collapse:first-child .wr-collapse__trigger {
-		padding-block-start: 0;
+	/* The Thumbnail / Player switch stays put while the sections scroll under
+	   it, so the other half of the panel is always one click away. */
+	.wr-style-panel__tabs {
+		position: sticky;
+		inset-block-start: 0;
+		z-index: 2;
+		margin-inline: -16px;
+		padding: 12px 16px 10px;
+		background: var(--wr-bg);
+		border-block-end: 1px solid var(--wr-border);
+	}
+
+	.wr-style-panel__tabs .wr-tabs__tab {
+		height: 32px;
+		font-weight: 600;
+	}
+
+	.wr-style-panel__hint {
+		margin: 8px 0 0;
+		font-size: 12px;
+		line-height: 1.4;
+		color: var(--wr-fg-muted);
+	}
+
+	.wr-style-panel__tabs + .wr-collapse {
+		border-block-start: 0;
 	}
 
 	/* A quiet sub-heading inside a section, e.g. "Carousel buttons". */
@@ -423,6 +498,18 @@
 	/* Below three panes' worth of room, the style panel becomes a drawer so the
 	   preview keeps the width it needs to be useful. */
 	@media (max-width: 1180px) {
+		/* The bar's three columns no longer fit beside the admin menu: back
+		   and actions share a row, the title takes a full one underneath. */
+		.wr-editor-head {
+			grid-template-columns: auto minmax(0, 1fr);
+		}
+
+		.wr-editor-head__title {
+			grid-column: 1 / -1;
+			grid-row: 2;
+			width: 100%;
+		}
+
 		.wr-editor,
 		.wr-editor.is-panel-hidden {
 			grid-template-columns: 240px minmax(0, 1fr);
@@ -466,7 +553,157 @@
 		}
 	}
 
+	/* ------------------------------------------------------ Widget title dialog */
+
+	/*
+	 * Three rows, each a label beside its control, under a strip that shows the
+	 * real name the way the page will: the dialog answers "what will it look
+	 * like?" before anyone has to close it and check the preview.
+	 */
+	.wr-title-dialog {
+		display: flex;
+		flex-direction: column;
+		gap: 18px;
+	}
+
+	.wr-title-dialog__lede {
+		margin: 0;
+		font-size: 13px;
+		line-height: 1.5;
+		color: var(--wr-fg-muted);
+	}
+
+	/* No gap of its own between title and reels: the title's margins are
+	   the owner's spacing, and the strip shows exactly that. */
+	.wr-title-dialog__preview {
+		display: flex;
+		flex-direction: column;
+		padding: 18px 20px 16px;
+		background: var(--wr-bg-muted);
+		border: 1px solid var(--wr-border);
+		border-radius: var(--wr-radius);
+	}
+
+	.wr-title-dialog__preview-text {
+		display: -webkit-box;
+		overflow: hidden;
+		min-height: 1.25em;
+		font-weight: 600;
+		line-height: 1.25;
+		overflow-wrap: anywhere;
+		-webkit-line-clamp: 2;
+		-webkit-box-orient: vertical;
+	}
+
+	.wr-title-dialog__preview-off {
+		display: inline-flex;
+		gap: 6px;
+		align-items: center;
+		align-self: center;
+		height: 26px;
+		margin-block-end: 12px;
+		padding-inline: 10px;
+		font-size: 12px;
+		font-weight: 500;
+		color: var(--wr-fg-muted);
+		background: var(--wr-bg);
+		border: 1px dashed var(--wr-border-strong);
+		border-radius: 999px;
+	}
+
+	/* Four stand-in reels, so the title reads as "above the reels". */
+	.wr-title-dialog__preview-reels {
+		display: grid;
+		grid-template-columns: repeat(4, minmax(0, 1fr));
+		gap: 8px;
+	}
+
+	.wr-title-dialog__preview-reels i {
+		display: block;
+		height: 44px;
+		background: linear-gradient(160deg, var(--wr-border) 0%, var(--wr-bg-sunken) 100%);
+		border-radius: 8px;
+	}
+
+	.wr-title-dialog__preview--off .wr-title-dialog__preview-reels i {
+		opacity: 0.6;
+	}
+
+	.wr-title-dialog .wr-field {
+		display: grid;
+		grid-template-columns: 84px minmax(0, 1fr);
+		gap: 6px 12px;
+		align-items: center;
+	}
+
+	.wr-title-dialog .wr-field__help,
+	.wr-title-dialog .wr-field__error {
+		grid-column: 2;
+	}
+
+	.wr-title-dialog .wr-toggle-group__item {
+		min-width: 38px;
+	}
+
+	.wr-title-dialog__when-shown {
+		display: flex;
+		flex-direction: column;
+		gap: 14px;
+		transition: opacity 150ms var(--wr-ease);
+	}
+
+	.wr-title-dialog__when-shown[data-disabled='true'] {
+		opacity: 0.45;
+	}
+
+	.wr-title-dialog__size {
+		display: inline-flex;
+		gap: 6px;
+		align-items: center;
+		font-size: 12px;
+		color: var(--wr-fg-muted);
+	}
+
+	.wr-title-dialog .wr-color__trigger {
+		max-width: 160px;
+	}
+
+	/* Top and bottom side by side, each a caption, a number and its unit. */
+	.wr-title-dialog__spacing {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 8px 16px;
+	}
+
+	.wr-title-dialog__spacing-input {
+		display: inline-flex;
+		gap: 6px;
+		align-items: center;
+		font-size: 12px;
+		color: var(--wr-fg-muted);
+	}
+
+	.wr-title-dialog__spacing-label {
+		min-width: 3em;
+		font-weight: 500;
+		color: var(--wr-fg);
+	}
+
+	.wr-title-dialog__spacing-unit {
+		color: var(--wr-fg-muted);
+	}
+
+	.wr-title-dialog__reset {
+		margin-inline-end: auto;
+	}
+
 	@media (max-width: 860px) {
+		/* One column: the panes stack, so the page scrolls again and only the
+		   picker keeps a scroll box of its own. */
+		.wr-app--editor {
+			height: auto;
+		}
+
 		.wr-editor {
 			grid-template-columns: minmax(0, 1fr);
 		}
@@ -475,7 +712,7 @@
 			border-block-end: 1px solid var(--wr-border);
 		}
 
-		.wr-editor__pane-body {
+		.wr-editor__picker .wr-editor__pane-body {
 			max-height: 320px;
 		}
 	}

@@ -6,6 +6,11 @@
  * price arrives as HTML that WooCommerce has already formatted, so currency,
  * tax display and sale strike-throughs match the rest of the store exactly.
  *
+ * One button, in one of two flavours: Add to cart keeps the shopper on the
+ * page and offers "View cart" once it lands; Buy now adds the product and
+ * goes straight to checkout. The editor keeps the two flags exclusive, and
+ * if both somehow arrive on, Buy now wins — the more deliberate choice.
+ *
  * Clicking the title or the image navigates — and must not toggle playback
  * on the way out, so those clicks stop before they reach the tap layer.
  */
@@ -62,6 +67,23 @@ export const Stars = ( { rating, count } ) => {
 	);
 };
 
+/* The tick's stroke draws itself in; the stylesheet animates the dash. */
+const Check = () => (
+	<svg
+		viewBox="0 0 24 24"
+		width="14"
+		height="14"
+		fill="none"
+		stroke="currentColor"
+		strokeWidth="2.5"
+		strokeLinecap="round"
+		strokeLinejoin="round"
+		aria-hidden="true"
+	>
+		<path d="m5 12.5 4.5 4.5L19 7.5" />
+	</svg>
+);
+
 const Spinner = () => (
 	<svg
 		className="wr-spin"
@@ -85,7 +107,10 @@ export const ProductCard = ( {
 	showRatings = true,
 	showAddToCart = true,
 	addToCartText,
+	directCheckout = false,
+	directCheckoutText,
 	cartUrl,
+	checkoutUrl,
 	onAddToCart,
 	onNavigate,
 	onToast,
@@ -116,7 +141,30 @@ export const ProductCard = ( {
 		stop( event );
 
 		if ( onNavigate ) {
-			onNavigate( link, product );
+			onNavigate( link );
+		}
+	};
+
+	const failed = ( error ) => {
+		setState( 'idle' );
+
+		if ( onToast ) {
+			onToast(
+				'error',
+				error && error.message
+					? sprintf(
+							/* translators: %s: the error message from WooCommerce. */
+							__(
+								'Failed to add to cart: %s',
+								'productreels-shoppable-video-reels-for-woocommerce'
+							),
+							error.message
+						)
+					: __(
+							'Failed to add to cart. Please try again.',
+							'productreels-shoppable-video-reels-for-woocommerce'
+						)
+			);
 		}
 	};
 
@@ -128,7 +176,7 @@ export const ProductCard = ( {
 		}
 
 		if ( onNavigate ) {
-			onNavigate( link, product );
+			onNavigate( link );
 		}
 
 		setState( 'adding' );
@@ -140,40 +188,56 @@ export const ProductCard = ( {
 			if ( onToast ) {
 				onToast(
 					'success',
-					__( 'Product added to cart!', 'wooreels' )
+					__(
+						'Product added to cart!',
+						'productreels-shoppable-video-reels-for-woocommerce'
+					)
 				);
 			}
 		} catch ( error ) {
-			setState( 'idle' );
+			failed( error );
+		}
+	};
 
-			if ( onToast ) {
-				onToast(
-					'error',
-					error && error.message
-						? sprintf(
-								/* translators: %s: the error message from WooCommerce. */
-								__( 'Failed to add to cart: %s', 'wooreels' ),
-								error.message
-						  )
-						: __(
-								'Failed to add to cart. Please try again.',
-								'wooreels'
-						  )
-				);
-			}
+	// Buy now: the same add, then the checkout page. The button stays busy
+	// until the page changes underneath it — a store with no checkout page
+	// gets the cart instead, and a store with neither the product's own.
+	const buy = async ( event ) => {
+		stop( event );
+
+		if ( state === 'adding' ) {
+			return;
+		}
+
+		if ( onNavigate ) {
+			onNavigate( link );
+		}
+
+		setState( 'adding' );
+
+		try {
+			await onAddToCart( product, link );
+			window.location.assign(
+				checkoutUrl || cartUrl || product.permalink
+			);
+		} catch ( error ) {
+			failed( error );
 		}
 	};
 
 	let action = null;
 
-	if ( showAddToCart ) {
+	if ( directCheckout || showAddToCart ) {
 		if ( ! product.in_stock ) {
 			action = (
 				<span
 					className="wr-product__btn is-disabled"
 					aria-disabled="true"
 				>
-					{ __( 'Out of stock', 'wooreels' ) }
+					{ __(
+						'Out of stock',
+						'productreels-shoppable-video-reels-for-woocommerce'
+					) }
 				</span>
 			);
 		} else if ( state === 'added' ) {
@@ -183,7 +247,11 @@ export const ProductCard = ( {
 					href={ cartUrl || product.permalink }
 					onClick={ stop }
 				>
-					{ __( 'View cart', 'wooreels' ) }
+					<Check />
+					{ __(
+						'View cart',
+						'productreels-shoppable-video-reels-for-woocommerce'
+					) }
 				</a>
 			);
 		} else if ( ! product.purchasable ) {
@@ -194,8 +262,28 @@ export const ProductCard = ( {
 					href={ product.permalink }
 					onClick={ navigate }
 				>
-					{ __( 'Select options', 'wooreels' ) }
+					{ __(
+						'Select options',
+						'productreels-shoppable-video-reels-for-woocommerce'
+					) }
 				</a>
+			);
+		} else if ( directCheckout ) {
+			action = (
+				<button
+					type="button"
+					className="wr-product__btn wr-product__btn--buy"
+					disabled={ state === 'adding' }
+					aria-busy={ state === 'adding' ? 'true' : undefined }
+					onClick={ buy }
+				>
+					{ state === 'adding' && <Spinner /> }
+					{ directCheckoutText ||
+						__(
+							'Buy now',
+							'productreels-shoppable-video-reels-for-woocommerce'
+						) }
+				</button>
 			);
 		} else {
 			action = (
@@ -208,8 +296,15 @@ export const ProductCard = ( {
 				>
 					{ state === 'adding' && <Spinner /> }
 					{ state === 'adding'
-						? __( 'Adding…', 'wooreels' )
-						: addToCartText || __( 'Add to cart', 'wooreels' ) }
+						? __(
+								'Adding…',
+								'productreels-shoppable-video-reels-for-woocommerce'
+							)
+						: addToCartText ||
+							__(
+								'Add to cart',
+								'productreels-shoppable-video-reels-for-woocommerce'
+							) }
 				</button>
 			);
 		}

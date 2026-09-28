@@ -18,7 +18,7 @@ if ( boot.pluginUrl ) {
 }
 
 const SELECTOR =
-	'.wooreels-embed[data-widget-id], .wooreels-embed[data-reel-id]';
+	'.productreels-embed[data-widget-id], .productreels-embed[data-reel-id]';
 
 const mount = ( node ) => {
 	if ( node.dataset.wrMounted === '1' ) {

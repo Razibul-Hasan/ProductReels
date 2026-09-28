@@ -2,11 +2,11 @@
  * The control primitives.
  *
  * Built once here and reused by every screen and by the style panel. Nothing
- * in this file reaches outside #wooreels-admin-app, and nothing hardcodes a
+ * in this file reaches outside #productreels-admin-app, and nothing hardcodes a
  * colour.
  */
 
-#wooreels-admin-app {
+#productreels-admin-app {
 
 	/* ---------------------------------------------------------------- Button */
 
@@ -216,6 +216,18 @@
 		background: var(--wr-bg);
 		border: 1px solid var(--wr-border-strong);
 		border-radius: var(--wr-radius-sm);
+	}
+
+	/* The browser adds its own cancel button to type="search"; we render our own. */
+	.wr-search__input::-webkit-search-cancel-button,
+	.wr-search__input::-webkit-search-decoration {
+		-webkit-appearance: none;
+		appearance: none;
+		display: none;
+	}
+
+	.wr-search__input::-ms-clear {
+		display: none;
 	}
 
 	.wr-search__clear {
@@ -744,6 +756,10 @@
 		animation: wr-rise 240ms var(--wr-ease);
 	}
 
+	.wr-modal__panel--sm {
+		max-width: 440px;
+	}
+
 	.wr-modal__panel--wide {
 		max-width: 860px;
 	}
@@ -756,6 +772,11 @@
 		margin-inline-end: auto;
 		font-size: 12px;
 		color: var(--wr-fg-muted);
+
+		&.is-blocking {
+			color: var(--wr-warning);
+			font-weight: 500;
+		}
 	}
 
 	.wr-modal__head {
@@ -800,23 +821,29 @@
 
 	/* ---------------------------------------------------------------- Toasts */
 
+	// Toasts sit at the bottom centre. The container spans the viewport edge
+	// so it centres in LTR and RTL alike, and lets clicks through to the
+	// page around the toasts.
 	.wr-toasts {
 		position: fixed;
 		inset-block-end: 24px;
-		inset-inline-end: 24px;
+		inset-inline: 16px;
 		z-index: 100001;
 		display: flex;
 		flex-direction: column;
+		align-items: center;
 		gap: 8px;
-		max-width: 360px;
+		pointer-events: none;
 	}
 
 	.wr-toast {
 		display: flex;
 		align-items: flex-start;
 		gap: 10px;
+		max-width: 360px;
 		padding: 11px 12px;
 		font-size: 13px;
+		pointer-events: auto;
 		background: var(--wr-bg);
 		border: 1px solid var(--wr-border);
 		border-inline-start: 3px solid var(--wr-fg-subtle);

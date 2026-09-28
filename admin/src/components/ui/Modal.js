@@ -2,7 +2,7 @@
  * Modal dialog and the confirm dialog built on it.
  *
  * Focus moves into the panel on open, is trapped while it is there, and is
- * restored to whatever opened it on close. WooReels never calls the browser's
+ * restored to whatever opened it on close. ProductReels never calls the browser's
  * confirm() — a confirmation is part of the interface, and it needs to be able
  * to name what it is about to delete and show a loading state while it does.
  */
@@ -26,6 +26,13 @@ export const Modal = ( {
 } ) => {
 	const panel = useRef( null );
 	const returnTo = useRef( null );
+	// The latest close handler, read at the moment a key is pressed. Callers
+	// pass a fresh function on every render, and an effect keyed on it would
+	// re-run on each — moving focus back to the first control every time a
+	// field inside the dialog changed a value, mid-keystroke.
+	const closeRef = useRef( onClose );
+
+	closeRef.current = onClose;
 
 	useEffect( () => {
 		returnTo.current = panel.current
@@ -39,7 +46,7 @@ export const Modal = ( {
 		const onKeyDown = ( event ) => {
 			if ( event.key === 'Escape' ) {
 				event.stopPropagation();
-				onClose();
+				closeRef.current();
 
 				return;
 			}
@@ -80,7 +87,7 @@ export const Modal = ( {
 			document.body.style.overflow = previousOverflow;
 			returnTo.current?.focus?.();
 		};
-	}, [ onClose ] );
+	}, [] );
 
 	return (
 		<div className="wr-modal-root">
@@ -108,7 +115,10 @@ export const Modal = ( {
 					<h2 className="wr-modal__title">{ title }</h2>
 					<IconButton
 						icon={ IconClose }
-						label={ __( 'Cancel', 'wooreels' ) }
+						label={ __(
+							'Close',
+							'productreels-shoppable-video-reels-for-woocommerce'
+						) }
 						onClick={ onClose }
 					/>
 				</div>
@@ -122,7 +132,10 @@ export const Modal = ( {
 export const ConfirmDialog = ( {
 	title,
 	children,
-	confirmLabel = __( 'Delete', 'wooreels' ),
+	confirmLabel = __(
+		'Delete',
+		'productreels-shoppable-video-reels-for-woocommerce'
+	),
 	tone = 'danger',
 	busy = false,
 	onConfirm,
@@ -134,7 +147,10 @@ export const ConfirmDialog = ( {
 		footer={
 			<>
 				<Button variant="ghost" onClick={ onClose } disabled={ busy }>
-					{ __( 'Cancel', 'wooreels' ) }
+					{ __(
+						'Cancel',
+						'productreels-shoppable-video-reels-for-woocommerce'
+					) }
 				</Button>
 				<Button
 					variant={ tone }

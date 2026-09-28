@@ -52,9 +52,25 @@ export const Carousel = ( { reels, styles, onOpen } ) => {
 		node.addEventListener( 'scroll', measure, { passive: true } );
 		window.addEventListener( 'resize', measure );
 
+		// The rail's own size changes without the window's: the editor's size
+		// slider and device toggle, a theme's collapsing sidebar. The edge
+		// fades are drawn from these measurements, so they must keep up.
+		const observer =
+			typeof window.ResizeObserver === 'function'
+				? new window.ResizeObserver( measure )
+				: null;
+
+		if ( observer ) {
+			observer.observe( node );
+		}
+
 		return () => {
 			node.removeEventListener( 'scroll', measure );
 			window.removeEventListener( 'resize', measure );
+
+			if ( observer ) {
+				observer.disconnect();
+			}
 		};
 	}, [ measure, reels.length ] );
 
@@ -125,12 +141,24 @@ export const Carousel = ( { reels, styles, onOpen } ) => {
 
 	return (
 		<div
-			className={ `wr-carousel wr-carousel--nav-${ styles.carouselBtnPosition }` }
+			className={ [
+				'wr-carousel',
+				`wr-carousel--nav-${ styles.carouselBtnPosition }`,
+				styles.shape === 'circle' ? 'wr-carousel--circle' : '',
+				// The stylesheet fades the edge the rail can still travel to.
+				edges.start ? 'is-start' : '',
+				edges.end ? 'is-end' : '',
+			]
+				.filter( Boolean )
+				.join( ' ' ) }
 		>
 			<button
 				type="button"
 				className="wr-nav wr-nav--prev"
-				aria-label={ __( 'Previous', 'wooreels' ) }
+				aria-label={ __(
+					'Previous',
+					'productreels-shoppable-video-reels-for-woocommerce'
+				) }
 				disabled={ edges.start }
 				onClick={ () => page( -1 ) }
 			>
@@ -156,7 +184,10 @@ export const Carousel = ( { reels, styles, onOpen } ) => {
 				className="wr-carousel__rail"
 				tabIndex={ 0 }
 				role="group"
-				aria-label={ __( 'Reels', 'wooreels' ) }
+				aria-label={ __(
+					'Reels',
+					'productreels-shoppable-video-reels-for-woocommerce'
+				) }
 				onKeyDown={ onKeyDown }
 				onPointerDown={ onPointerDown }
 				onPointerMove={ onPointerMove }
@@ -178,7 +209,10 @@ export const Carousel = ( { reels, styles, onOpen } ) => {
 			<button
 				type="button"
 				className="wr-nav wr-nav--next"
-				aria-label={ __( 'Next', 'wooreels' ) }
+				aria-label={ __(
+					'Next',
+					'productreels-shoppable-video-reels-for-woocommerce'
+				) }
 				disabled={ edges.end }
 				onClick={ () => page( 1 ) }
 			>

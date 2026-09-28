@@ -18,6 +18,7 @@ import {
 	IconChevronRight,
 	IconCopy,
 	IconDuplicate,
+	IconShortcode,
 	IconEdit,
 	IconLayout,
 	IconPlus,
@@ -50,19 +51,51 @@ const formatDate = ( value ) => {
 		? value
 		: new Intl.DateTimeFormat( locale(), { dateStyle: 'medium' } ).format(
 				date
-		  );
+			);
 };
 
 const TEMPLATE_LABELS = {
-	grid: __( 'Grid', 'wooreels' ),
-	carousel: __( 'Carousel', 'wooreels' ),
-	marquee: __( 'Marquee', 'wooreels' ),
-	stacked: __( 'Stacked', 'wooreels' ),
-	popup: __( 'Popup', 'wooreels' ),
+	grid: __( 'Grid', 'productreels-shoppable-video-reels-for-woocommerce' ),
+	carousel: __(
+		'Carousel',
+		'productreels-shoppable-video-reels-for-woocommerce'
+	),
+	marquee: __(
+		'Marquee',
+		'productreels-shoppable-video-reels-for-woocommerce'
+	),
+	stacked: __(
+		'Stacked',
+		'productreels-shoppable-video-reels-for-woocommerce'
+	),
+	popup: __( 'Popup', 'productreels-shoppable-video-reels-for-woocommerce' ),
 };
 
 const ctrOf = ( widget ) =>
 	widget.view_total > 0 ? widget.click_total / widget.view_total : 0;
+
+/**
+ * Every widget matching a search, however many pages the API splits it into.
+ *
+ * The list sorts on the client and the overview strip sums every row, so
+ * both need the whole set; a hundred at a time keeps each request small.
+ *
+ * @param {string} search The search term.
+ * @return {Promise<{items: Array, total: number}>} Every matching widget.
+ */
+const loadAll = async ( search ) => {
+	const params = { search, per_page: 100, orderby: 'id', order: 'DESC' };
+	const first = await widgetsApi.list( { ...params, page: 1 } );
+	let items = first.items;
+
+	for ( let page = 2; page <= first.pages; page++ ) {
+		const next = await widgetsApi.list( { ...params, page } );
+
+		items = items.concat( next.items );
+	}
+
+	return { items, total: first.total };
+};
 
 /**
  * Copy text with a fallback for browsers that refuse the clipboard API.
@@ -85,7 +118,7 @@ const copyText = async ( text ) => {
 
 const ShortcodeChip = ( { id, onCopied } ) => {
 	const [ copied, setCopied ] = useState( false );
-	const shortcode = `[wooreels id="${ id }"]`;
+	const shortcode = `[productreels id="${ id }"]`;
 
 	const copy = async () => {
 		await copyText( shortcode );
@@ -101,7 +134,10 @@ const ShortcodeChip = ( { id, onCopied } ) => {
 			onClick={ copy }
 			aria-label={ sprintf(
 				/* translators: %s: the shortcode. */
-				__( 'Copy %s', 'wooreels' ),
+				__(
+					'Copy %s',
+					'productreels-shoppable-video-reels-for-woocommerce'
+				),
 				shortcode
 			) }
 		>
@@ -186,7 +222,10 @@ const Overview = ( { items, loading } ) => {
 
 	const tiles = [
 		{
-			label: __( 'Widgets', 'wooreels' ),
+			label: __(
+				'Widgets',
+				'productreels-shoppable-video-reels-for-woocommerce'
+			),
 			value: formatNumber( totals.widgets ),
 			hint: sprintf(
 				/* translators: %d: number of reel placements across all widgets. */
@@ -194,25 +233,43 @@ const Overview = ( { items, loading } ) => {
 					'%d reel placed',
 					'%d reels placed',
 					totals.reels,
-					'wooreels'
+					'productreels-shoppable-video-reels-for-woocommerce'
 				),
 				totals.reels
 			),
 		},
 		{
-			label: __( 'Total Views', 'wooreels' ),
+			label: __(
+				'Total Views',
+				'productreels-shoppable-video-reels-for-woocommerce'
+			),
 			value: formatNumber( totals.views ),
-			hint: __( 'Across every widget', 'wooreels' ),
+			hint: __(
+				'Across every widget',
+				'productreels-shoppable-video-reels-for-woocommerce'
+			),
 		},
 		{
-			label: __( 'Total Clicks', 'wooreels' ),
+			label: __(
+				'Total Clicks',
+				'productreels-shoppable-video-reels-for-woocommerce'
+			),
 			value: formatNumber( totals.clicks ),
-			hint: __( 'Buttons and product cards', 'wooreels' ),
+			hint: __(
+				'Buttons and product cards',
+				'productreels-shoppable-video-reels-for-woocommerce'
+			),
 		},
 		{
-			label: __( 'CTR', 'wooreels' ),
+			label: __(
+				'CTR',
+				'productreels-shoppable-video-reels-for-woocommerce'
+			),
 			value: formatPercent( totals.ctr ),
-			hint: __( 'Clicks per view', 'wooreels' ),
+			hint: __(
+				'Clicks per view',
+				'productreels-shoppable-video-reels-for-woocommerce'
+			),
 		},
 	];
 
@@ -286,10 +343,13 @@ const SkeletonRows = () => (
 const GettingStarted = ( { hasReels, onAddReel, onCreate } ) => {
 	const steps = [
 		{
-			title: __( 'Add Reel', 'wooreels' ),
+			title: __(
+				'Add Reel',
+				'productreels-shoppable-video-reels-for-woocommerce'
+			),
 			text: __(
 				'Upload a short vertical video, or paste a Vimeo, YouTube Shorts or hosted link. Tag products or add a button.',
-				'wooreels'
+				'productreels-shoppable-video-reels-for-woocommerce'
 			),
 			done: hasReels,
 			action: (
@@ -298,15 +358,21 @@ const GettingStarted = ( { hasReels, onAddReel, onCreate } ) => {
 					icon={ IconPlus }
 					onClick={ onAddReel }
 				>
-					{ __( 'Add Reel', 'wooreels' ) }
+					{ __(
+						'Add Reel',
+						'productreels-shoppable-video-reels-for-woocommerce'
+					) }
 				</Button>
 			),
 		},
 		{
-			title: __( 'Create Widget', 'wooreels' ),
+			title: __(
+				'Create Widget',
+				'productreels-shoppable-video-reels-for-woocommerce'
+			),
 			text: __(
 				'Group reels into a widget, pick a layout and style it in the live editor.',
-				'wooreels'
+				'productreels-shoppable-video-reels-for-woocommerce'
 			),
 			done: false,
 			action: (
@@ -315,19 +381,27 @@ const GettingStarted = ( { hasReels, onAddReel, onCreate } ) => {
 					icon={ IconLayout }
 					onClick={ onCreate }
 				>
-					{ __( 'Create Widget', 'wooreels' ) }
+					{ __(
+						'Create Widget',
+						'productreels-shoppable-video-reels-for-woocommerce'
+					) }
 				</Button>
 			),
 		},
 		{
-			title: __( 'Place it', 'wooreels' ),
+			title: __(
+				'Place it',
+				'productreels-shoppable-video-reels-for-woocommerce'
+			),
 			text: __(
-				'Drop the shortcode into any page, or use the WooReels block or Elementor widget.',
-				'wooreels'
+				'Drop the shortcode into any page, or use the ProductReels block or Elementor widget.',
+				'productreels-shoppable-video-reels-for-woocommerce'
 			),
 			done: false,
 			action: (
-				<code className="wr-start__code">{ '[wooreels id="1"]' }</code>
+				<code className="wr-start__code">
+					{ '[productreels id="1"]' }
+				</code>
 			),
 		},
 	];
@@ -336,12 +410,15 @@ const GettingStarted = ( { hasReels, onAddReel, onCreate } ) => {
 		<div className="wr-card wr-start">
 			<div className="wr-start__head">
 				<h2 className="wr-start__title">
-					{ __( "You haven't created any widget yet!", 'wooreels' ) }
+					{ __(
+						"You haven't created any widget yet!",
+						'productreels-shoppable-video-reels-for-woocommerce'
+					) }
 				</h2>
 				<p className="wr-start__text">
 					{ __(
 						'A widget is a styled, reusable set of reels. Three steps and it is live.',
-						'wooreels'
+						'productreels-shoppable-video-reels-for-woocommerce'
 					) }
 				</p>
 			</div>
@@ -402,12 +479,7 @@ export const WidgetsList = ( { navigate } ) => {
 		setError( '' );
 
 		try {
-			const page = await widgetsApi.list( {
-				search: term,
-				per_page: 100,
-				orderby: 'id',
-				order: 'DESC',
-			} );
+			const page = await loadAll( term );
 
 			setItems( page.items );
 			setTotal( page.total );
@@ -473,7 +545,7 @@ export const WidgetsList = ( { navigate } ) => {
 				? {
 						column,
 						direction: current.direction === 'asc' ? 'desc' : 'asc',
-				  }
+					}
 				: { column, direction: column === 'name' ? 'asc' : 'desc' }
 		);
 
@@ -482,7 +554,12 @@ export const WidgetsList = ( { navigate } ) => {
 
 		try {
 			await widgetsApi.duplicate( widget.id );
-			toasts.success( __( 'Widget created successfully!', 'wooreels' ) );
+			toasts.success(
+				__(
+					'Widget created successfully!',
+					'productreels-shoppable-video-reels-for-woocommerce'
+				)
+			);
 			await load();
 		} catch ( requestError ) {
 			toasts.error( requestError.message );
@@ -496,7 +573,12 @@ export const WidgetsList = ( { navigate } ) => {
 
 		try {
 			await widgetsApi.remove( confirming.id );
-			toasts.success( __( 'Widget deleted successfully!', 'wooreels' ) );
+			toasts.success(
+				__(
+					'Widget deleted successfully!',
+					'productreels-shoppable-video-reels-for-woocommerce'
+				)
+			);
 			setConfirming( null );
 			await load();
 		} catch ( requestError ) {
@@ -514,7 +596,10 @@ export const WidgetsList = ( { navigate } ) => {
 			<div className="wr-page-head">
 				<div className="wr-page-head__titles">
 					<h1 className="wr-page-head__title">
-						{ __( 'All Widgets', 'wooreels' ) }
+						{ __(
+							'All Widgets',
+							'productreels-shoppable-video-reels-for-woocommerce'
+						) }
 						{ ! loading && total > 0 && (
 							<span className="wr-count-chip">
 								{ formatNumber( total ) }
@@ -524,7 +609,7 @@ export const WidgetsList = ( { navigate } ) => {
 					<p className="wr-page-head__sub">
 						{ __(
 							'Reusable, styled collections of reels you can drop anywhere.',
-							'wooreels'
+							'productreels-shoppable-video-reels-for-woocommerce'
 						) }
 					</p>
 				</div>
@@ -532,20 +617,29 @@ export const WidgetsList = ( { navigate } ) => {
 					<SearchInput
 						value={ search }
 						onChange={ setSearch }
-						placeholder={ __( 'Search widgets…', 'wooreels' ) }
+						placeholder={ __(
+							'Search widgets…',
+							'productreels-shoppable-video-reels-for-woocommerce'
+						) }
 					/>
 					<Button
 						icon={ IconPlus }
 						onClick={ () => setAddingReel( true ) }
 					>
-						{ __( 'Add Reel', 'wooreels' ) }
+						{ __(
+							'Add Reel',
+							'productreels-shoppable-video-reels-for-woocommerce'
+						) }
 					</Button>
 					<Button
 						variant="primary"
 						icon={ IconLayout }
 						onClick={ () => navigate( '#/widgets/new' ) }
 					>
-						{ __( 'Create Widget', 'wooreels' ) }
+						{ __(
+							'Create Widget',
+							'productreels-shoppable-video-reels-for-woocommerce'
+						) }
 					</Button>
 				</div>
 			</div>
@@ -555,7 +649,10 @@ export const WidgetsList = ( { navigate } ) => {
 					<div className="wr-card wr-error-card">
 						<p>{ error }</p>
 						<Button onClick={ load }>
-							{ __( 'Continue', 'wooreels' ) }
+							{ __(
+								'Try again',
+								'productreels-shoppable-video-reels-for-woocommerce'
+							) }
 						</Button>
 					</div>
 				) }
@@ -571,15 +668,18 @@ export const WidgetsList = ( { navigate } ) => {
 						<EmptyState
 							title={ __(
 								'No widgets match that search.',
-								'wooreels'
+								'productreels-shoppable-video-reels-for-woocommerce'
 							) }
 							text={ __(
 								'Try a different name, or clear the search to see everything.',
-								'wooreels'
+								'productreels-shoppable-video-reels-for-woocommerce'
 							) }
 							action={
 								<Button onClick={ () => setSearch( '' ) }>
-									{ __( 'Clear', 'wooreels' ) }
+									{ __(
+										'Clear',
+										'productreels-shoppable-video-reels-for-woocommerce'
+									) }
 								</Button>
 							}
 						/>
@@ -603,51 +703,72 @@ export const WidgetsList = ( { navigate } ) => {
 										column="name"
 										label={ __(
 											'Widget Name',
-											'wooreels'
+											'productreels-shoppable-video-reels-for-woocommerce'
 										) }
 										sort={ sort }
 										onSort={ toggleSort }
 									/>
 									<SortHeader
 										column="reel_count"
-										label={ __( 'Reels', 'wooreels' ) }
+										label={ __(
+											'Reels',
+											'productreels-shoppable-video-reels-for-woocommerce'
+										) }
 										sort={ sort }
 										onSort={ toggleSort }
 										numeric
 									/>
 									<th scope="col">
-										{ __( 'Shortcode', 'wooreels' ) }
+										{ __(
+											'Shortcode',
+											'productreels-shoppable-video-reels-for-woocommerce'
+										) }
 									</th>
 									<SortHeader
 										column="view_total"
-										label={ __( 'Views', 'wooreels' ) }
+										label={ __(
+											'Views',
+											'productreels-shoppable-video-reels-for-woocommerce'
+										) }
 										sort={ sort }
 										onSort={ toggleSort }
 										numeric
 									/>
 									<SortHeader
 										column="click_total"
-										label={ __( 'Clicks', 'wooreels' ) }
+										label={ __(
+											'Clicks',
+											'productreels-shoppable-video-reels-for-woocommerce'
+										) }
 										sort={ sort }
 										onSort={ toggleSort }
 										numeric
 									/>
 									<SortHeader
 										column="ctr"
-										label={ __( 'CTR', 'wooreels' ) }
+										label={ __(
+											'CTR',
+											'productreels-shoppable-video-reels-for-woocommerce'
+										) }
 										sort={ sort }
 										onSort={ toggleSort }
 										numeric
 									/>
 									<SortHeader
 										column="created_at"
-										label={ __( 'Created', 'wooreels' ) }
+										label={ __(
+											'Created',
+											'productreels-shoppable-video-reels-for-woocommerce'
+										) }
 										sort={ sort }
 										onSort={ toggleSort }
 									/>
 									<th scope="col">
 										<span className="wr-screen-reader-text">
-											{ __( 'Actions', 'wooreels' ) }
+											{ __(
+												'Actions',
+												'productreels-shoppable-video-reels-for-woocommerce'
+											) }
 										</span>
 									</th>
 								</tr>
@@ -714,7 +835,7 @@ export const WidgetsList = ( { navigate } ) => {
 														toasts.success(
 															__(
 																'Copied!',
-																'wooreels'
+																'productreels-shoppable-video-reels-for-woocommerce'
 															)
 														)
 													}
@@ -734,7 +855,7 @@ export const WidgetsList = ( { navigate } ) => {
 												{ widget.view_total > 0
 													? formatPercent(
 															ctrOf( widget )
-													  )
+														)
 													: '—' }
 											</td>
 											<td className="wr-table__muted">
@@ -748,7 +869,7 @@ export const WidgetsList = ( { navigate } ) => {
 														icon={ IconEdit }
 														label={ __(
 															'Edit',
-															'wooreels'
+															'productreels-shoppable-video-reels-for-woocommerce'
 														) }
 														onClick={ () =>
 															navigate(
@@ -760,7 +881,7 @@ export const WidgetsList = ( { navigate } ) => {
 														icon={ IconChart }
 														label={ __(
 															'Statistics',
-															'wooreels'
+															'productreels-shoppable-video-reels-for-woocommerce'
 														) }
 														onClick={ () =>
 															navigate(
@@ -772,7 +893,7 @@ export const WidgetsList = ( { navigate } ) => {
 														icon={ IconDuplicate }
 														label={ __(
 															'Duplicate',
-															'wooreels'
+															'productreels-shoppable-video-reels-for-woocommerce'
 														) }
 														disabled={
 															busyId === widget.id
@@ -782,19 +903,19 @@ export const WidgetsList = ( { navigate } ) => {
 														}
 													/>
 													<IconButton
-														icon={ IconCopy }
+														icon={ IconShortcode }
 														label={ __(
 															'Copy shortcode',
-															'wooreels'
+															'productreels-shoppable-video-reels-for-woocommerce'
 														) }
 														onClick={ async () => {
 															await copyText(
-																`[wooreels id="${ widget.id }"]`
+																`[productreels id="${ widget.id }"]`
 															);
 															toasts.success(
 																__(
 																	'Copied!',
-																	'wooreels'
+																	'productreels-shoppable-video-reels-for-woocommerce'
 																)
 															);
 														} }
@@ -803,7 +924,7 @@ export const WidgetsList = ( { navigate } ) => {
 														icon={ IconTrash }
 														label={ __(
 															'Delete',
-															'wooreels'
+															'productreels-shoppable-video-reels-for-woocommerce'
 														) }
 														tone="danger"
 														onClick={ () =>
@@ -838,7 +959,7 @@ export const WidgetsList = ( { navigate } ) => {
 				<ConfirmDialog
 					title={ __(
 						'Are you sure you want to delete this widget?',
-						'wooreels'
+						'productreels-shoppable-video-reels-for-woocommerce'
 					) }
 					busy={ deleting }
 					onConfirm={ remove }
@@ -848,7 +969,7 @@ export const WidgetsList = ( { navigate } ) => {
 						/* translators: %1$s: widget name, %2$s: a count of reels, already pluralised. */
 						__(
 							'%1$s will be removed, along with its click statistics. Its %2$s stay in your library and keep working in any other widget.',
-							'wooreels'
+							'productreels-shoppable-video-reels-for-woocommerce'
 						),
 						confirming.name,
 						sprintf(
@@ -857,7 +978,7 @@ export const WidgetsList = ( { navigate } ) => {
 								'%d reel',
 								'%d reels',
 								confirming.reel_count,
-								'wooreels'
+								'productreels-shoppable-video-reels-for-woocommerce'
 							),
 							confirming.reel_count
 						)

@@ -8,7 +8,7 @@
 
 import { createAddToCart } from '@shared/storeApi';
 
-const boot = window.wooreelsPublic || {};
+const boot = window.productreelsPublic || {};
 
 const headers = () => {
 	const out = { 'Content-Type': 'application/json' };
@@ -23,7 +23,7 @@ const headers = () => {
 /**
  * Fetch JSON from the plugin's API.
  *
- * @param {string} path Route, relative to the wooreels/v1 base.
+ * @param {string} path Route, relative to the productreels/v1 base.
  * @param {Object} init Fetch options.
  * @return {Promise<any>} The decoded body.
  */
@@ -60,7 +60,7 @@ export const api = async ( path, init = {} ) => {
  * sendBeacon when the browser has it — a click that navigates away would
  * otherwise cancel the request — and fetch with keepalive as the fallback.
  *
- * @param {string} path Route, relative to the wooreels/v1 base.
+ * @param {string} path Route, relative to the productreels/v1 base.
  * @param {Object} data JSON body.
  */
 const beacon = ( path, data ) => {
@@ -96,7 +96,7 @@ const beacon = ( path, data ) => {
 const viewed = new Set();
 
 const viewKey = ( widgetId, reelId ) =>
-	`wooreels_viewed_${ widgetId }_${ reelId }`;
+	`productreels_viewed_${ widgetId }_${ reelId }`;
 
 const alreadyViewed = ( widgetId, reelId ) => {
 	const key = viewKey( widgetId, reelId );
@@ -156,16 +156,13 @@ export const createServices = ( widgetId ) => ( {
 			.catch( () => {} );
 	},
 
-	trackClick: ( reel, link, product ) => {
+	// The server looks the button up on the reel and records its own labels,
+	// so the request carries nothing but the three ids.
+	trackClick: ( reel, link ) => {
 		beacon( 'track/click', {
 			widget_id: widgetId,
 			reel_id: reel.id,
-			reel_title: reel.title || '',
 			btn_uuid: link.btn_uuid,
-			button_text: link.buttonText || ( product && product.name ) || '',
-			button_url:
-				link.buttonUrl || ( product && product.permalink ) || '',
-			campaign_name: link.campaignName || '',
 		} );
 	},
 
@@ -185,10 +182,11 @@ export const createServices = ( widgetId ) => ( {
 		? createAddToCart( {
 				restUrl: boot.restUrl,
 				nonce: boot.storeApiNonce,
-		  } )
+			} )
 		: () => Promise.reject( new Error( '' ) ),
 
 	cartUrl: boot.cartUrl || '',
+	checkoutUrl: boot.checkoutUrl || '',
 	hasWoo: !! boot.hasWoo,
 } );
 

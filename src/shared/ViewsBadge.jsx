@@ -2,7 +2,7 @@
  * The view counter that sits on a thumbnail.
  *
  * A circle thumbnail has no corner to tuck this into without clipping it, so
- * the badge drops below the circle instead of insetting.
+ * there it is a line under the disc, with the title, instead of insetting.
  */
 
 import { __ } from '@wordpress/i18n';
@@ -11,7 +11,10 @@ export const ViewsBadge = ( { count, background, color, shape } ) => (
 	<span
 		className={ `wr-views wr-views--${ shape }` }
 		style={ { background, color } }
-		title={ __( 'Views', 'wooreels' ) }
+		title={ __(
+			'Views',
+			'productreels-shoppable-video-reels-for-woocommerce'
+		) }
 	>
 		<svg
 			viewBox="0 0 24 24"

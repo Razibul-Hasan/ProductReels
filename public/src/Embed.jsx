@@ -17,11 +17,31 @@ import {
 import { WidgetRenderer } from '@shared/WidgetRenderer';
 import { api, boot, createServices } from './services';
 
-const Player = lazy( () =>
+const loadPlayer = () =>
 	import(
-		/* webpackChunkName: "wooreels-player" */ '@shared/player/Player'
-	).then( ( module ) => ( { default: module.Player } ) )
+		/* webpackChunkName: "productreels-player" */ '@shared/player/Player'
+	);
+
+const Player = lazy( () =>
+	loadPlayer().then( ( module ) => ( { default: module.Player } ) )
 );
+
+/**
+ * Start the player chunk downloading at the first sign of interest — a
+ * pointer over the widget, a finger on it, focus landing in it — so that by
+ * the time the tap comes the code is usually already here. A visitor who
+ * never approaches the widget still never pays for it.
+ */
+let warmed = false;
+
+const warmPlayer = () => {
+	if ( ! warmed ) {
+		warmed = true;
+		loadPlayer().catch( () => {
+			warmed = false;
+		} );
+	}
+};
 
 /**
  * The reel-count skeleton shown while the payload loads.
@@ -82,6 +102,8 @@ export const Embed = ( { widgetId, reelId, version } ) => {
 			<WidgetRenderer
 				widget={ widget }
 				styles={ styles }
+				services={ services }
+				onApproach={ warmPlayer }
 				onOpen={ ( reel, from ) => {
 					const index = widget.reels.findIndex(
 						( entry ) => entry.id === reel.id

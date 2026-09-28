@@ -50,7 +50,11 @@ export const PosterCapture = ( { src, onCaptured, onClose } ) => {
 
 			const body = new FormData();
 
-			body.append( 'file', blob, `wooreels-poster-${ Date.now() }.jpg` );
+			body.append(
+				'file',
+				blob,
+				`productreels-poster-${ Date.now() }.jpg`
+			);
 
 			const media = await apiFetch( {
 				path: '/wp/v2/media',
@@ -63,7 +67,7 @@ export const PosterCapture = ( { src, onCaptured, onClose } ) => {
 			setError(
 				__(
 					'This frame could not be captured. Videos hosted on another domain are blocked from being read this way — pick a poster from the media library instead.',
-					'wooreels'
+					'productreels-shoppable-video-reels-for-woocommerce'
 				)
 			);
 		} finally {
@@ -73,12 +77,18 @@ export const PosterCapture = ( { src, onCaptured, onClose } ) => {
 
 	return (
 		<Modal
-			title={ __( 'Choose from Media', 'wooreels' ) }
+			title={ __(
+				'Capture frame',
+				'productreels-shoppable-video-reels-for-woocommerce'
+			) }
 			onClose={ onClose }
 			footer={
 				<>
 					<Button variant="ghost" onClick={ onClose }>
-						{ __( 'Cancel', 'wooreels' ) }
+						{ __(
+							'Cancel',
+							'productreels-shoppable-video-reels-for-woocommerce'
+						) }
 					</Button>
 					<Button
 						variant="primary"
@@ -87,14 +97,16 @@ export const PosterCapture = ( { src, onCaptured, onClose } ) => {
 						disabled={ busy }
 						onClick={ capture }
 					>
-						{ __( 'Upload', 'wooreels' ) }
+						{ __(
+							'Use this frame',
+							'productreels-shoppable-video-reels-for-woocommerce'
+						) }
 					</Button>
 				</>
 			}
 		>
 			<div className="wr-form">
 				<div className="wr-capture">
-					{  }
 					<video
 						ref={ video }
 						className="wr-capture__video"
@@ -114,7 +126,10 @@ export const PosterCapture = ( { src, onCaptured, onClose } ) => {
 				<div className="wr-slider">
 					<div className="wr-slider__head">
 						<span className="wr-field__label">
-							{ __( 'Position', 'wooreels' ) }
+							{ __(
+								'Position',
+								'productreels-shoppable-video-reels-for-woocommerce'
+							) }
 						</span>
 						<span className="wr-field__help">
 							{ time.toFixed( 1 ) }s / { duration.toFixed( 1 ) }s
@@ -127,7 +142,10 @@ export const PosterCapture = ( { src, onCaptured, onClose } ) => {
 						max={ Math.max( 0.1, duration ) }
 						step="0.1"
 						value={ time }
-						aria-label={ __( 'Position', 'wooreels' ) }
+						aria-label={ __(
+							'Position',
+							'productreels-shoppable-video-reels-for-woocommerce'
+						) }
 						onChange={ ( event ) => {
 							const next = Number( event.target.value );
 

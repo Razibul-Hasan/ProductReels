@@ -1,13 +1,13 @@
 {
 	"$schema": "https://schemas.wp.org/trunk/block.json",
 	"apiVersion": 3,
-	"name": "wooreels/reels",
+	"name": "productreels/reels",
 	"version": "1.0.0",
-	"title": "WooReels",
+	"title": "ProductReels",
 	"category": "widgets",
-	"description": "Place a WooReels widget — a styled collection of shoppable video reels.",
+	"description": "Place a ProductReels widget — a styled collection of shoppable video reels.",
 	"keywords": [ "reels", "video", "shoppable", "woocommerce", "stories" ],
-	"textdomain": "wooreels",
+	"textdomain": "productreels-shoppable-video-reels-for-woocommerce",
 	"attributes": {
 		"widgetId": {
 			"type": "string",
@@ -21,8 +21,8 @@
 			"margin": true
 		}
 	},
-	"editorScript": "wooreels-block",
-	"editorStyle": "wooreels-block",
+	"editorScript": "productreels-block",
+	"editorStyle": "productreels-block",
 	"example": {
 		"attributes": {
 			"widgetId": ""

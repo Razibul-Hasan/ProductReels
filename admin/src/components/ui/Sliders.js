@@ -12,9 +12,30 @@ import { IconDesktop, IconMobile, IconReset, IconTablet } from '../icons';
 import { IconButton } from './Button';
 
 const DEVICES = [
-	{ value: 'desktop', icon: IconDesktop, label: __( 'Desktop', 'wooreels' ) },
-	{ value: 'tablet', icon: IconTablet, label: __( 'Tablet', 'wooreels' ) },
-	{ value: 'mobile', icon: IconMobile, label: __( 'Mobile', 'wooreels' ) },
+	{
+		value: 'desktop',
+		icon: IconDesktop,
+		label: __(
+			'Desktop',
+			'productreels-shoppable-video-reels-for-woocommerce'
+		),
+	},
+	{
+		value: 'tablet',
+		icon: IconTablet,
+		label: __(
+			'Tablet',
+			'productreels-shoppable-video-reels-for-woocommerce'
+		),
+	},
+	{
+		value: 'mobile',
+		icon: IconMobile,
+		label: __(
+			'Mobile',
+			'productreels-shoppable-video-reels-for-woocommerce'
+		),
+	},
 ];
 
 export const Slider = ( {
@@ -39,7 +60,10 @@ export const Slider = ( {
 					{ onReset && (
 						<IconButton
 							icon={ IconReset }
-							label={ __( 'Reset', 'wooreels' ) }
+							label={ __(
+								'Reset',
+								'productreels-shoppable-video-reels-for-woocommerce'
+							) }
 							size={ 14 }
 							onClick={ onReset }
 						/>
@@ -100,7 +124,10 @@ export const ResponsiveSlider = ( {
 					<div
 						className="wr-toggle-group"
 						role="group"
-						aria-label={ __( 'Device', 'wooreels' ) }
+						aria-label={ __(
+							'Device',
+							'productreels-shoppable-video-reels-for-woocommerce'
+						) }
 					>
 						{ DEVICES.map( ( entry ) => {
 							const Icon = entry.icon;
@@ -126,7 +153,10 @@ export const ResponsiveSlider = ( {
 					{ defaults && (
 						<IconButton
 							icon={ IconReset }
-							label={ __( 'Reset', 'wooreels' ) }
+							label={ __(
+								'Reset',
+								'productreels-shoppable-video-reels-for-woocommerce'
+							) }
 							size={ 14 }
 							onClick={ () =>
 								onChange( device, defaults[ device ] )

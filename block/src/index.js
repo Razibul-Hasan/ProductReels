@@ -1,5 +1,5 @@
 /**
- * The wooreels/reels block editor script.
+ * The productreels/reels block editor script.
  *
  * A dynamic block: it saves nothing but a widget id and PHP prints the
  * mount node. In the editor it shows which widget is chosen and a strip of
@@ -21,10 +21,10 @@ import {
 import { useEffect, useMemo, useState } from '@wordpress/element';
 import { __, _n, sprintf } from '@wordpress/i18n';
 import metadata from '../block.json';
-import { WooReelsIcon } from './icon';
+import { ProductReelsIcon } from './icon';
 import './editor.scss';
 
-const config = window.wooreelsBlock || {};
+const config = window.productreelsBlock || {};
 
 const posterOf = ( reel ) =>
 	reel.thumbnail ||
@@ -37,7 +37,7 @@ let widgetsPromise = null;
 const loadWidgets = () => {
 	if ( ! widgetsPromise ) {
 		widgetsPromise = apiFetch( {
-			path: '/wooreels/v1/widgets?per_page=100&orderby=name&order=ASC',
+			path: '/productreels/v1/widgets?per_page=100&orderby=name&order=ASC',
 		} ).catch( () => {
 			widgetsPromise = null;
 
@@ -82,7 +82,7 @@ const Edit = ( { attributes, setAttributes } ) => {
 
 		setWidget( null );
 
-		apiFetch( { path: `/wooreels/v1/widgets/${ Number( widgetId ) }` } )
+		apiFetch( { path: `/productreels/v1/widgets/${ Number( widgetId ) }` } )
 			.then( ( full ) => {
 				if ( ! cancelled ) {
 					setWidget( full );
@@ -106,7 +106,10 @@ const Edit = ( { attributes, setAttributes } ) => {
 				value: String( entry.id ),
 				label: sprintf(
 					/* translators: 1: widget name, 2: reel count. */
-					__( '%1$s (%2$s)', 'wooreels' ),
+					__(
+						'%1$s (%2$s)',
+						'productreels-shoppable-video-reels-for-woocommerce'
+					),
 					entry.name,
 					sprintf(
 						/* translators: %d: number of reels. */
@@ -114,7 +117,7 @@ const Edit = ( { attributes, setAttributes } ) => {
 							'%d reel',
 							'%d reels',
 							entry.reel_count,
-							'wooreels'
+							'productreels-shoppable-video-reels-for-woocommerce'
 						),
 						entry.reel_count
 					)
@@ -127,7 +130,10 @@ const Edit = ( { attributes, setAttributes } ) => {
 		<ComboboxControl
 			__nextHasNoMarginBottom
 			__next40pxDefaultSize
-			label={ __( 'Widget', 'wooreels' ) }
+			label={ __(
+				'Widget',
+				'productreels-shoppable-video-reels-for-woocommerce'
+			) }
 			value={ widgetId || null }
 			options={ options }
 			onChange={ ( value ) =>
@@ -135,8 +141,14 @@ const Edit = ( { attributes, setAttributes } ) => {
 			}
 			placeholder={
 				widgets === null
-					? __( 'Loading…', 'wooreels' )
-					: __( 'Search widgets…', 'wooreels' )
+					? __(
+							'Loading…',
+							'productreels-shoppable-video-reels-for-woocommerce'
+						)
+					: __(
+							'Search widgets…',
+							'productreels-shoppable-video-reels-for-woocommerce'
+						)
 			}
 		/>
 	);
@@ -144,30 +156,48 @@ const Edit = ( { attributes, setAttributes } ) => {
 	const editLink = widgetId
 		? `${ config.adminUrl }#/widgets/${ Number( widgetId ) }`
 		: config.adminUrl;
+	// Only someone who can open the ProductReels screens gets a link to them.
+	const canManage = !! config.canManage;
 
 	return (
 		<>
 			<InspectorControls>
-				<PanelBody title={ __( 'WooReels', 'wooreels' ) }>
+				<PanelBody
+					title={ __(
+						'ProductReels',
+						'productreels-shoppable-video-reels-for-woocommerce'
+					) }
+				>
 					{ picker }
-					<p className="wr-block__open">
-						<ExternalLink href={ editLink }>
-							{ widgetId
-								? __( 'Open in WooReels', 'wooreels' )
-								: __( 'Create Widget', 'wooreels' ) }
-						</ExternalLink>
-					</p>
+					{ canManage && (
+						<p className="wr-block__open">
+							<ExternalLink href={ editLink }>
+								{ widgetId
+									? __(
+											'Open in ProductReels',
+											'productreels-shoppable-video-reels-for-woocommerce'
+										)
+									: __(
+											'Create Widget',
+											'productreels-shoppable-video-reels-for-woocommerce'
+										) }
+							</ExternalLink>
+						</p>
+					) }
 				</PanelBody>
 			</InspectorControls>
 
 			<div { ...blockProps }>
 				{ ! widgetId && (
 					<Placeholder
-						icon={ <WooReelsIcon /> }
-						label={ __( 'WooReels', 'wooreels' ) }
+						icon={ <ProductReelsIcon /> }
+						label={ __(
+							'ProductReels',
+							'productreels-shoppable-video-reels-for-woocommerce'
+						) }
 						instructions={ __(
 							'Choose which widget to show here.',
-							'wooreels'
+							'productreels-shoppable-video-reels-for-woocommerce'
 						) }
 					>
 						<div className="wr-block__picker">
@@ -175,11 +205,21 @@ const Edit = ( { attributes, setAttributes } ) => {
 								<Notice status="info" isDismissible={ false }>
 									{ __(
 										"You haven't created any widget yet!",
-										'wooreels'
-									) }{ ' ' }
-									<ExternalLink href={ config.adminUrl }>
-										{ __( 'Create Widget', 'wooreels' ) }
-									</ExternalLink>
+										'productreels-shoppable-video-reels-for-woocommerce'
+									) }
+									{ canManage && (
+										<>
+											{ ' ' }
+											<ExternalLink
+												href={ config.adminUrl }
+											>
+												{ __(
+													'Create Widget',
+													'productreels-shoppable-video-reels-for-woocommerce'
+												) }
+											</ExternalLink>
+										</>
+									) }
 								</Notice>
 							) : (
 								picker
@@ -194,7 +234,7 @@ const Edit = ( { attributes, setAttributes } ) => {
 							/* translators: %d: widget id. */
 							__(
 								'Widget #%d no longer exists. Choose another one.',
-								'wooreels'
+								'productreels-shoppable-video-reels-for-woocommerce'
 							),
 							Number( widgetId )
 						) }
@@ -211,7 +251,7 @@ const Edit = ( { attributes, setAttributes } ) => {
 					<div className="wr-block__card">
 						<div className="wr-block__head">
 							<span className="wr-block__icon">
-								<WooReelsIcon />
+								<ProductReelsIcon />
 							</span>
 							<span className="wr-block__titles">
 								<strong className="wr-block__name">
@@ -220,14 +260,17 @@ const Edit = ( { attributes, setAttributes } ) => {
 								<span className="wr-block__meta">
 									{ sprintf(
 										/* translators: 1: number of reels (already pluralised), 2: template name. */
-										__( '%1$s · %2$s', 'wooreels' ),
+										__(
+											'%1$s · %2$s',
+											'productreels-shoppable-video-reels-for-woocommerce'
+										),
 										sprintf(
 											/* translators: %d: number of reels. */
 											_n(
 												'%d reel',
 												'%d reels',
 												widget.reels.length,
-												'wooreels'
+												'productreels-shoppable-video-reels-for-woocommerce'
 											),
 											widget.reels.length
 										),
@@ -235,12 +278,17 @@ const Edit = ( { attributes, setAttributes } ) => {
 									) }
 								</span>
 							</span>
-							<ExternalLink
-								className="wr-block__edit"
-								href={ editLink }
-							>
-								{ __( 'Edit', 'wooreels' ) }
-							</ExternalLink>
+							{ canManage && (
+								<ExternalLink
+									className="wr-block__edit"
+									href={ editLink }
+								>
+									{ __(
+										'Edit',
+										'productreels-shoppable-video-reels-for-woocommerce'
+									) }
+								</ExternalLink>
+							) }
 						</div>
 
 						{ widget.reels.length > 0 ? (
@@ -278,7 +326,7 @@ const Edit = ( { attributes, setAttributes } ) => {
 							<p className="wr-block__empty">
 								{ __(
 									'No reels have been added to this widget yet.',
-									'wooreels'
+									'productreels-shoppable-video-reels-for-woocommerce'
 								) }
 							</p>
 						) }
@@ -290,7 +338,7 @@ const Edit = ( { attributes, setAttributes } ) => {
 };
 
 registerBlockType( metadata.name, {
-	icon: WooReelsIcon,
+	icon: ProductReelsIcon,
 	edit: Edit,
 	save: () => null,
 } );

@@ -61,8 +61,14 @@ const isValidUrl = ( value ) => {
 const CustomTab = ( { draft, setDraft, errors } ) => (
 	<div className="wr-form">
 		<TextField
-			label={ __( 'Button Text', 'wooreels' ) }
-			placeholder={ __( 'e.g Buy Now', 'wooreels' ) }
+			label={ __(
+				'Button Text',
+				'productreels-shoppable-video-reels-for-woocommerce'
+			) }
+			placeholder={ __(
+				'e.g Buy Now',
+				'productreels-shoppable-video-reels-for-woocommerce'
+			) }
 			value={ draft.buttonText }
 			error={ errors.buttonText }
 			onChange={ ( value ) =>
@@ -70,19 +76,31 @@ const CustomTab = ( { draft, setDraft, errors } ) => (
 			}
 		/>
 		<TextField
-			label={ __( 'Url', 'wooreels' ) }
+			label={ __(
+				'Url',
+				'productreels-shoppable-video-reels-for-woocommerce'
+			) }
 			type="url"
-			placeholder={ __( 'e.g https://example.com', 'wooreels' ) }
+			placeholder={ __(
+				'e.g https://example.com',
+				'productreels-shoppable-video-reels-for-woocommerce'
+			) }
 			value={ draft.buttonUrl }
 			error={ errors.buttonUrl }
 			onChange={ ( value ) => setDraft( { ...draft, buttonUrl: value } ) }
 		/>
 		<TextField
-			label={ __( 'Campaign Name', 'wooreels' ) }
-			placeholder={ __( 'e.g Summer sale', 'wooreels' ) }
+			label={ __(
+				'Campaign Name',
+				'productreels-shoppable-video-reels-for-woocommerce'
+			) }
+			placeholder={ __(
+				'e.g Summer sale',
+				'productreels-shoppable-video-reels-for-woocommerce'
+			) }
 			help={ __(
 				'Groups this button in your statistics so you can tell campaigns apart.',
-				'wooreels'
+				'productreels-shoppable-video-reels-for-woocommerce'
 			) }
 			value={ draft.campaignName }
 			error={ errors.campaignName }
@@ -91,14 +109,20 @@ const CustomTab = ( { draft, setDraft, errors } ) => (
 			}
 		/>
 		<Switch
-			label={ __( 'Open in new tab', 'wooreels' ) }
+			label={ __(
+				'Open in new tab',
+				'productreels-shoppable-video-reels-for-woocommerce'
+			) }
 			checked={ draft.openInNewTab }
 			onChange={ ( value ) =>
 				setDraft( { ...draft, openInNewTab: value } )
 			}
 		/>
 		<TextField
-			label={ __( 'Custom class', 'wooreels' ) }
+			label={ __(
+				'Custom class',
+				'productreels-shoppable-video-reels-for-woocommerce'
+			) }
 			value={ draft.customClass }
 			onChange={ ( value ) =>
 				setDraft( { ...draft, customClass: value } )
@@ -151,8 +175,8 @@ const ProductsTab = ( { chosen, setChosen } ) => {
 		return (
 			<Notice tone="info">
 				{ __(
-					'Product tagging needs WooCommerce. Activate WooCommerce and this tab will list your products — every other part of WooReels works without it.',
-					'wooreels'
+					'Product tagging needs WooCommerce. Activate WooCommerce and this tab will list your products — every other part of ProductReels works without it.',
+					'productreels-shoppable-video-reels-for-woocommerce'
 				) }
 			</Notice>
 		);
@@ -170,7 +194,10 @@ const ProductsTab = ( { chosen, setChosen } ) => {
 			<SearchInput
 				value={ search }
 				onChange={ setSearch }
-				placeholder={ __( 'Search products…', 'wooreels' ) }
+				placeholder={ __(
+					'Search products…',
+					'productreels-shoppable-video-reels-for-woocommerce'
+				) }
 			/>
 
 			{ loading && (
@@ -188,7 +215,7 @@ const ProductsTab = ( { chosen, setChosen } ) => {
 				<EmptyState
 					title={ __(
 						'No products are available to add.',
-						'wooreels'
+						'productreels-shoppable-video-reels-for-woocommerce'
 					) }
 				/>
 			) }
@@ -197,7 +224,10 @@ const ProductsTab = ( { chosen, setChosen } ) => {
 				<div
 					className="wr-product-list"
 					role="group"
-					aria-label={ __( 'Select Products', 'wooreels' ) }
+					aria-label={ __(
+						'Select Products',
+						'productreels-shoppable-video-reels-for-woocommerce'
+					) }
 				>
 					{ items.map( ( product ) => {
 						const picked = chosen.some(
@@ -245,7 +275,10 @@ const ProductsTab = ( { chosen, setChosen } ) => {
 								</span>
 								{ ! product.in_stock && (
 									<span className="wr-product-row__stock">
-										{ __( 'Out of stock', 'wooreels' ) }
+										{ __(
+											'Out of stock',
+											'productreels-shoppable-video-reels-for-woocommerce'
+										) }
 									</span>
 								) }
 							</button>
@@ -276,8 +309,20 @@ export const LinkDialog = ( {
 
 	const tabs = useMemo(
 		() => [
-			{ value: 'custom', label: __( 'Add Custom Link', 'wooreels' ) },
-			{ value: 'product', label: __( 'Tag Products', 'wooreels' ) },
+			{
+				value: 'custom',
+				label: __(
+					'Add Custom Link',
+					'productreels-shoppable-video-reels-for-woocommerce'
+				),
+			},
+			{
+				value: 'product',
+				label: __(
+					'Tag Products',
+					'productreels-shoppable-video-reels-for-woocommerce'
+				),
+			},
 		],
 		[]
 	);
@@ -299,15 +344,24 @@ export const LinkDialog = ( {
 		const found = {};
 
 		if ( draft.buttonText.trim() === '' ) {
-			found.buttonText = __( 'Button text is required!', 'wooreels' );
+			found.buttonText = __(
+				'Button text is required!',
+				'productreels-shoppable-video-reels-for-woocommerce'
+			);
 		}
 
 		if ( ! isValidUrl( draft.buttonUrl.trim() ) ) {
-			found.buttonUrl = __( 'A valid url is required!', 'wooreels' );
+			found.buttonUrl = __(
+				'A valid url is required!',
+				'productreels-shoppable-video-reels-for-woocommerce'
+			);
 		}
 
 		if ( draft.campaignName.trim() === '' ) {
-			found.campaignName = __( 'Campaign name is required!', 'wooreels' );
+			found.campaignName = __(
+				'Campaign name is required!',
+				'productreels-shoppable-video-reels-for-woocommerce'
+			);
 		}
 
 		setErrors( found );
@@ -330,33 +384,54 @@ export const LinkDialog = ( {
 		] );
 	};
 
-	let confirmLabel = __( 'Save', 'wooreels' );
+	let confirmLabel = __(
+		'Save',
+		'productreels-shoppable-video-reels-for-woocommerce'
+	);
 
 	if ( editing ) {
-		confirmLabel = __( 'Update', 'wooreels' );
+		confirmLabel = __(
+			'Update',
+			'productreels-shoppable-video-reels-for-woocommerce'
+		);
 	} else if ( tab === 'product' ) {
 		confirmLabel =
 			chosen.length > 0
 				? sprintf(
 						/* translators: %d: number of selected products. */
-						__( 'Select Products (%d)', 'wooreels' ),
+						__(
+							'Select Products (%d)',
+							'productreels-shoppable-video-reels-for-woocommerce'
+						),
 						chosen.length
-				  )
-				: __( 'Select Products', 'wooreels' );
+					)
+				: __(
+						'Select Products',
+						'productreels-shoppable-video-reels-for-woocommerce'
+					);
 	}
 
 	return (
 		<Modal
 			title={
 				! editing && tab === 'product'
-					? __( 'Tag Products', 'wooreels' )
-					: __( 'Add Custom Link', 'wooreels' )
+					? __(
+							'Tag Products',
+							'productreels-shoppable-video-reels-for-woocommerce'
+						)
+					: __(
+							'Add Custom Link',
+							'productreels-shoppable-video-reels-for-woocommerce'
+						)
 			}
 			onClose={ onClose }
 			footer={
 				<>
 					<Button variant="ghost" onClick={ onClose }>
-						{ __( 'Cancel', 'wooreels' ) }
+						{ __(
+							'Cancel',
+							'productreels-shoppable-video-reels-for-woocommerce'
+						) }
 					</Button>
 					<Button
 						variant="primary"
@@ -378,7 +453,10 @@ export const LinkDialog = ( {
 						value={ tab }
 						tabs={ tabs }
 						onChange={ setTab }
-						label={ __( 'Add Custom Link', 'wooreels' ) }
+						label={ __(
+							'Add Custom Link',
+							'productreels-shoppable-video-reels-for-woocommerce'
+						) }
 					/>
 				) }
 

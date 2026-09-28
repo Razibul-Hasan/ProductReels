@@ -29,10 +29,6 @@ export const reels = {
 		post( '/reels/validate-url', { url, source } ),
 };
 
-export const files = {
-	remove: ( id ) => del( `/files/${ id }` ),
-};
-
 export const products = {
 	search: ( params ) => getList( '/products', params ),
 };

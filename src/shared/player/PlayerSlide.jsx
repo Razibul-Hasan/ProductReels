@@ -13,18 +13,11 @@ import { posterOf } from '../format';
 import { providerFor } from '../providers';
 import { LinkStack } from './LinkStack';
 
+/* The disc is drawn by the stylesheet; this is only the triangle. */
 const BigPlay = () => (
 	<span className="wr-player__bigplay" aria-hidden="true">
-		<svg viewBox="0 0 48 48" width="64" height="64" fill="none">
-			<circle
-				cx="24"
-				cy="24"
-				r="23"
-				fill="rgb(0 0 0 / .35)"
-				stroke="#fff"
-				strokeWidth="1.5"
-			/>
-			<path d="M19 15.5v17L34 24l-15-8.5Z" fill="#fff" />
+		<svg viewBox="0 0 24 24" width="30" height="30" fill="#fff">
+			<path d="M8 5.5v13a1 1 0 0 0 1.5.87l11-6.5a1 1 0 0 0 0-1.74l-11-6.5A1 1 0 0 0 8 5.5Z" />
 		</svg>
 	</span>
 );
@@ -126,8 +119,14 @@ export const PlayerSlide = forwardRef(
 						className="wr-player__tap"
 						aria-label={
 							playing
-								? __( 'Pause', 'wooreels' )
-								: __( 'Play', 'wooreels' )
+								? __(
+										'Pause',
+										'productreels-shoppable-video-reels-for-woocommerce'
+									)
+								: __(
+										'Play',
+										'productreels-shoppable-video-reels-for-woocommerce'
+									)
 						}
 						onPointerDown={ onPointerDown }
 						onClick={ onClick }

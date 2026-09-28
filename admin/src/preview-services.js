@@ -18,8 +18,9 @@ export const editorServices = {
 		? createAddToCart( {
 				restUrl: boot.restUrl,
 				nonce: boot.storeApiNonce,
-		  } )
+			} )
 		: () => Promise.reject( new Error( '' ) ),
 	cartUrl: boot.cartUrl || '',
+	checkoutUrl: boot.checkoutUrl || '',
 	hasWoo: !! boot.hasWoo,
 };

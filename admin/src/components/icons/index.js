@@ -72,6 +72,16 @@ export const IconDuplicate = ( p ) => (
 	</Svg>
 );
 
+/* Square brackets: the shortcode's own syntax, so it cannot be mistaken for
+   the two-squares "duplicate" glyph beside it. */
+export const IconShortcode = ( p ) => (
+	<Svg { ...p }>
+		<path d="M9 4H6.5A1.5 1.5 0 0 0 5 5.5v13A1.5 1.5 0 0 0 6.5 20H9" />
+		<path d="M15 4h2.5A1.5 1.5 0 0 1 19 5.5v13a1.5 1.5 0 0 1-1.5 1.5H15" />
+		<path d="M10.5 15.5 13.5 8.5" opacity=".55" />
+	</Svg>
+);
+
 export const IconChart = ( p ) => (
 	<Svg { ...p }>
 		<path d="M5 20V11M12 20V4M19 20v-6" />
@@ -269,14 +279,6 @@ export const IconSliders = ( p ) => (
 	</Svg>
 );
 
-export const IconType = ( p ) => (
-	<Svg { ...p }>
-		<path d="M5 6V4h14v2" />
-		<path d="M12 4v16" />
-		<path d="M9 20h6" />
-	</Svg>
-);
-
 export const IconCart = ( p ) => (
 	<Svg { ...p }>
 		<path d="M3 4h2l2.4 11h11.2L21 7H6" />
@@ -298,5 +300,72 @@ export const IconPalette = ( p ) => (
 		<circle cx="8" cy="10" r="1.2" fill="currentColor" stroke="none" />
 		<circle cx="12" cy="7.5" r="1.2" fill="currentColor" stroke="none" />
 		<circle cx="16" cy="10" r="1.2" fill="currentColor" stroke="none" />
+	</Svg>
+);
+
+/* Widget alignment: a page edge with the cards pulled towards one side. */
+export const IconAlignLeft = ( p ) => (
+	<Svg { ...p }>
+		<path d="M4 3v18" />
+		<rect x="7" y="6" width="12" height="4" rx="1" />
+		<rect x="7" y="14" width="7" height="4" rx="1" />
+	</Svg>
+);
+
+export const IconAlignCenter = ( p ) => (
+	<Svg { ...p }>
+		<path d="M12 3v3M12 10v4M12 18v3" />
+		<rect x="5" y="6" width="14" height="4" rx="1" />
+		<rect x="8" y="14" width="8" height="4" rx="1" />
+	</Svg>
+);
+
+export const IconAlignRight = ( p ) => (
+	<Svg { ...p }>
+		<path d="M20 3v18" />
+		<rect x="5" y="6" width="12" height="4" rx="1" />
+		<rect x="10" y="14" width="7" height="4" rx="1" />
+	</Svg>
+);
+
+export const IconFilm = ( p ) => (
+	<Svg { ...p }>
+		<rect x="3" y="4" width="18" height="16" rx="2" />
+		<path d="M7 4v16M17 4v16M3 9h4M3 15h4M17 9h4M17 15h4" />
+	</Svg>
+);
+
+/* Text alignment: lines of type ragged towards one side. */
+export const IconTextLeft = ( p ) => (
+	<Svg { ...p }>
+		<path d="M4 6h16M4 10h10M4 14h16M4 18h10" />
+	</Svg>
+);
+
+export const IconTextCenter = ( p ) => (
+	<Svg { ...p }>
+		<path d="M4 6h16M7 10h10M4 14h16M7 18h10" />
+	</Svg>
+);
+
+export const IconTextRight = ( p ) => (
+	<Svg { ...p }>
+		<path d="M4 6h16M10 10h10M4 14h16M10 18h10" />
+	</Svg>
+);
+
+export const IconEyeOff = ( p ) => (
+	<Svg { ...p }>
+		<path d="M3 3l18 18" />
+		<path d="M10.6 5.9A10.8 10.8 0 0 1 12 5.5c6.2 0 10 6.5 10 6.5a17.6 17.6 0 0 1-3.2 3.8" />
+		<path d="M6.3 6.5A17.4 17.4 0 0 0 2 12s3.8 6.5 10 6.5c1.5 0 2.9-.4 4.1-.9" />
+		<path d="M9.9 9.9a2.6 2.6 0 0 0 4.2 4.2" />
+	</Svg>
+);
+
+export const IconGear = ( p ) => (
+	<Svg { ...p }>
+		<circle cx="12" cy="12" r="3" />
+		<path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1Z" />
 	</Svg>
 );

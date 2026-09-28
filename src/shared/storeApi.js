@@ -50,7 +50,7 @@ export const createAddToCart =
 
 		// Let the theme know. The classic hook keeps mini-cart counters honest.
 		document.dispatchEvent(
-			new CustomEvent( 'wooreels:added-to-cart', {
+			new CustomEvent( 'productreels:added-to-cart', {
 				bubbles: true,
 				detail: { product, link, cart: body },
 			} )

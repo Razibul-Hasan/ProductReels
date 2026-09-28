@@ -28,6 +28,9 @@ import { useDebounced } from '../hooks/use-debounced';
 import { editorServices } from '../preview-services';
 import { ReelEditor } from './ReelEditor';
 
+/** How many reels one page of the library holds. */
+const PAGE_SIZE = 60;
+
 const formatNumber = ( value ) =>
 	new Intl.NumberFormat( document.documentElement.lang || undefined ).format(
 		value
@@ -118,7 +121,7 @@ const ReelCard = ( {
 						label={ sprintf(
 							/* translators: %s: reel title. */ __(
 								'Select %s',
-								'wooreels'
+								'productreels-shoppable-video-reels-for-woocommerce'
 							),
 							reel.title
 						) }
@@ -135,17 +138,26 @@ const ReelCard = ( {
 				<div className="wr-reel-card__hover">
 					<IconButton
 						icon={ IconEye }
-						label={ __( 'Preview', 'wooreels' ) }
+						label={ __(
+							'Preview',
+							'productreels-shoppable-video-reels-for-woocommerce'
+						) }
 						onClick={ onPreview }
 					/>
 					<IconButton
 						icon={ IconEdit }
-						label={ __( 'Edit', 'wooreels' ) }
+						label={ __(
+							'Edit',
+							'productreels-shoppable-video-reels-for-woocommerce'
+						) }
 						onClick={ onEdit }
 					/>
 					<IconButton
 						icon={ IconTrash }
-						label={ __( 'Delete', 'wooreels' ) }
+						label={ __(
+							'Delete',
+							'productreels-shoppable-video-reels-for-woocommerce'
+						) }
 						tone="danger"
 						onClick={ onDelete }
 					/>
@@ -196,26 +208,39 @@ export const ReelsLibrary = () => {
 	const [ previewing, setPreviewing ] = useState( null );
 	const [ confirming, setConfirming ] = useState( null );
 	const [ deleting, setDeleting ] = useState( false );
+	const [ page, setPage ] = useState( 1 );
+	const [ pages, setPages ] = useState( 1 );
+	const [ loadingMore, setLoadingMore ] = useState( false );
 
 	const term = useDebounced( search, 300 );
 
+	const fetchPage = useCallback(
+		( number ) =>
+			reelsApi.list( {
+				search: term,
+				page: number,
+				per_page: PAGE_SIZE,
+				orderby: 'id',
+				order: 'DESC',
+			} ),
+		[ term ]
+	);
+
+	/** Start over from the first page: a new search, or after a change. */
 	const load = useCallback( async () => {
 		setLoading( true );
 		setError( '' );
 
 		try {
-			const page = await reelsApi.list( {
-				search: term,
-				per_page: 100,
-				orderby: 'id',
-				order: 'DESC',
-			} );
+			const first = await fetchPage( 1 );
 
-			setItems( page.items );
-			setTotal( page.total );
+			setItems( first.items );
+			setTotal( first.total );
+			setPage( 1 );
+			setPages( first.pages );
 			setSelected( ( current ) =>
 				current.filter( ( id ) =>
-					page.items.some( ( reel ) => reel.id === id )
+					first.items.some( ( reel ) => reel.id === id )
 				)
 			);
 		} catch ( requestError ) {
@@ -223,11 +248,35 @@ export const ReelsLibrary = () => {
 		} finally {
 			setLoading( false );
 		}
-	}, [ term ] );
+	}, [ fetchPage ] );
 
 	useEffect( () => {
 		load();
 	}, [ load ] );
+
+	const loadMore = async () => {
+		const next = page + 1;
+
+		setLoadingMore( true );
+
+		try {
+			const more = await fetchPage( next );
+
+			setItems( ( current ) => {
+				const seen = new Set( current.map( ( reel ) => reel.id ) );
+
+				return current.concat(
+					more.items.filter( ( reel ) => ! seen.has( reel.id ) )
+				);
+			} );
+			setPage( next );
+			setPages( more.pages );
+		} catch ( requestError ) {
+			toasts.error( requestError.message );
+		} finally {
+			setLoadingMore( false );
+		}
+	};
 
 	const toggle = ( id ) =>
 		setSelected( ( current ) =>
@@ -241,7 +290,12 @@ export const ReelsLibrary = () => {
 
 		try {
 			await reelsApi.remove( confirming.reel.id );
-			toasts.success( __( 'Reel deleted successfully!', 'wooreels' ) );
+			toasts.success(
+				__(
+					'Reel deleted successfully!',
+					'productreels-shoppable-video-reels-for-woocommerce'
+				)
+			);
 			setConfirming( null );
 			await load();
 		} catch ( requestError ) {
@@ -265,7 +319,7 @@ export const ReelsLibrary = () => {
 							'%d reel deleted successfully!',
 							'%d reels deleted successfully!',
 							result.deleted,
-							'wooreels'
+							'productreels-shoppable-video-reels-for-woocommerce'
 						),
 						result.deleted
 					)
@@ -280,7 +334,7 @@ export const ReelsLibrary = () => {
 							'%d reel failed to delete.',
 							'%d reels failed to delete.',
 							result.failed.length,
-							'wooreels'
+							'productreels-shoppable-video-reels-for-woocommerce'
 						),
 						result.failed.length
 					)
@@ -320,7 +374,10 @@ export const ReelsLibrary = () => {
 			<div className="wr-page-head">
 				<div className="wr-page-head__titles">
 					<h1 className="wr-page-head__title">
-						{ __( 'All Reels', 'wooreels' ) }
+						{ __(
+							'All Reels',
+							'productreels-shoppable-video-reels-for-woocommerce'
+						) }
 						{ ! loading && total > 0 && (
 							<span className="wr-count-chip">
 								{ formatNumber( total ) }
@@ -330,7 +387,7 @@ export const ReelsLibrary = () => {
 					<p className="wr-page-head__sub">
 						{ __(
 							'Each reel lives on its own and can appear in as many widgets as you like.',
-							'wooreels'
+							'productreels-shoppable-video-reels-for-woocommerce'
 						) }
 					</p>
 				</div>
@@ -343,7 +400,10 @@ export const ReelsLibrary = () => {
 						>
 							{ sprintf(
 								/* translators: %d: number of selected reels. */
-								__( 'Delete Selected (%d)', 'wooreels' ),
+								__(
+									'Delete Selected (%d)',
+									'productreels-shoppable-video-reels-for-woocommerce'
+								),
 								selected.length
 							) }
 						</Button>
@@ -351,14 +411,20 @@ export const ReelsLibrary = () => {
 					<SearchInput
 						value={ search }
 						onChange={ setSearch }
-						placeholder={ __( 'Search reels…', 'wooreels' ) }
+						placeholder={ __(
+							'Search reels…',
+							'productreels-shoppable-video-reels-for-woocommerce'
+						) }
 					/>
 					<Button
 						variant="primary"
 						icon={ IconPlus }
 						onClick={ () => setEditing( { id: 0 } ) }
 					>
-						{ __( 'Add Reel', 'wooreels' ) }
+						{ __(
+							'Add Reel',
+							'productreels-shoppable-video-reels-for-woocommerce'
+						) }
 					</Button>
 				</div>
 			</div>
@@ -368,7 +434,10 @@ export const ReelsLibrary = () => {
 					<div className="wr-card wr-error-card">
 						<p>{ error }</p>
 						<Button onClick={ load }>
-							{ __( 'Continue', 'wooreels' ) }
+							{ __(
+								'Try again',
+								'productreels-shoppable-video-reels-for-woocommerce'
+							) }
 						</Button>
 					</div>
 				) }
@@ -380,23 +449,23 @@ export const ReelsLibrary = () => {
 								search === ''
 									? __(
 											"You don't have any reels yet.",
-											'wooreels'
-									  )
+											'productreels-shoppable-video-reels-for-woocommerce'
+										)
 									: __(
 											'No reels match that search.',
-											'wooreels'
-									  )
+											'productreels-shoppable-video-reels-for-woocommerce'
+										)
 							}
 							text={
 								search === ''
 									? __(
 											'A reel is one vertical video, a title, and the buttons or products you want to sell from it.',
-											'wooreels'
-									  )
+											'productreels-shoppable-video-reels-for-woocommerce'
+										)
 									: __(
 											'Try a different title, or clear the search to see everything.',
-											'wooreels'
-									  )
+											'productreels-shoppable-video-reels-for-woocommerce'
+										)
 							}
 							action={
 								search === '' ? (
@@ -407,11 +476,17 @@ export const ReelsLibrary = () => {
 											setEditing( { id: 0 } )
 										}
 									>
-										{ __( 'Add Reel', 'wooreels' ) }
+										{ __(
+											'Add Reel',
+											'productreels-shoppable-video-reels-for-woocommerce'
+										) }
 									</Button>
 								) : (
 									<Button onClick={ () => setSearch( '' ) }>
-										{ __( 'Clear', 'wooreels' ) }
+										{ __(
+											'Clear',
+											'productreels-shoppable-video-reels-for-woocommerce'
+										) }
 									</Button>
 								)
 							}
@@ -438,6 +513,26 @@ export const ReelsLibrary = () => {
 								/>
 							) )
 						) }
+					</div>
+				) }
+
+				{ error === '' && ! loading && page < pages && (
+					<div className="wr-load-more">
+						<Button
+							busy={ loadingMore }
+							disabled={ loadingMore }
+							onClick={ loadMore }
+						>
+							{ sprintf(
+								/* translators: 1: reels shown so far, 2: total reels. */
+								__(
+									'Load more (%1$s of %2$s)',
+									'productreels-shoppable-video-reels-for-woocommerce'
+								),
+								formatNumber( items.length ),
+								formatNumber( total )
+							) }
+						</Button>
 					</div>
 				) }
 			</div>
@@ -475,14 +570,14 @@ export const ReelsLibrary = () => {
 									/* translators: %d: number of reels. */
 									__(
 										'Are you sure you want to remove %d reels?',
-										'wooreels'
+										'productreels-shoppable-video-reels-for-woocommerce'
 									),
 									selected.length
-							  )
+								)
 							: __(
 									'Are you sure you want to remove this reel?',
-									'wooreels'
-							  )
+									'productreels-shoppable-video-reels-for-woocommerce'
+								)
 					}
 					busy={ deleting }
 					onConfirm={ confirming.bulk ? removeMany : removeOne }
@@ -490,7 +585,7 @@ export const ReelsLibrary = () => {
 				>
 					{ __(
 						'This also removes it from every widget it appears in. Widgets themselves are kept.',
-						'wooreels'
+						'productreels-shoppable-video-reels-for-woocommerce'
 					) }
 				</ConfirmDialog>
 			) }

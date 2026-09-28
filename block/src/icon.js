@@ -2,7 +2,7 @@
  * The block's icon: two reel frames, the front one playing.
  */
 
-export const WooReelsIcon = () => (
+export const ProductReelsIcon = () => (
 	<svg
 		viewBox="0 0 24 24"
 		width="24"

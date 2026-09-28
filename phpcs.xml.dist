@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
-<ruleset name="WooReels">
-	<description>WordPress coding standards for WooReels.</description>
+<ruleset name="ProductReels">
+	<description>WordPress coding standards for ProductReels.</description>
 
 	<file>.</file>
 
@@ -14,7 +14,7 @@
 	<arg name="colors" />
 	<arg value="sp" />
 
-	<config name="minimum_wp_version" value="6.0" />
+	<config name="minimum_wp_version" value="6.6" />
 	<config name="testVersion" value="7.4-" />
 
 	<rule ref="WordPress-Extra" />
@@ -23,7 +23,7 @@
 	<rule ref="WordPress.WP.I18n">
 		<properties>
 			<property name="text_domain" type="array">
-				<element value="wooreels" />
+				<element value="productreels-shoppable-video-reels-for-woocommerce" />
 			</property>
 		</properties>
 	</rule>
@@ -31,9 +31,9 @@
 	<rule ref="WordPress.NamingConventions.PrefixAllGlobals">
 		<properties>
 			<property name="prefixes" type="array">
-				<element value="wooreels" />
-				<element value="Wooreels" />
-				<element value="WOOREELS" />
+				<element value="productreels" />
+				<element value="Productreels" />
+				<element value="PRODUCTREELS" />
 			</property>
 		</properties>
 	</rule>

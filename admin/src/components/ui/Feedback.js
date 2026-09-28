@@ -22,7 +22,7 @@ export const Skeleton = ( { width = '100%', height = 12, radius } ) => (
 	/>
 );
 
-export const EmptyArt = () => (
+const EmptyArt = () => (
 	<svg
 		width="104"
 		height="76"

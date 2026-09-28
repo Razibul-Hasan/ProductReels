@@ -21,13 +21,14 @@ import {
 	useState,
 } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
-import { productIdsIn, slotsFor } from '../format';
+import { slotsFor } from '../format';
 import { useKeyboardNav } from '../hooks/useKeyboardNav';
 import { useMediaQuery } from '../hooks/useMediaQuery';
 import { useReducedMotion } from '../hooks/useReducedMotion';
 import { useSwipe } from '../hooks/useSwipe';
 import { useWheelNav } from '../hooks/useWheelNav';
 import { claimPlayback } from '../playback';
+import { useProducts } from '../products';
 import { withDefaults } from '../services';
 import { styleVars } from '../styleVars';
 import { PlayerNav } from './PlayerNav';
@@ -39,7 +40,11 @@ const FOCUSABLE =
 	'a[href], button:not([disabled]), input:not([disabled]), [tabindex]:not([tabindex="-1"])';
 
 const TOAST_MS = 4000;
-const STEP_MS = 320;
+const STEP_MS = 360;
+/* How long the closing animation runs before the player unmounts. */
+const EXIT_MS = 240;
+/* The opening choreography — stage, chrome, foot — is over by then. */
+const OPEN_MS = 1000;
 
 /** The one node every player on the page renders into. */
 const portalRoot = () => {
@@ -57,8 +62,8 @@ const portalRoot = () => {
 const CloseIcon = () => (
 	<svg
 		viewBox="0 0 24 24"
-		width="22"
-		height="22"
+		width="20"
+		height="20"
 		fill="none"
 		stroke="currentColor"
 		strokeWidth="2.2"
@@ -66,6 +71,22 @@ const CloseIcon = () => (
 		aria-hidden="true"
 	>
 		<path d="M18 6 6 18M6 6l12 12" />
+	</svg>
+);
+
+const PlayPauseIcon = ( { playing } ) => (
+	<svg
+		viewBox="0 0 24 24"
+		width="18"
+		height="18"
+		fill="currentColor"
+		aria-hidden="true"
+	>
+		{ playing ? (
+			<path d="M7 5h4v14H7zM13 5h4v14h-4z" />
+		) : (
+			<path d="M8 5.5v13a1 1 0 0 0 1.5.87l11-6.5a1 1 0 0 0 0-1.74l-11-6.5A1 1 0 0 0 8 5.5Z" />
+		) }
 	</svg>
 );
 
@@ -116,8 +137,11 @@ export const Player = ( {
 	const [ time, setTime ] = useState( 0 );
 	const [ duration, setDuration ] = useState( 0 );
 	const [ soundTap, setSoundTap ] = useState( false );
-	const [ products, setProducts ] = useState( null );
 	const [ toast, setToast ] = useState( null );
+	// `opening` gates the entrance of things that live inside the slides,
+	// which remount on every step; `closing` plays the exit before unmount.
+	const [ opening, setOpening ] = useState( true );
+	const [ closing, setClosing ] = useState( false );
 
 	const root = useRef( null );
 	const stage = useRef( null );
@@ -127,6 +151,7 @@ export const Player = ( {
 	const popped = useRef( false );
 	const releaseClaim = useRef( null );
 	const stepTimer = useRef( 0 );
+	const exitTimer = useRef( 0 );
 
 	const mobile = useMediaQuery( '(max-width: 782px)' );
 	const reduced = useReducedMotion();
@@ -143,6 +168,9 @@ export const Player = ( {
 
 	/* ------------------------------------------------------------ closing */
 
+	// The exit is a fade, not a cut: the stage settles back and the room
+	// lights up, then the player unmounts. Playback stops at once, so the
+	// sound never outlives the picture.
 	const requestClose = useCallback( () => {
 		if ( closed.current ) {
 			return;
@@ -158,8 +186,23 @@ export const Player = ( {
 			}
 		}
 
-		onClose();
-	}, [ onClose ] );
+		if ( reduced ) {
+			onClose();
+
+			return;
+		}
+
+		setClosing( true );
+		exitTimer.current = setTimeout( onClose, EXIT_MS );
+	}, [ onClose, reduced ] );
+
+	useEffect( () => () => clearTimeout( exitTimer.current ), [] );
+
+	useEffect( () => {
+		const timer = setTimeout( () => setOpening( false ), OPEN_MS );
+
+		return () => clearTimeout( timer );
+	}, [] );
 
 	/* ---------------------------------------------------------- stepping */
 
@@ -360,47 +403,7 @@ export const Player = ( {
 
 	/* ----------------------------------------------------------- products */
 
-	// null until the lookup has answered; a product missing from the answer
-	// (WooCommerce off, product deleted) then renders nothing rather than a
-	// skeleton that never resolves.
-	useEffect( () => {
-		const ids = productIdsIn( widget.reels );
-
-		if ( ids.length === 0 || ! services.hasWoo ) {
-			setProducts( {} );
-
-			return undefined;
-		}
-
-		let cancelled = false;
-
-		setProducts( null );
-
-		services
-			.getProducts( ids )
-			.then( ( list ) => {
-				if ( cancelled ) {
-					return;
-				}
-
-				const map = {};
-
-				( list || [] ).forEach( ( product ) => {
-					map[ Number( product.id ) ] = product;
-				} );
-
-				setProducts( map );
-			} )
-			.catch( () => {
-				if ( ! cancelled ) {
-					setProducts( {} );
-				}
-			} );
-
-		return () => {
-			cancelled = true;
-		};
-	}, [ widget.reels, services ] );
+	const products = useProducts( widget.reels, services );
 
 	/* ------------------------------------------------------------- toast */
 
@@ -422,35 +425,72 @@ export const Player = ( {
 	/* ---------------------------------------------- dialog housekeeping */
 
 	// Body scroll lock that restores the exact scroll position on close.
+	//
+	// Nothing on the page may move while it is locked, or the lock shows as
+	// a blink on open and again on close. Two things would move it:
+	//
+	// - Locking takes the scrollbar with it, and the page would reflow into
+	//   the width it freed — centred content shifting half a scrollbar
+	//   sideways. The body is padded by the scrollbar's width instead.
+	// - A fixed body is placed from the viewport, not from <html>, so any
+	//   margin on <html> — the admin bar's 32px for a logged-in visitor —
+	//   would drop out and the page would jump up by that much. The body is
+	//   pinned where it is measured on screen, not at a computed -scrollY.
 	useEffect( () => {
 		const body = document.body;
+		const html = document.documentElement;
 		const scrollY = window.scrollY;
+		const gap = window.innerWidth - html.clientWidth;
+		const bodyStyle = window.getComputedStyle( body );
+		// `top` places the margin edge; the measured box is the border edge.
+		const top =
+			body.getBoundingClientRect().top -
+			( parseFloat( bodyStyle.marginTop ) || 0 );
 		const previous = {
 			position: body.style.position,
 			top: body.style.top,
-			width: body.style.width,
+			left: body.style.left,
+			right: body.style.right,
 			overflow: body.style.overflow,
+			paddingRight: body.style.paddingRight,
+			scrollBehavior: html.style.scrollBehavior,
 		};
 
+		if ( gap > 0 ) {
+			const padding = parseFloat( bodyStyle.paddingRight ) || 0;
+
+			body.style.paddingRight = `${ padding + gap }px`;
+		}
+
 		body.style.position = 'fixed';
-		body.style.top = `-${ scrollY }px`;
-		body.style.width = '100%';
+		body.style.top = `${ top }px`;
+		// Pinned to both edges rather than given a width: a fixed box would
+		// otherwise shrink to its content, and `width: 100%` would put the
+		// padding outside the viewport instead of inside the content box.
+		body.style.left = '0';
+		body.style.right = '0';
 		body.style.overflow = 'hidden';
 		body.classList.add( 'wr-player-open' );
 
 		return () => {
+			// A theme's smooth scrolling would turn the restore into a visible
+			// scroll from the top; it is switched off for the one jump.
+			html.style.scrollBehavior = 'auto';
 			body.style.position = previous.position;
 			body.style.top = previous.top;
-			body.style.width = previous.width;
+			body.style.left = previous.left;
+			body.style.right = previous.right;
 			body.style.overflow = previous.overflow;
+			body.style.paddingRight = previous.paddingRight;
 			body.classList.remove( 'wr-player-open' );
 			window.scrollTo( 0, scrollY );
+			html.style.scrollBehavior = previous.scrollBehavior;
 		};
 	}, [] );
 
 	// A history entry, so a phone's back button closes the player.
 	useEffect( () => {
-		const marker = { wooreelsPlayer: widget.id };
+		const marker = { productreelsPlayer: widget.id };
 
 		window.history.pushState( marker, '' );
 
@@ -467,7 +507,7 @@ export const Player = ( {
 			if (
 				! popped.current &&
 				window.history.state &&
-				window.history.state.wooreelsPlayer === widget.id
+				window.history.state.productreelsPlayer === widget.id
 			) {
 				window.history.back();
 			}
@@ -585,10 +625,19 @@ export const Player = ( {
 	const label = current
 		? sprintf(
 				/* translators: %s: reel title. */
-				__( 'Reel player: %s', 'wooreels' ),
+				__(
+					'Reel player: %s',
+					'productreels-shoppable-video-reels-for-woocommerce'
+				),
 				current.reel.title || widget.name || ''
-		  )
-		: __( 'Reel player', 'wooreels' );
+			)
+		: __(
+				'Reel player',
+				'productreels-shoppable-video-reels-for-woocommerce'
+			);
+
+	const hasFile = !! ( current && current.file );
+	const showBar = hasFile && styles.showSeekbar;
 
 	return createPortal(
 		<div
@@ -597,8 +646,12 @@ export const Player = ( {
 				'wr-player',
 				horizontal ? 'wr-player--horizontal' : 'wr-player--vertical',
 				mobile ? 'wr-player--mobile' : '',
+				current && current.fileCount > 1 ? 'wr-player--files' : '',
+				showBar ? '' : 'wr-player--no-bar',
 				swipe.dragging ? 'is-dragging' : '',
 				snap || reduced ? 'is-snap' : '',
+				opening ? 'is-opening' : '',
+				closing ? 'is-closing' : '',
 			]
 				.filter( Boolean )
 				.join( ' ' ) }
@@ -613,21 +666,6 @@ export const Player = ( {
 				onPointerDown={ onBackdropPointerDown }
 				onClick={ onBackdropClick }
 			/>
-
-			<button
-				type="button"
-				className="wr-player__close"
-				aria-label={ __( 'Close', 'wooreels' ) }
-				onClick={ requestClose }
-			>
-				<CloseIcon />
-			</button>
-
-			{ many && (
-				<span className="wr-player__counter" aria-live="polite">
-					{ current.reelIndex + 1 } / { widget.reels.length }
-				</span>
-			) }
 
 			<div className="wr-player__layout">
 				<PlayerNav
@@ -672,6 +710,65 @@ export const Player = ( {
 						) }
 					</div>
 
+					{ /* The controls live on the stage itself, the way a
+					     phone's reels feed keeps them within thumb reach:
+					     the counter on the start side, sound / play / close
+					     in one pill on the end side. */ }
+					<div className="wr-player__head" data-wr-no-swipe="">
+						{ many && (
+							<span
+								className="wr-player__counter"
+								aria-live="polite"
+							>
+								<b>{ current.reelIndex + 1 }</b>
+								<span aria-hidden="true">/</span>
+								{ widget.reels.length }
+							</span>
+						) }
+
+						<div className="wr-player__tools">
+							{ hasFile && styles.showVolumeControl && (
+								<VolumeControl
+									muted={ muted }
+									volume={ volume }
+									onToggleMute={ toggleMute }
+									onVolume={ changeVolume }
+								/>
+							) }
+							{ hasFile && (
+								<button
+									type="button"
+									className="wr-player__ctl"
+									aria-label={
+										playing
+											? __(
+													'Pause',
+													'productreels-shoppable-video-reels-for-woocommerce'
+												)
+											: __(
+													'Play',
+													'productreels-shoppable-video-reels-for-woocommerce'
+												)
+									}
+									onClick={ toggle }
+								>
+									<PlayPauseIcon playing={ playing } />
+								</button>
+							) }
+							<button
+								type="button"
+								className="wr-player__ctl wr-player__close"
+								aria-label={ __(
+									'Close',
+									'productreels-shoppable-video-reels-for-woocommerce'
+								) }
+								onClick={ requestClose }
+							>
+								<CloseIcon />
+							</button>
+						</div>
+					</div>
+
 					{ soundTap && (
 						<button
 							type="button"
@@ -680,31 +777,22 @@ export const Player = ( {
 							onClick={ toggle }
 						>
 							<SoundIcon />
-							{ __( 'Tap for sound', 'wooreels' ) }
+							{ __(
+								'Tap for sound',
+								'productreels-shoppable-video-reels-for-woocommerce'
+							) }
 						</button>
 					) }
 
-					{ current &&
-						current.file &&
-						( styles.showSeekbar || styles.showVolumeControl ) && (
-							<div className="wr-player__bar" data-wr-no-swipe="">
-								{ styles.showSeekbar && (
-									<Seekbar
-										current={ time }
-										duration={ duration }
-										onSeek={ seek }
-									/>
-								) }
-								{ styles.showVolumeControl && (
-									<VolumeControl
-										muted={ muted }
-										volume={ volume }
-										onToggleMute={ toggleMute }
-										onVolume={ changeVolume }
-									/>
-								) }
-							</div>
-						) }
+					{ showBar && (
+						<div className="wr-player__bar" data-wr-no-swipe="">
+							<Seekbar
+								current={ time }
+								duration={ duration }
+								onSeek={ seek }
+							/>
+						</div>
+					) }
 				</div>
 			</div>
 

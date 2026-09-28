@@ -2,7 +2,7 @@
  * The four ways this app asks someone to pick one of a small set: a listbox, a
  * tab strip, an icon toggle group and visual option cards.
  *
- * There is no native <select> anywhere in WooReels. Every one of these is
+ * There is no native <select> anywhere in ProductReels. Every one of these is
  * keyboard operable and announces its own state.
  */
 

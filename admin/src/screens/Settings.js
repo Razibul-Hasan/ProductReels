@@ -96,18 +96,24 @@ export const Settings = () => {
 		const next = {};
 
 		if ( ! isInt( draft.view_limit, 1, 100 ) ) {
-			next.view_limit = __( 'Please enter valid numbers.', 'wooreels' );
+			next.view_limit = __(
+				'Please enter valid numbers.',
+				'productreels-shoppable-video-reels-for-woocommerce'
+			);
 		}
 
 		if ( ! isInt( draft.view_interval, 1, 1440 ) ) {
 			next.view_interval = __(
 				'Please enter valid numbers.',
-				'wooreels'
+				'productreels-shoppable-video-reels-for-woocommerce'
 			);
 		}
 
 		if ( ! isInt( draft.cache_ttl, 1, 7 * 24 * 60 ) ) {
-			next.cache_ttl = __( 'Please enter valid numbers.', 'wooreels' );
+			next.cache_ttl = __(
+				'Please enter valid numbers.',
+				'productreels-shoppable-video-reels-for-woocommerce'
+			);
 		}
 
 		setErrors( next );
@@ -117,7 +123,12 @@ export const Settings = () => {
 
 	const save = async () => {
 		if ( ! validate() ) {
-			toasts.error( __( 'Please enter valid numbers.', 'wooreels' ) );
+			toasts.error(
+				__(
+					'Please enter valid numbers.',
+					'productreels-shoppable-video-reels-for-woocommerce'
+				)
+			);
 
 			return;
 		}
@@ -139,7 +150,10 @@ export const Settings = () => {
 			setDraft( next );
 			setSaved( JSON.stringify( next ) );
 			toasts.success(
-				__( 'Settings updated successfully.', 'wooreels' )
+				__(
+					'Settings updated successfully.',
+					'productreels-shoppable-video-reels-for-woocommerce'
+				)
 			);
 		} catch ( error ) {
 			toasts.error( error.message );
@@ -153,12 +167,15 @@ export const Settings = () => {
 			<div className="wr-page-head">
 				<div className="wr-page-head__titles">
 					<h1 className="wr-page-head__title">
-						{ __( 'Settings', 'wooreels' ) }
+						{ __(
+							'Settings',
+							'productreels-shoppable-video-reels-for-woocommerce'
+						) }
 					</h1>
 					<p className="wr-page-head__sub">
 						{ __(
 							'Tracking, public access, caching and what happens on uninstall.',
-							'wooreels'
+							'productreels-shoppable-video-reels-for-woocommerce'
 						) }
 					</p>
 				</div>
@@ -169,7 +186,10 @@ export const Settings = () => {
 						disabled={ saving || ! dirty }
 						onClick={ save }
 					>
-						{ __( 'Save', 'wooreels' ) }
+						{ __(
+							'Save',
+							'productreels-shoppable-video-reels-for-woocommerce'
+						) }
 					</Button>
 				</div>
 			</div>
@@ -186,18 +206,24 @@ export const Settings = () => {
 				{ draft && (
 					<>
 						<Card
-							title={ __( 'View tracking', 'wooreels' ) }
+							title={ __(
+								'View tracking',
+								'productreels-shoppable-video-reels-for-woocommerce'
+							) }
 							text={ __(
 								'The two numbers work together as a rate limit: a visitor can add at most this many views to one reel within this many minutes. Visitor IPs are hashed before they are used and never stored.',
-								'wooreels'
+								'productreels-shoppable-video-reels-for-woocommerce'
 							) }
 						>
 							<div className="wr-settings-row">
 								<TextField
-									label={ __( 'View limit', 'wooreels' ) }
+									label={ __(
+										'View limit',
+										'productreels-shoppable-video-reels-for-woocommerce'
+									) }
 									help={ __(
 										'Views per visitor, per reel.',
-										'wooreels'
+										'productreels-shoppable-video-reels-for-woocommerce'
 									) }
 									error={ errors.view_limit }
 									type="number"
@@ -210,8 +236,14 @@ export const Settings = () => {
 									}
 								/>
 								<TextField
-									label={ __( 'Time interval', 'wooreels' ) }
-									help={ __( 'In minutes.', 'wooreels' ) }
+									label={ __(
+										'Time interval',
+										'productreels-shoppable-video-reels-for-woocommerce'
+									) }
+									help={ __(
+										'In minutes.',
+										'productreels-shoppable-video-reels-for-woocommerce'
+									) }
 									error={ errors.view_interval }
 									type="number"
 									min={ 1 }
@@ -229,7 +261,7 @@ export const Settings = () => {
 									/* translators: 1: view limit, 2: interval in minutes. */
 									__(
 										'Currently: at most %1$s views per reel every %2$s minutes, per visitor.',
-										'wooreels'
+										'productreels-shoppable-video-reels-for-woocommerce'
 									),
 									draft.view_limit || '—',
 									draft.view_interval || '—'
@@ -238,17 +270,23 @@ export const Settings = () => {
 						</Card>
 
 						<Card
-							title={ __( 'Public API', 'wooreels' ) }
+							title={ __(
+								'Public API',
+								'productreels-shoppable-video-reels-for-woocommerce'
+							) }
 							text={ __(
 								'Your own pages always work. This decides whether anyone else can read a widget directly from the REST API.',
-								'wooreels'
+								'productreels-shoppable-video-reels-for-woocommerce'
 							) }
 						>
 							<Switch
-								label={ __( 'Allow public fetch', 'wooreels' ) }
+								label={ __(
+									'Allow public fetch',
+									'productreels-shoppable-video-reels-for-woocommerce'
+								) }
 								help={ __(
-									'When on, GET /wooreels/v1/render/{id} answers any request. It exposes reel titles, video URLs, posters, view counts and links — never anything about your visitors or orders.',
-									'wooreels'
+									'When on, GET /productreels/v1/render/{id} answers any request. It exposes reel titles, video URLs, posters, view counts and links — never anything about your visitors or orders.',
+									'productreels-shoppable-video-reels-for-woocommerce'
 								) }
 								checked={ draft.allow_public_fetch }
 								onChange={ ( value ) =>
@@ -258,20 +296,23 @@ export const Settings = () => {
 						</Card>
 
 						<Card
-							title={ __( 'Performance', 'wooreels' ) }
+							title={ __(
+								'Performance',
+								'productreels-shoppable-video-reels-for-woocommerce'
+							) }
 							text={ __(
 								'Widget payloads are assembled once and reused until something changes.',
-								'wooreels'
+								'productreels-shoppable-video-reels-for-woocommerce'
 							) }
 						>
 							<Switch
 								label={ __(
 									'Cache render responses',
-									'wooreels'
+									'productreels-shoppable-video-reels-for-woocommerce'
 								) }
 								help={ __(
 									'Any edit to a widget, reel or file clears the cache immediately.',
-									'wooreels'
+									'productreels-shoppable-video-reels-for-woocommerce'
 								) }
 								checked={ draft.cache_render }
 								onChange={ ( value ) =>
@@ -281,10 +322,13 @@ export const Settings = () => {
 							{ draft.cache_render && (
 								<div className="wr-settings-row wr-settings-row--narrow">
 									<TextField
-										label={ __( 'Cache TTL', 'wooreels' ) }
+										label={ __(
+											'Cache TTL',
+											'productreels-shoppable-video-reels-for-woocommerce'
+										) }
 										help={ __(
 											'In minutes. Between 1 minute and 7 days.',
-											'wooreels'
+											'productreels-shoppable-video-reels-for-woocommerce'
 										) }
 										error={ errors.cache_ttl }
 										type="number"
@@ -301,20 +345,23 @@ export const Settings = () => {
 						</Card>
 
 						<Card
-							title={ __( 'Data', 'wooreels' ) }
+							title={ __(
+								'Data',
+								'productreels-shoppable-video-reels-for-woocommerce'
+							) }
 							text={ __(
 								'What happens to your reels, widgets and statistics when the plugin is deleted.',
-								'wooreels'
+								'productreels-shoppable-video-reels-for-woocommerce'
 							) }
 						>
 							<Switch
 								label={ __(
 									'Delete all plugin data on uninstall',
-									'wooreels'
+									'productreels-shoppable-video-reels-for-woocommerce'
 								) }
 								help={ __(
 									'Off by default. Deactivating never removes anything.',
-									'wooreels'
+									'productreels-shoppable-video-reels-for-woocommerce'
 								) }
 								checked={ draft.delete_data_on_uninstall }
 								onChange={ ( value ) =>
@@ -324,8 +371,8 @@ export const Settings = () => {
 							{ draft.delete_data_on_uninstall && (
 								<Notice tone="warning">
 									{ __(
-										'Deleting the plugin will permanently drop every WooReels table — all widgets, reels, file records, view counts and click counts. Media files in your library are kept.',
-										'wooreels'
+										'Deleting the plugin will permanently drop every ProductReels table — all widgets, reels, file records, view counts and click counts. Media files in your library are kept.',
+										'productreels-shoppable-video-reels-for-woocommerce'
 									) }
 								</Notice>
 							) }

@@ -8,7 +8,7 @@
 @use '../../src/shared/styles/embed';
 @use '../../src/shared/styles/player';
 
-.wooreels-embed .wr-embed-loading {
+.productreels-embed .wr-embed-loading {
 	/* One row of thumbnails' worth of height, so the page settles before the payload lands. */
 	min-height: 120px;
 }

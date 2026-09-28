@@ -48,6 +48,7 @@ import {
 	IconCopy,
 	IconDesktop,
 	IconDuplicate,
+	IconGear,
 	IconGrip,
 	IconMobile,
 	IconPanel,
@@ -68,6 +69,7 @@ import { useDebounced } from '../hooks/use-debounced';
 import { useUnsavedChanges } from '../hooks/use-unsaved-guard';
 import { ReelEditor } from './ReelEditor';
 import { StylePanel } from './StylePanel';
+import { TitleAppearanceDialog } from './TitleAppearanceDialog';
 
 /** How many reels the picker fetches per page. */
 const PICKER_PAGE = 24;
@@ -76,19 +78,28 @@ const DEVICES = [
 	{
 		value: 'desktop',
 		icon: IconDesktop,
-		label: __( 'Desktop', 'wooreels' ),
+		label: __(
+			'Desktop',
+			'productreels-shoppable-video-reels-for-woocommerce'
+		),
 		width: '100%',
 	},
 	{
 		value: 'tablet',
 		icon: IconTablet,
-		label: __( 'Tablet', 'wooreels' ),
+		label: __(
+			'Tablet',
+			'productreels-shoppable-video-reels-for-woocommerce'
+		),
 		width: '768px',
 	},
 	{
 		value: 'mobile',
 		icon: IconMobile,
-		label: __( 'Mobile', 'wooreels' ),
+		label: __(
+			'Mobile',
+			'productreels-shoppable-video-reels-for-woocommerce'
+		),
 		width: '390px',
 	},
 ];
@@ -169,7 +180,10 @@ const SortableReel = ( { reel, onRemove, onPreview } ) => {
 				className="wr-attached__grip"
 				aria-label={ sprintf(
 					/* translators: %s: reel title. */
-					__( 'Reorder %s', 'wooreels' ),
+					__(
+						'Reorder %s',
+						'productreels-shoppable-video-reels-for-woocommerce'
+					),
 					reel.title
 				) }
 				{ ...attributes }
@@ -192,14 +206,20 @@ const SortableReel = ( { reel, onRemove, onPreview } ) => {
 
 			<IconButton
 				icon={ IconPlay }
-				label={ __( 'Preview', 'wooreels' ) }
+				label={ __(
+					'Preview',
+					'productreels-shoppable-video-reels-for-woocommerce'
+				) }
 				size={ 14 }
 				onClick={ ( event ) => onPreview( reel, event.currentTarget ) }
 			/>
 
 			<IconButton
 				icon={ IconTrash }
-				label={ __( 'Delete', 'wooreels' ) }
+				label={ __(
+					'Delete',
+					'productreels-shoppable-video-reels-for-woocommerce'
+				) }
 				tone="danger"
 				size={ 14 }
 				onClick={ () => onRemove( reel.id ) }
@@ -221,6 +241,7 @@ export const WidgetEditor = ( { widgetId, navigate } ) => {
 	const [ device, setDevice ] = useState( 'desktop' );
 	const [ dirty, setDirty ] = useState( false );
 	const [ confirming, setConfirming ] = useState( false );
+	const [ titleOpen, setTitleOpen ] = useState( false );
 	const [ copied, setCopied ] = useState( false );
 	const [ playing, setPlaying ] = useState( null );
 	const [ duplicating, setDuplicating ] = useState( false );
@@ -382,8 +403,24 @@ export const WidgetEditor = ( { widgetId, navigate } ) => {
 		[ snapshot ]
 	);
 
+	/**
+	 * Write one style, or several at once.
+	 *
+	 * Takes a dotted path and a value, or an object of paths to values. The
+	 * object form exists because two calls in one event handler both start
+	 * from the `styles` this closure captured, so the second silently undoes
+	 * the first; a control that must change two keys together hands them
+	 * over as one patch.
+	 *
+	 * @param {string|Object} path  Dotted path, or a { path: value } patch.
+	 * @param {*}             value The value, when `path` is a string.
+	 */
 	const setStyle = ( path, value ) => {
-		const next = setPath( styles, path, value );
+		const patch = typeof path === 'string' ? { [ path ]: value } : path;
+		const next = Object.keys( patch ).reduce(
+			( acc, key ) => setPath( acc, key, patch[ key ] ),
+			styles
+		);
 
 		setStyles( next );
 		markDirty( name, next, attached );
@@ -455,8 +492,14 @@ export const WidgetEditor = ( { widgetId, navigate } ) => {
 
 			toasts.success(
 				isNew && ! savedId
-					? __( 'Widget created successfully!', 'wooreels' )
-					: __( 'Changes saved successfully!', 'wooreels' )
+					? __(
+							'Widget created successfully!',
+							'productreels-shoppable-video-reels-for-woocommerce'
+						)
+					: __(
+							'Changes saved successfully!',
+							'productreels-shoppable-video-reels-for-woocommerce'
+						)
 			);
 
 			if ( isNew && ! savedId ) {
@@ -495,7 +538,12 @@ export const WidgetEditor = ( { widgetId, navigate } ) => {
 		try {
 			await widgetsApi.remove( savedId );
 			setDirty( false );
-			toasts.success( __( 'Widget deleted successfully!', 'wooreels' ) );
+			toasts.success(
+				__(
+					'Widget deleted successfully!',
+					'productreels-shoppable-video-reels-for-woocommerce'
+				)
+			);
 			navigate( '#/widgets' );
 		} catch ( error ) {
 			toasts.error( error.message );
@@ -504,7 +552,7 @@ export const WidgetEditor = ( { widgetId, navigate } ) => {
 	};
 
 	const copyShortcode = async () => {
-		const shortcode = `[wooreels id="${ savedId }"]`;
+		const shortcode = `[productreels id="${ savedId }"]`;
 
 		try {
 			await window.navigator.clipboard.writeText( shortcode );
@@ -519,7 +567,12 @@ export const WidgetEditor = ( { widgetId, navigate } ) => {
 		}
 
 		setCopied( true );
-		toasts.success( __( 'Copied!', 'wooreels' ) );
+		toasts.success(
+			__(
+				'Copied!',
+				'productreels-shoppable-video-reels-for-woocommerce'
+			)
+		);
 		setTimeout( () => setCopied( false ), 1600 );
 	};
 
@@ -541,7 +594,12 @@ export const WidgetEditor = ( { widgetId, navigate } ) => {
 		try {
 			const copy = await widgetsApi.duplicate( savedId );
 
-			toasts.success( __( 'Widget created successfully!', 'wooreels' ) );
+			toasts.success(
+				__(
+					'Widget created successfully!',
+					'productreels-shoppable-video-reels-for-woocommerce'
+				)
+			);
 			navigate( `#/widgets/${ copy.id }` );
 		} catch ( error ) {
 			toasts.error( error.message );
@@ -560,6 +618,7 @@ export const WidgetEditor = ( { widgetId, navigate } ) => {
 	const previewWidth = DEVICES.find(
 		( entry ) => entry.value === device
 	).width;
+	const titleHidden = 'hidden' === styles.widgetTitle.alignment;
 
 	return (
 		<>
@@ -567,50 +626,88 @@ export const WidgetEditor = ( { widgetId, navigate } ) => {
 				<div className="wr-editor-head__left">
 					<IconButton
 						icon={ IconChevronLeft }
-						label={ __( 'Back', 'wooreels' ) }
+						label={ __(
+							'Back',
+							'productreels-shoppable-video-reels-for-woocommerce'
+						) }
 						onClick={ () => navigate( '#/widgets' ) }
 					/>
-					<div className="wr-editor-head__titles">
-						<nav
-							className="wr-crumbs"
-							aria-label={ __( 'Breadcrumb', 'wooreels' ) }
+					<nav
+						className="wr-crumbs"
+						aria-label={ __(
+							'Breadcrumb',
+							'productreels-shoppable-video-reels-for-woocommerce'
+						) }
+					>
+						<button
+							type="button"
+							className="wr-crumbs__link"
+							onClick={ () => navigate( '#/widgets' ) }
 						>
-							<button
-								type="button"
-								className="wr-crumbs__link"
-								onClick={ () => navigate( '#/widgets' ) }
-							>
-								{ __( 'All Widgets', 'wooreels' ) }
-							</button>
-							<IconChevronRight size={ 12 } />
-							<span className="wr-crumbs__current">
-								{ savedId > 0
-									? name ||
-									  __( 'Untitled widget', 'wooreels' )
-									: __( 'Create Widget', 'wooreels' ) }
-							</span>
-						</nav>
-						<input
-							type="text"
-							className="wr-editor-head__name"
-							value={ name }
-							placeholder={ __(
-								'Enter widget title',
-								'wooreels'
+							{ __(
+								'All Widgets',
+								'productreels-shoppable-video-reels-for-woocommerce'
 							) }
-							aria-label={ __( 'Widget Name', 'wooreels' ) }
-							onChange={ ( event ) =>
-								rename( event.target.value )
-							}
-						/>
-					</div>
+						</button>
+						<IconChevronRight size={ 12 } />
+						<span className="wr-crumbs__current">
+							{ savedId > 0
+								? name ||
+									__(
+										'Untitled widget',
+										'productreels-shoppable-video-reels-for-woocommerce'
+									)
+								: __(
+										'Create Widget',
+										'productreels-shoppable-video-reels-for-woocommerce'
+									) }
+						</span>
+					</nav>
+				</div>
+
+				<div className="wr-editor-head__title">
+					<input
+						type="text"
+						className="wr-editor-head__name"
+						value={ name }
+						placeholder={ __(
+							'Enter widget title',
+							'productreels-shoppable-video-reels-for-woocommerce'
+						) }
+						aria-label={ __(
+							'Widget Name',
+							'productreels-shoppable-video-reels-for-woocommerce'
+						) }
+						onChange={ ( event ) => rename( event.target.value ) }
+					/>
+					<IconButton
+						icon={ IconGear }
+						label={
+							titleHidden
+								? __(
+										'Title appearance (not shown on the page)',
+										'productreels-shoppable-video-reels-for-woocommerce'
+									)
+								: __(
+										'Title appearance',
+										'productreels-shoppable-video-reels-for-woocommerce'
+									)
+						}
+						className="wr-editor-head__title-btn"
+						data-hidden={ titleHidden ? 'true' : 'false' }
+						size={ 15 }
+						onClick={ () => setTitleOpen( true ) }
+					/>
 				</div>
 
 				<div className="wr-page-head__actions">
 					{ dirty && (
 						<IconButton
 							icon={ IconUndo }
-							label={ __( 'Discard changes', 'wooreels' ) }
+							label={ __(
+								'Discard changes',
+								'productreels-shoppable-video-reels-for-woocommerce'
+							) }
 							onClick={ discard }
 						/>
 					) }
@@ -621,7 +718,7 @@ export const WidgetEditor = ( { widgetId, navigate } ) => {
 							className="wr-shortcode"
 							onClick={ copyShortcode }
 						>
-							<code>{ `[wooreels id="${ savedId }"]` }</code>
+							<code>{ `[productreels id="${ savedId }"]` }</code>
 							{ copied ? (
 								<IconCheck size={ 13 } />
 							) : (
@@ -633,7 +730,10 @@ export const WidgetEditor = ( { widgetId, navigate } ) => {
 					{ savedId > 0 && (
 						<IconButton
 							icon={ IconDuplicate }
-							label={ __( 'Duplicate', 'wooreels' ) }
+							label={ __(
+								'Duplicate',
+								'productreels-shoppable-video-reels-for-woocommerce'
+							) }
 							disabled={ duplicating || dirty }
 							onClick={ duplicateWidget }
 						/>
@@ -642,7 +742,10 @@ export const WidgetEditor = ( { widgetId, navigate } ) => {
 					{ savedId > 0 && (
 						<IconButton
 							icon={ IconTrash }
-							label={ __( 'Delete', 'wooreels' ) }
+							label={ __(
+								'Delete',
+								'productreels-shoppable-video-reels-for-woocommerce'
+							) }
 							tone="danger"
 							onClick={ () => setConfirming( true ) }
 						/>
@@ -652,8 +755,14 @@ export const WidgetEditor = ( { widgetId, navigate } ) => {
 						icon={ IconPanel }
 						label={
 							( narrow ? panelOpen : ! panelHidden )
-								? __( 'Hide customization', 'wooreels' )
-								: __( 'Show customization', 'wooreels' )
+								? __(
+										'Hide customization',
+										'productreels-shoppable-video-reels-for-woocommerce'
+									)
+								: __(
+										'Show customization',
+										'productreels-shoppable-video-reels-for-woocommerce'
+									)
 						}
 						aria-pressed={
 							( narrow ? panelOpen : ! panelHidden )
@@ -675,8 +784,14 @@ export const WidgetEditor = ( { widgetId, navigate } ) => {
 						onClick={ save }
 					>
 						{ savedId > 0
-							? __( 'Update', 'wooreels' )
-							: __( 'Save', 'wooreels' ) }
+							? __(
+									'Update',
+									'productreels-shoppable-video-reels-for-woocommerce'
+								)
+							: __(
+									'Save',
+									'productreels-shoppable-video-reels-for-woocommerce'
+								) }
 					</Button>
 				</div>
 			</div>
@@ -692,16 +807,22 @@ export const WidgetEditor = ( { widgetId, navigate } ) => {
 			>
 				<section
 					className="wr-editor__pane wr-editor__picker"
-					aria-label={ __( 'All Reels', 'wooreels' ) }
+					aria-label={ __(
+						'All Reels',
+						'productreels-shoppable-video-reels-for-woocommerce'
+					) }
 				>
 					<header className="wr-editor__pane-head">
 						<h2 className="wr-editor__pane-title">
-							{ __( 'All Reels', 'wooreels' ) }
+							{ __(
+								'All Reels',
+								'productreels-shoppable-video-reels-for-woocommerce'
+							) }
 						</h2>
 						<p className="wr-editor__pane-sub">
 							{ __(
 								'Choose reels to attach in this widget',
-								'wooreels'
+								'productreels-shoppable-video-reels-for-woocommerce'
 							) }
 						</p>
 					</header>
@@ -712,12 +833,18 @@ export const WidgetEditor = ( { widgetId, navigate } ) => {
 							icon={ IconPlus }
 							onClick={ () => setCreating( true ) }
 						>
-							{ __( 'Add Reel', 'wooreels' ) }
+							{ __(
+								'Add Reel',
+								'productreels-shoppable-video-reels-for-woocommerce'
+							) }
 						</Button>
 						<SearchInput
 							value={ search }
 							onChange={ setSearch }
-							placeholder={ __( 'Search reels…', 'wooreels' ) }
+							placeholder={ __(
+								'Search reels…',
+								'productreels-shoppable-video-reels-for-woocommerce'
+							) }
 						/>
 					</div>
 
@@ -737,7 +864,7 @@ export const WidgetEditor = ( { widgetId, navigate } ) => {
 							<p className="wr-editor__empty">
 								{ __(
 									'No reels are available to add.',
-									'wooreels'
+									'productreels-shoppable-video-reels-for-woocommerce'
 								) }
 							</p>
 						) }
@@ -762,7 +889,10 @@ export const WidgetEditor = ( { widgetId, navigate } ) => {
 									disabled={ loadingMore }
 									onClick={ loadMore }
 								>
-									{ __( 'Load more', 'wooreels' ) }
+									{ __(
+										'Load more',
+										'productreels-shoppable-video-reels-for-woocommerce'
+									) }
 								</Button>
 							</div>
 						) }
@@ -771,17 +901,23 @@ export const WidgetEditor = ( { widgetId, navigate } ) => {
 
 				<section
 					className="wr-editor__pane wr-editor__preview"
-					aria-label={ __( 'Preview', 'wooreels' ) }
+					aria-label={ __(
+						'Preview',
+						'productreels-shoppable-video-reels-for-woocommerce'
+					) }
 				>
 					<header className="wr-editor__pane-head wr-editor__preview-head">
 						<div>
 							<h2 className="wr-editor__pane-title">
-								{ __( 'Preview', 'wooreels' ) }
+								{ __(
+									'Preview',
+									'productreels-shoppable-video-reels-for-woocommerce'
+								) }
 							</h2>
 							<p className="wr-editor__pane-sub">
 								{ __(
 									'This is a representation of how the widget will appear to visitors.',
-									'wooreels'
+									'productreels-shoppable-video-reels-for-woocommerce'
 								) }
 							</p>
 						</div>
@@ -789,7 +925,10 @@ export const WidgetEditor = ( { widgetId, navigate } ) => {
 						<div
 							className="wr-toggle-group"
 							role="group"
-							aria-label={ __( 'Device', 'wooreels' ) }
+							aria-label={ __(
+								'Device',
+								'productreels-shoppable-video-reels-for-woocommerce'
+							) }
 						>
 							{ DEVICES.map( ( entry ) => {
 								const Icon = entry.icon;
@@ -816,100 +955,112 @@ export const WidgetEditor = ( { widgetId, navigate } ) => {
 						</div>
 					</header>
 
-					<div className="wr-editor__stage">
-						{ loading && (
-							<div
-								className="wr-editor__stage-inner"
-								style={ { width: previewWidth } }
-							>
-								<Skeleton height={ 260 } radius="10px" />
-							</div>
-						) }
+					<div className="wr-editor__preview-body">
+						<div className="wr-editor__stage">
+							{ loading && (
+								<div
+									className="wr-editor__stage-inner"
+									style={ { width: previewWidth } }
+								>
+									<Skeleton height={ 260 } radius="10px" />
+								</div>
+							) }
 
-						{ ! loading && attached.length === 0 && (
-							<EmptyState
-								title={ __(
-									'No reels have been added to this widget yet.',
-									'wooreels'
-								) }
-								text={ __(
-									'Select some from the list on the left to get started.',
-									'wooreels'
-								) }
-							/>
-						) }
-
-						{ ! loading && attached.length > 0 && (
-							<div
-								className="wr-editor__stage-inner"
-								style={ { width: previewWidth } }
-							>
-								<WidgetRenderer
-									widget={ {
-										id: savedId,
-										name,
-										reels: attached,
-									} }
-									styles={ styles }
-									device={ device }
-									inEditor
-									onOpen={ preview }
+							{ ! loading && attached.length === 0 && (
+								<EmptyState
+									title={ __(
+										'No reels have been added to this widget yet.',
+										'productreels-shoppable-video-reels-for-woocommerce'
+									) }
+									text={ __(
+										'Select some from the list on the left to get started.',
+										'productreels-shoppable-video-reels-for-woocommerce'
+									) }
 								/>
+							) }
+
+							{ ! loading && attached.length > 0 && (
+								<div
+									className="wr-editor__stage-inner"
+									style={ { width: previewWidth } }
+								>
+									<WidgetRenderer
+										widget={ {
+											id: savedId,
+											name,
+											reels: attached,
+										} }
+										styles={ styles }
+										device={ device }
+										inEditor
+										onOpen={ preview }
+										services={ editorServices }
+									/>
+								</div>
+							) }
+						</div>
+
+						{ attached.length > 0 && (
+							<div className="wr-editor__attached">
+								<div className="wr-editor__attached-head">
+									<h3 className="wr-section-label">
+										{ __(
+											'Attached videos',
+											'productreels-shoppable-video-reels-for-woocommerce'
+										) }
+									</h3>
+									<span className="wr-editor__pane-sub">
+										{ __(
+											'These reels will be shown in this reel widget',
+											'productreels-shoppable-video-reels-for-woocommerce'
+										) }
+									</span>
+								</div>
+
+								<DndContext
+									sensors={ sensors }
+									collisionDetection={ closestCenter }
+									onDragEnd={ onDragEnd }
+								>
+									<SortableContext
+										items={ attachedIds }
+										strategy={ rectSortingStrategy }
+									>
+										<ul className="wr-attached-list">
+											{ attached.map( ( reel ) => (
+												<SortableReel
+													key={ reel.id }
+													reel={ reel }
+													onRemove={ remove }
+													onPreview={ preview }
+												/>
+											) ) }
+										</ul>
+									</SortableContext>
+								</DndContext>
 							</div>
 						) }
 					</div>
-
-					{ attached.length > 0 && (
-						<div className="wr-editor__attached">
-							<div className="wr-editor__attached-head">
-								<h3 className="wr-section-label">
-									{ __( 'Attached videos', 'wooreels' ) }
-								</h3>
-								<span className="wr-editor__pane-sub">
-									{ __(
-										'These reels will be shown in this reel widget',
-										'wooreels'
-									) }
-								</span>
-							</div>
-
-							<DndContext
-								sensors={ sensors }
-								collisionDetection={ closestCenter }
-								onDragEnd={ onDragEnd }
-							>
-								<SortableContext
-									items={ attachedIds }
-									strategy={ rectSortingStrategy }
-								>
-									<ul className="wr-attached-list">
-										{ attached.map( ( reel ) => (
-											<SortableReel
-												key={ reel.id }
-												reel={ reel }
-												onRemove={ remove }
-												onPreview={ preview }
-											/>
-										) ) }
-									</ul>
-								</SortableContext>
-							</DndContext>
-						</div>
-					) }
 				</section>
 
 				<section
 					className="wr-editor__pane wr-editor__style"
-					aria-label={ __( 'Customization', 'wooreels' ) }
+					aria-label={ __(
+						'Customization',
+						'productreels-shoppable-video-reels-for-woocommerce'
+					) }
 				>
 					<header className="wr-editor__pane-head">
 						<h2 className="wr-editor__pane-title">
-							{ __( 'Customization', 'wooreels' ) }
+							{ __(
+								'Customization',
+								'productreels-shoppable-video-reels-for-woocommerce'
+							) }
 						</h2>
 						<p className="wr-editor__pane-sub">
 							{ __(
 								'Customize your widget however you like',
-								'wooreels'
+								'productreels-shoppable-video-reels-for-woocommerce'
 							) }
 						</p>
 					</header>
@@ -930,7 +1081,10 @@ export const WidgetEditor = ( { widgetId, navigate } ) => {
 					aria-expanded={ panelOpen ? 'true' : 'false' }
 					onClick={ () => setPanelOpen( ! panelOpen ) }
 				>
-					{ __( 'Customization', 'wooreels' ) }
+					{ __(
+						'Customization',
+						'productreels-shoppable-video-reels-for-woocommerce'
+					) }
 				</button>
 			</div>
 
@@ -953,18 +1107,27 @@ export const WidgetEditor = ( { widgetId, navigate } ) => {
 				/>
 			) }
 
+			{ titleOpen && (
+				<TitleAppearanceDialog
+					name={ name }
+					styles={ styles }
+					set={ setStyle }
+					onClose={ () => setTitleOpen( false ) }
+				/>
+			) }
+
 			{ confirming && (
 				<ConfirmDialog
 					title={ __(
 						'Are you sure you want to delete this widget?',
-						'wooreels'
+						'productreels-shoppable-video-reels-for-woocommerce'
 					) }
 					onConfirm={ removeWidget }
 					onClose={ () => setConfirming( false ) }
 				>
 					{ __(
 						'This widget and its click statistics will be removed. Its reels stay in your library and keep working in any other widget.',
-						'wooreels'
+						'productreels-shoppable-video-reels-for-woocommerce'
 					) }
 				</ConfirmDialog>
 			) }

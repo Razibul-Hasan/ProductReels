@@ -32,18 +32,3 @@ export const claimPlayback = ( pause ) => {
 		}
 	};
 };
-
-/**
- * Pause whatever is playing, if anything.
- */
-export const pauseAll = () => {
-	if ( current ) {
-		try {
-			current();
-		} catch ( error ) {
-			// Already gone.
-		}
-
-		current = null;
-	}
-};

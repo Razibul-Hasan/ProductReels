@@ -1,8 +1,8 @@
-=== WooReels — Shoppable Video Reels for WooCommerce ===
+=== ProductReels – Shoppable Video Reels for WooCommerce ===
 Contributors: razibulhasan
 Donate link: https://bestwebexpert.com/
 Tags: woocommerce, video, reels, shoppable video, stories
-Requires at least: 6.0
+Requires at least: 6.6
 Tested up to: 7.1
 Requires PHP: 7.4
 Stable tag: 1.0.0
@@ -13,11 +13,11 @@ Turn product videos and customer UGC into shoppable Instagram-style reels with a
 
 == Description ==
 
-WooReels lets a store owner group short vertical videos into reusable **widgets**, style every widget from a live visual editor, tag WooCommerce products or custom call-to-action buttons inside each reel, and place the widget anywhere with a shortcode, a block or an Elementor widget.
+ProductReels lets a store owner group short vertical videos into reusable **widgets**, style every widget from a live visual editor, tag WooCommerce products or custom call-to-action buttons inside each reel, and place the widget anywhere with a shortcode, a block or an Elementor widget.
 
 Visitors tap a thumbnail, a fullscreen swipeable player opens, and they can add to cart without leaving the page. Views and button clicks are tracked and reported per widget.
 
-**Everything ships unlocked.** There is no free/pro split, no license key, no telemetry and no external requests from your server.
+**Everything ships unlocked.** There is no free/pro split, no license key and no telemetry. The only third-party services involved are the video hosts you choose to embed — see *External services* below.
 
 = Layouts =
 
@@ -55,13 +55,22 @@ Every widget reports total views, total clicks and CTR, with a per-reel table an
 
 Reels, widgets, custom links and analytics all work on a plain WordPress site. Product tagging and add to cart appear once WooCommerce is active.
 
+= External services =
+
+ProductReels sends nothing about your site or your visitors anywhere. It contacts a third party only when you choose to embed a video hosted there:
+
+* **Vimeo** — when an administrator pastes a Vimeo link in the reel editor, the plugin asks Vimeo's public oEmbed endpoint (`https://vimeo.com/api/oembed.json`) for the video's poster image and duration. Only the pasted URL is sent. On the front end, opening a Vimeo reel loads Vimeo's Player SDK (`https://player.vimeo.com/api/player.js`) in the visitor's browser, with Do Not Track enabled. [Terms of service](https://vimeo.com/terms) · [Privacy policy](https://vimeo.com/privacy)
+* **YouTube** — a YouTube reel's poster is the thumbnail YouTube publishes for that video (`https://img.youtube.com/vi/…`). Opening a YouTube reel loads the YouTube IFrame Player API (`https://www.youtube.com/iframe_api`) in the visitor's browser. [Terms of service](https://www.youtube.com/t/terms) · [Privacy policy](https://policies.google.com/privacy)
+
+Neither SDK is loaded on a page until a visitor actually opens a reel from that provider. Reels from your media library or a self-hosted URL involve no third party at all. The `productreels_allow_provider_lookup` filter turns the Vimeo oEmbed lookup off entirely.
+
 == Installation ==
 
-1. Upload the `wooreels` folder to `/wp-content/plugins/`, or install it from the Plugins screen.
+1. Upload the `productreels` folder to `/wp-content/plugins/`, or install it from the Plugins screen.
 2. Activate the plugin. The database tables are created on activation.
-3. Go to **WooReels → All Reels** and add your first reel from the media library, Vimeo, YouTube Shorts or a hosted MP4 URL.
-4. Go to **WooReels → Create Widget**, pick reels, style the widget and save.
-5. Place it with `[wooreels id="1"]`, the **WooReels** block, or the **WooReels** Elementor widget.
+3. Go to **ProductReels → All Reels** and add your first reel from the media library, Vimeo, YouTube Shorts or a hosted MP4 URL.
+4. Go to **ProductReels → Create Widget**, pick reels, style the widget and save.
+5. Place it with `[productreels id="1"]`, the **ProductReels** block, or the **ProductReels** Elementor widget.
 
 == Frequently Asked Questions ==
 
@@ -79,15 +88,15 @@ A view is counted after about one second of actual playback, at most a configura
 
 = Is any personal data stored? =
 
-No. The rate limiter keys on a salted hash of the visitor's IP address, which is kept only in a short-lived transient. Nothing about a visitor is written to the WooReels tables.
+No. The rate limiter keys on a salted hash of the visitor's IP address, which is kept only in a short-lived transient. Nothing about a visitor is written to the ProductReels tables. The browser remembers which reels it has already counted and which popups it has closed in its own session or local storage; nothing else is stored client-side.
 
 = What happens on uninstall? =
 
-By default, nothing is deleted. Turn on **Delete all plugin data on uninstall** under WooReels → Settings to have the tables and options removed when the plugin is deleted.
+By default, nothing is deleted. Turn on **Delete all plugin data on uninstall** under ProductReels → Settings to have the tables and options removed when the plugin is deleted.
 
 = Does it work with Elementor? =
 
-Yes. When Elementor is active a **WooReels** widget appears under the General category of the Elementor panel.
+Yes. When Elementor is active a **ProductReels** widget appears under the General category of the Elementor panel.
 
 == Screenshots ==
 

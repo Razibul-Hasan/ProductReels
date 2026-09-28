@@ -90,8 +90,14 @@ export const VolumeControl = ( { muted, volume, onToggleMute, onVolume } ) => {
 				className="wr-player__ctl"
 				aria-label={
 					muted
-						? __( 'Unmute', 'wooreels' )
-						: __( 'Mute', 'wooreels' )
+						? __(
+								'Unmute',
+								'productreels-shoppable-video-reels-for-woocommerce'
+							)
+						: __(
+								'Mute',
+								'productreels-shoppable-video-reels-for-woocommerce'
+							)
 				}
 				aria-pressed={ muted ? 'true' : 'false' }
 				onClick={ onToggleMute }
@@ -103,7 +109,10 @@ export const VolumeControl = ( { muted, volume, onToggleMute, onVolume } ) => {
 				className="wr-volume__slider"
 				role="slider"
 				tabIndex={ 0 }
-				aria-label={ __( 'Volume', 'wooreels' ) }
+				aria-label={ __(
+					'Volume',
+					'productreels-shoppable-video-reels-for-woocommerce'
+				) }
 				aria-valuemin={ 0 }
 				aria-valuemax={ 100 }
 				aria-valuenow={ shown }

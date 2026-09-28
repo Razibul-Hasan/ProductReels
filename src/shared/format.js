@@ -35,21 +35,17 @@ export const compactCount = ( value ) => {
 };
 
 /**
- * The first thing worth showing over a thumbnail: a link's button text, or the
- * reel's own title as a fallback.
+ * The product a reel is tagged with — the first product link's product.
  *
- * @param {Object}  reel              The reel.
- * @param {boolean} showFallbackTitle Whether the title may stand in.
- * @return {string} The caption, or an empty string.
+ * @param {Object} reel The reel.
+ * @return {number} The product id, or 0 when the reel tags no product.
  */
-export const thumbnailCaption = ( reel, showFallbackTitle ) => {
-	const first = ( reel.links || [] )[ 0 ];
+export const taggedProductId = ( reel ) => {
+	const link = ( reel.links || [] ).find(
+		( entry ) => entry.btn_type === 'product' && entry.product_id
+	);
 
-	if ( first && first.buttonText ) {
-		return first.buttonText;
-	}
-
-	return showFallbackTitle ? reel.title || '' : '';
+	return link ? Number( link.product_id ) : 0;
 };
 
 /**

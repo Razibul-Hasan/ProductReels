@@ -10,7 +10,11 @@ import { useMemo, useRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { boot } from './api';
 import { IconExternal } from './components/icons';
-import { useHashRoute, useSubmenuHighlight } from './hooks/use-hash-route';
+import {
+	useDocumentTitle,
+	useHashRoute,
+	useSubmenuHighlight,
+} from './hooks/use-hash-route';
 import { UnsavedContext } from './hooks/use-unsaved-guard';
 import { ConfirmDialog } from './components/ui/Modal';
 import { ToastProvider } from './components/ui/Toasts';
@@ -20,7 +24,7 @@ import { Statistics } from './screens/Statistics';
 import { WidgetEditor } from './screens/WidgetEditor';
 import { WidgetsList } from './screens/WidgetsList';
 
-const DOCS_URL = 'https://bestwebexpert.com/wooreels';
+const DOCS_URL = 'https://bestwebexpert.com/productreels';
 
 const BrandMark = () => (
 	<svg
@@ -70,17 +74,26 @@ const AppBar = ( { route, navigate } ) => {
 		{
 			hash: '#/widgets',
 			match: [ 'widgets', 'widget-stats' ],
-			label: __( 'All Widgets', 'wooreels' ),
+			label: __(
+				'All Widgets',
+				'productreels-shoppable-video-reels-for-woocommerce'
+			),
 		},
 		{
 			hash: '#/reels',
 			match: [ 'reels' ],
-			label: __( 'All Reels', 'wooreels' ),
+			label: __(
+				'All Reels',
+				'productreels-shoppable-video-reels-for-woocommerce'
+			),
 		},
 		{
 			hash: '#/settings',
 			match: [ 'settings' ],
-			label: __( 'Settings', 'wooreels' ),
+			label: __(
+				'Settings',
+				'productreels-shoppable-video-reels-for-woocommerce'
+			),
 		},
 	];
 
@@ -94,13 +107,16 @@ const AppBar = ( { route, navigate } ) => {
 				<span className="wr-appbar__mark">
 					<BrandMark />
 				</span>
-				<span className="wr-appbar__name">WooReels</span>
+				<span className="wr-appbar__name">ProductReels</span>
 				<span className="wr-appbar__version">v{ boot.version }</span>
 			</button>
 
 			<nav
 				className="wr-appbar__tabs"
-				aria-label={ __( 'WooReels sections', 'wooreels' ) }
+				aria-label={ __(
+					'ProductReels sections',
+					'productreels-shoppable-video-reels-for-woocommerce'
+				) }
 			>
 				{ tabs.map( ( tab ) => {
 					const current = tab.match.includes( route.name );
@@ -128,7 +144,10 @@ const AppBar = ( { route, navigate } ) => {
 					target="_blank"
 					rel="noopener noreferrer"
 				>
-					{ __( 'Documentation', 'wooreels' ) }
+					{ __(
+						'Documentation',
+						'productreels-shoppable-video-reels-for-woocommerce'
+					) }
 					<IconExternal size={ 12 } />
 				</a>
 			</div>
@@ -180,6 +199,34 @@ const App = () => {
 		useHashRoute( dirty );
 
 	useSubmenuHighlight( route );
+	useDocumentTitle(
+		{
+			widgets: __(
+				'All Widgets',
+				'productreels-shoppable-video-reels-for-woocommerce'
+			),
+			'widget-new': __(
+				'Create Widget',
+				'productreels-shoppable-video-reels-for-woocommerce'
+			),
+			'widget-edit': __(
+				'Edit Widget',
+				'productreels-shoppable-video-reels-for-woocommerce'
+			),
+			'widget-stats': __(
+				'Statistics',
+				'productreels-shoppable-video-reels-for-woocommerce'
+			),
+			reels: __(
+				'All Reels',
+				'productreels-shoppable-video-reels-for-woocommerce'
+			),
+			settings: __(
+				'Settings',
+				'productreels-shoppable-video-reels-for-woocommerce'
+			),
+		}[ route.name ]
+	);
 
 	const unsaved = useMemo(
 		() => ( {
@@ -191,14 +238,20 @@ const App = () => {
 		[]
 	);
 
+	// The widget editor has its own header and locks its panes to the
+	// viewport, so it drops the app bar and gets a fixed-height shell.
+	const isEditor =
+		'widget-new' === route.name || 'widget-edit' === route.name;
+
 	return (
 		<ToastProvider>
 			<UnsavedContext.Provider value={ unsaved }>
-				<div className="wr-app">
-					{ route.name !== 'widget-new' &&
-						route.name !== 'widget-edit' && (
-							<AppBar route={ route } navigate={ navigate } />
-						) }
+				<div
+					className={ isEditor ? 'wr-app wr-app--editor' : 'wr-app' }
+				>
+					{ ! isEditor && (
+						<AppBar route={ route } navigate={ navigate } />
+					) }
 					<Screen route={ route } navigate={ navigate } />
 				</div>
 
@@ -206,16 +259,19 @@ const App = () => {
 					<ConfirmDialog
 						title={ __(
 							'You have unsaved changes. Leave this page without saving?',
-							'wooreels'
+							'productreels-shoppable-video-reels-for-woocommerce'
 						) }
-						confirmLabel={ __( 'Continue', 'wooreels' ) }
+						confirmLabel={ __(
+							'Continue',
+							'productreels-shoppable-video-reels-for-woocommerce'
+						) }
 						tone="primary"
 						onConfirm={ leaveAnyway }
 						onClose={ stayHere }
 					>
 						{ __(
 							'Anything you have changed since the last save will be lost.',
-							'wooreels'
+							'productreels-shoppable-video-reels-for-woocommerce'
 						) }
 					</ConfirmDialog>
 				) }

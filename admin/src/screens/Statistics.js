@@ -73,7 +73,7 @@ const useSort = ( initialColumn, initialDirection = 'desc' ) => {
 				? {
 						column,
 						direction: current.direction === 'asc' ? 'desc' : 'asc',
-				  }
+					}
 				: {
 						column,
 						direction:
@@ -82,7 +82,7 @@ const useSort = ( initialColumn, initialDirection = 'desc' ) => {
 							column === 'buttonText'
 								? 'asc'
 								: 'desc',
-				  }
+					}
 		);
 
 	return [ sort, toggle ];
@@ -169,7 +169,7 @@ export const Statistics = ( { widgetId, navigate } ) => {
 						stats.buttons,
 						buttonSort.column,
 						buttonSort.direction
-				  )
+					)
 				: [],
 		[ stats, buttonSort ]
 	);
@@ -184,12 +184,18 @@ export const Statistics = ( { widgetId, navigate } ) => {
 				<div className="wr-page-head__titles wr-page-head__titles--with-back">
 					<IconButton
 						icon={ IconChevronLeft }
-						label={ __( 'Back', 'wooreels' ) }
+						label={ __(
+							'Back',
+							'productreels-shoppable-video-reels-for-woocommerce'
+						) }
 						onClick={ () => navigate( '#/widgets' ) }
 					/>
 					<div>
 						<h1 className="wr-page-head__title">
-							{ __( 'Statistics', 'wooreels' ) }
+							{ __(
+								'Statistics',
+								'productreels-shoppable-video-reels-for-woocommerce'
+							) }
 							{ widget && (
 								<span className="wr-page-head__crumb">
 									{ widget.name }
@@ -199,7 +205,7 @@ export const Statistics = ( { widgetId, navigate } ) => {
 						<p className="wr-page-head__sub">
 							{ __(
 								'Lifetime views and clicks for this widget.',
-								'wooreels'
+								'productreels-shoppable-video-reels-for-woocommerce'
 							) }
 						</p>
 					</div>
@@ -209,7 +215,10 @@ export const Statistics = ( { widgetId, navigate } ) => {
 						icon={ IconEdit }
 						onClick={ () => navigate( `#/widgets/${ widgetId }` ) }
 					>
-						{ __( 'Edit', 'wooreels' ) }
+						{ __(
+							'Edit',
+							'productreels-shoppable-video-reels-for-woocommerce'
+						) }
 					</Button>
 				</div>
 			</div>
@@ -219,7 +228,10 @@ export const Statistics = ( { widgetId, navigate } ) => {
 					<div className="wr-card wr-error-card">
 						<p>{ error }</p>
 						<Button onClick={ load }>
-							{ __( 'Continue', 'wooreels' ) }
+							{ __(
+								'Continue',
+								'productreels-shoppable-video-reels-for-woocommerce'
+							) }
 						</Button>
 					</div>
 				) }
@@ -227,34 +239,46 @@ export const Statistics = ( { widgetId, navigate } ) => {
 				{ error === '' && (
 					<div className="wr-tiles">
 						<Tile
-							label={ __( 'Total Views', 'wooreels' ) }
+							label={ __(
+								'Total Views',
+								'productreels-shoppable-video-reels-for-woocommerce'
+							) }
 							value={
 								stats ? formatNumber( stats.totals.views ) : ''
 							}
 							loading={ loading }
 							hint={ __(
 								'Counted after a second of playback.',
-								'wooreels'
+								'productreels-shoppable-video-reels-for-woocommerce'
 							) }
 						/>
 						<Tile
-							label={ __( 'Total Clicks', 'wooreels' ) }
+							label={ __(
+								'Total Clicks',
+								'productreels-shoppable-video-reels-for-woocommerce'
+							) }
 							value={
 								stats ? formatNumber( stats.totals.clicks ) : ''
 							}
 							loading={ loading }
 							hint={ __(
 								'Buttons and product cards.',
-								'wooreels'
+								'productreels-shoppable-video-reels-for-woocommerce'
 							) }
 						/>
 						<Tile
-							label={ __( 'CTR', 'wooreels' ) }
+							label={ __(
+								'CTR',
+								'productreels-shoppable-video-reels-for-woocommerce'
+							) }
 							value={
 								stats ? formatPercent( stats.totals.ctr ) : ''
 							}
 							loading={ loading }
-							hint={ __( 'Clicks per view.', 'wooreels' ) }
+							hint={ __(
+								'Clicks per view.',
+								'productreels-shoppable-video-reels-for-woocommerce'
+							) }
 						/>
 					</div>
 				) }
@@ -264,11 +288,11 @@ export const Statistics = ( { widgetId, navigate } ) => {
 						<EmptyState
 							title={ __(
 								'No stats available for this widget yet.',
-								'wooreels'
+								'productreels-shoppable-video-reels-for-woocommerce'
 							) }
 							text={ __(
 								'Place the widget on a page and numbers will start to appear once visitors watch and tap.',
-								'wooreels'
+								'productreels-shoppable-video-reels-for-woocommerce'
 							) }
 							action={
 								<Button
@@ -278,7 +302,10 @@ export const Statistics = ( { widgetId, navigate } ) => {
 										navigate( `#/widgets/${ widgetId }` )
 									}
 								>
-									{ __( 'Edit', 'wooreels' ) }
+									{ __(
+										'Edit',
+										'productreels-shoppable-video-reels-for-woocommerce'
+									) }
 								</Button>
 							}
 						/>
@@ -290,7 +317,10 @@ export const Statistics = ( { widgetId, navigate } ) => {
 						<section className="wr-card wr-table-card">
 							<header className="wr-card__head">
 								<h2 className="wr-section-label">
-									{ __( 'Reel performance', 'wooreels' ) }
+									{ __(
+										'Reel performance',
+										'productreels-shoppable-video-reels-for-woocommerce'
+									) }
 								</h2>
 							</header>
 							<table className="wr-table wr-table--stats">
@@ -300,7 +330,7 @@ export const Statistics = ( { widgetId, navigate } ) => {
 											<span className="wr-screen-reader-text">
 												{ __(
 													'Thumbnail',
-													'wooreels'
+													'productreels-shoppable-video-reels-for-woocommerce'
 												) }
 											</span>
 										</th>
@@ -308,28 +338,37 @@ export const Statistics = ( { widgetId, navigate } ) => {
 											column="title"
 											label={ __(
 												'Reel Title',
-												'wooreels'
+												'productreels-shoppable-video-reels-for-woocommerce'
 											) }
 											sort={ reelSort }
 											onSort={ toggleReelSort }
 										/>
 										<SortHeader
 											column="view_count"
-											label={ __( 'Views', 'wooreels' ) }
+											label={ __(
+												'Views',
+												'productreels-shoppable-video-reels-for-woocommerce'
+											) }
 											sort={ reelSort }
 											onSort={ toggleReelSort }
 											numeric
 										/>
 										<SortHeader
 											column="click_count"
-											label={ __( 'Clicks', 'wooreels' ) }
+											label={ __(
+												'Clicks',
+												'productreels-shoppable-video-reels-for-woocommerce'
+											) }
 											sort={ reelSort }
 											onSort={ toggleReelSort }
 											numeric
 										/>
 										<SortHeader
 											column="ctr"
-											label={ __( 'CTR', 'wooreels' ) }
+											label={ __(
+												'CTR',
+												'productreels-shoppable-video-reels-for-woocommerce'
+											) }
 											sort={ reelSort }
 											onSort={ toggleReelSort }
 											numeric
@@ -375,7 +414,7 @@ export const Statistics = ( { widgetId, navigate } ) => {
 														/>
 													</td>
 												</tr>
-										  ) )
+											) )
 										: reels.map( ( reel ) => {
 												const poster = posterOf( reel );
 
@@ -421,7 +460,7 @@ export const Statistics = ( { widgetId, navigate } ) => {
 														</td>
 													</tr>
 												);
-										  } ) }
+											} ) }
 								</tbody>
 							</table>
 						</section>
@@ -429,14 +468,17 @@ export const Statistics = ( { widgetId, navigate } ) => {
 						<section className="wr-card wr-table-card">
 							<header className="wr-card__head">
 								<h2 className="wr-section-label">
-									{ __( 'Button performance', 'wooreels' ) }
+									{ __(
+										'Button performance',
+										'productreels-shoppable-video-reels-for-woocommerce'
+									) }
 								</h2>
 							</header>
 							{ ! loading && buttons.length === 0 ? (
 								<p className="wr-card__empty">
 									{ __(
 										'No button has been clicked yet.',
-										'wooreels'
+										'productreels-shoppable-video-reels-for-woocommerce'
 									) }
 								</p>
 							) : (
@@ -447,7 +489,7 @@ export const Statistics = ( { widgetId, navigate } ) => {
 												column="reelTitle"
 												label={ __(
 													'Reel Title',
-													'wooreels'
+													'productreels-shoppable-video-reels-for-woocommerce'
 												) }
 												sort={ buttonSort }
 												onSort={ toggleButtonSort }
@@ -456,7 +498,7 @@ export const Statistics = ( { widgetId, navigate } ) => {
 												column="buttonText"
 												label={ __(
 													'Button Text',
-													'wooreels'
+													'productreels-shoppable-video-reels-for-woocommerce'
 												) }
 												sort={ buttonSort }
 												onSort={ toggleButtonSort }
@@ -465,19 +507,22 @@ export const Statistics = ( { widgetId, navigate } ) => {
 												column="campaignName"
 												label={ __(
 													'Campaign Name',
-													'wooreels'
+													'productreels-shoppable-video-reels-for-woocommerce'
 												) }
 												sort={ buttonSort }
 												onSort={ toggleButtonSort }
 											/>
 											<th scope="col">
-												{ __( 'Url', 'wooreels' ) }
+												{ __(
+													'Url',
+													'productreels-shoppable-video-reels-for-woocommerce'
+												) }
 											</th>
 											<SortHeader
 												column="clickCount"
 												label={ __(
 													'Clicks',
-													'wooreels'
+													'productreels-shoppable-video-reels-for-woocommerce'
 												) }
 												sort={ buttonSort }
 												onSort={ toggleButtonSort }
@@ -523,7 +568,7 @@ export const Statistics = ( { widgetId, navigate } ) => {
 															/>
 														</td>
 													</tr>
-											  ) )
+												) )
 											: buttons.map( ( button ) => (
 													<tr
 														key={ button.btn_uuid }
@@ -572,7 +617,7 @@ export const Statistics = ( { widgetId, navigate } ) => {
 															) }
 														</td>
 													</tr>
-											  ) ) }
+												) ) }
 									</tbody>
 								</table>
 							) }

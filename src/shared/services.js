@@ -8,12 +8,13 @@
  * these methods. The public bundle supplies real ones; the editor supplies
  * these, which do nothing.
  *
- * @typedef {Object} WooreelsServices
+ * @typedef {Object} ProductreelsServices
  * @property {Function} trackView   (widgetId, reel) => void — a reel has been watched.
- * @property {Function} trackClick  (reel, link, product?) => void — a link was pressed.
+ * @property {Function} trackClick  (reel, link) => void — a link was pressed.
  * @property {Function} getProducts (ids) => Promise<Array> — display data for tagged products.
  * @property {Function} addToCart   (product, link) => Promise<void> — add one to the cart.
  * @property {string}   cartUrl     Where "View cart" goes.
+ * @property {string}   checkoutUrl Where "Buy now" goes once the product is in the cart.
  * @property {boolean}  hasWoo      Whether WooCommerce is available.
  */
 
@@ -23,6 +24,7 @@ export const noopServices = {
 	getProducts: () => Promise.resolve( [] ),
 	addToCart: () => Promise.resolve(),
 	cartUrl: '',
+	checkoutUrl: '',
 	hasWoo: false,
 };
 
@@ -30,7 +32,7 @@ export const noopServices = {
  * Fill in anything a caller left out, so the player can call every method.
  *
  * @param {Object} partial Whatever the caller supplied.
- * @return {WooreelsServices} A complete services object.
+ * @return {ProductreelsServices} A complete services object.
  */
 export const withDefaults = ( partial ) => ( {
 	...noopServices,

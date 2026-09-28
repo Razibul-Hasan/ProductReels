@@ -5,55 +5,90 @@
  * every widget, directly on <body>. Always dark: it is a stage, not a page,
  * and the content is the light source. Colours for the nav buttons arrive
  * as custom properties from styleVars(), the same as the templates.
+ *
+ * Opening is one orchestrated motion: the room dims, the stage lands, then
+ * the chrome — counter, tools, seek strip, the buttons beside the stage —
+ * fades in a beat later, and the foot with its title and product rises
+ * last. Closing runs the first two in reverse. Between reels the track
+ * slides and nothing else moves, so a swipe is only ever a swipe.
  */
 
 .wr-portal-root {
 	--wr-p-fg: #ffffff;
-	--wr-p-muted: rgb(255 255 255 / 0.68);
-	--wr-p-glass: rgb(255 255 255 / 0.14);
-	--wr-p-glass-border: rgb(255 255 255 / 0.2);
+	--wr-p-muted: rgb(255 255 255 / 0.66);
+	--wr-p-ink-text: #1a1a1a;
+	/* The controls' glass: dark, so it reads over bright footage too, with a
+	   lit top edge that gives the pill a surface. */
+	--wr-p-ink: rgb(12 14 18 / 0.55);
+	--wr-p-ink-border: rgb(255 255 255 / 0.12);
+	--wr-p-ink-glow: inset 0 1px 0 rgb(255 255 255 / 0.08);
+	--wr-p-hair: rgb(0 0 0 / 0.06);
 	--wr-p-ease: cubic-bezier(0.22, 0.61, 0.36, 1);
-	--wr-p-bar-h: 48px;
+	--wr-p-out: cubic-bezier(0.16, 1, 0.3, 1);
+	--wr-p-in: cubic-bezier(0.4, 0, 1, 1);
+	--wr-p-spring: cubic-bezier(0.34, 1.3, 0.64, 1);
+	--wr-p-bar-h: 34px;
 
 	position: relative;
 	z-index: 2147483000;
-	font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+	font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI Variable', 'Segoe UI', system-ui, Roboto, 'Helvetica Neue', Arial, sans-serif;
 	font-size: 14px;
 	line-height: 1.4;
 	color: var(--wr-p-fg);
+	-webkit-font-smoothing: antialiased;
 
 	*,
 	*::before,
 	*::after {
 		box-sizing: border-box;
 	}
+}
 
-	button {
-		margin: 0;
-		padding: 0;
-		font: inherit;
-		color: inherit;
-		background: none;
-		border: 0;
-		cursor: pointer;
-	}
+/*
+ * The reset carries no specificity of its own. `.wr-portal-root button`
+ * would out-specify `.wr-product__btn`, `.wr-player__nav` and every other
+ * single-class button below, silently stripping their backgrounds — which is
+ * exactly what happened. :where() keeps the scope and drops the weight.
+ */
+:where(.wr-portal-root) button {
+	margin: 0;
+	padding: 0;
+	font: inherit;
+	color: inherit;
+	background: none;
+	border: 0;
+	cursor: pointer;
+	-webkit-tap-highlight-color: transparent;
+}
 
-	a {
-		color: inherit;
-	}
+:where(.wr-portal-root) a {
+	color: inherit;
+	-webkit-tap-highlight-color: transparent;
+}
 
-	:focus-visible {
-		outline: 2px solid #60a5fa;
-		outline-offset: 2px;
-	}
+:where(.wr-portal-root) :focus-visible {
+	outline: 2px solid #fff;
+	outline-offset: 3px;
+}
 
-	img,
-	video,
-	iframe {
-		display: block;
-		max-width: 100%;
-		border: 0;
-	}
+/* No ring for a click; a theme's blanket `:focus` outline must not draw
+   around a control the visitor just pressed with the mouse. */
+:where(.wr-portal-root) :focus:not(:focus-visible) {
+	outline: 0;
+}
+
+/* The controls sit inside a pill with 2px of air: the ring goes just inside
+   the disc, where it cannot cross the pill's edge. */
+:where(.wr-portal-root) .wr-player__ctl:focus-visible {
+	outline-offset: -2px;
+}
+
+:where(.wr-portal-root) img,
+:where(.wr-portal-root) video,
+:where(.wr-portal-root) iframe {
+	display: block;
+	max-width: 100%;
+	border: 0;
 }
 
 body.wr-player-open {
@@ -63,17 +98,29 @@ body.wr-player-open {
 
 /* ------------------------------------------------------------- Backdrop */
 
+/* The page stays faintly visible through a deep blur, so the player feels
+   laid over the shop rather than cut off from it. The dim is a vignette:
+   lightest behind the stage, darkest in the corners. */
 .wr-player {
 	position: fixed;
 	inset: 0;
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	background: rgb(0 0 0 / 0.92);
-	backdrop-filter: blur(6px);
-	-webkit-backdrop-filter: blur(6px);
-	animation: wr-player-in 200ms var(--wr-p-ease);
+	background: radial-gradient(
+		120% 90% at 50% 45%,
+		rgb(22 24 30 / 0.78),
+		rgb(4 5 8 / 0.94)
+	);
+	backdrop-filter: blur(24px) saturate(1.2);
+	-webkit-backdrop-filter: blur(24px) saturate(1.2);
+	animation: wr-player-in 320ms var(--wr-p-out);
 	touch-action: none;
+}
+
+.wr-player.is-closing {
+	animation: wr-player-out 240ms var(--wr-p-in) forwards;
+	pointer-events: none;
 }
 
 @keyframes wr-player-in {
@@ -85,39 +132,132 @@ body.wr-player-open {
 	}
 }
 
-.wr-player__close {
-	position: fixed;
-	inset-block-start: 16px;
-	inset-inline-end: 16px;
-	z-index: 5;
-	display: inline-flex;
-	align-items: center;
-	justify-content: center;
-	width: 44px;
-	height: 44px;
-	color: var(--wr-p-fg);
-	background: rgb(255 255 255 / 0.1);
-	border-radius: 50%;
-	transition: background-color 150ms var(--wr-p-ease);
+@keyframes wr-player-out {
+	to {
+		opacity: 0;
+	}
 }
 
-.wr-player__close:hover {
-	background: rgb(255 255 255 / 0.22);
+/* The chrome arrives after the stage has landed: one fade, reused. */
+@keyframes wr-chrome-in {
+	from {
+		opacity: 0;
+		translate: 0 -6px;
+	}
+}
+
+/* ---------------------------------------------------------------- Head */
+
+/* The strip along the top of the stage that carries the controls. It fades
+   the footage a touch so white icons stay legible over a bright frame, and
+   lets taps through everywhere except on the buttons themselves. */
+.wr-player__head {
+	position: absolute;
+	inset-inline: 0;
+	inset-block-start: 0;
+	z-index: 4;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 8px;
+	padding: 12px 12px 32px;
+	background: linear-gradient(
+		to bottom,
+		rgb(0 0 0 / 0.5) 0%,
+		rgb(0 0 0 / 0.26) 40%,
+		rgb(0 0 0 / 0) 100%
+	);
+	pointer-events: none;
+	animation: wr-chrome-in 480ms var(--wr-p-out) 220ms backwards;
+}
+
+.wr-player__head > * {
+	pointer-events: auto;
+}
+
+/* The counter has nothing on the start side to hold it, so a spacer is what
+   keeps the tools on the end side. */
+.wr-player__head::before {
+	content: '';
+	flex: 1;
+	order: 1;
+	pointer-events: none;
+}
+
+.wr-player__tools {
+	order: 2;
+}
+
+/* Story dots ride the very top edge; the head steps down under them. */
+.wr-player--files .wr-player__head {
+	padding-block-start: 22px;
+}
+
+.wr-player--mobile .wr-player__head {
+	padding-block-start: calc(12px + env(safe-area-inset-top, 0px));
+}
+
+.wr-player--mobile.wr-player--files .wr-player__head {
+	padding-block-start: calc(22px + env(safe-area-inset-top, 0px));
 }
 
 .wr-player__counter {
-	position: fixed;
-	inset-block-start: 22px;
-	inset-inline-start: 20px;
-	z-index: 5;
-	padding: 4px 10px;
+	display: inline-flex;
+	align-items: baseline;
+	gap: 3px;
+	height: 34px;
+	padding: 0 12px;
 	font-size: 12px;
-	font-weight: 600;
+	font-weight: 500;
+	line-height: 34px;
 	font-variant-numeric: tabular-nums;
-	letter-spacing: 0.02em;
+	letter-spacing: 0.03em;
 	color: var(--wr-p-muted);
-	background: rgb(255 255 255 / 0.08);
+	background: var(--wr-p-ink);
+	border: 1px solid var(--wr-p-ink-border);
 	border-radius: 999px;
+	box-shadow: var(--wr-p-ink-glow), 0 8px 24px -8px rgb(0 0 0 / 0.5);
+	backdrop-filter: blur(16px) saturate(1.6);
+	-webkit-backdrop-filter: blur(16px) saturate(1.6);
+}
+
+.wr-player__counter b {
+	font-weight: 600;
+	color: var(--wr-p-fg);
+}
+
+/* Sound, play and close share one glass pill: one shape to find, not
+   three floating circles. */
+.wr-player__tools {
+	display: inline-flex;
+	align-items: center;
+	gap: 2px;
+	padding: 2px;
+	background: var(--wr-p-ink);
+	border: 1px solid var(--wr-p-ink-border);
+	border-radius: 999px;
+	box-shadow: var(--wr-p-ink-glow), 0 8px 24px -8px rgb(0 0 0 / 0.5);
+	backdrop-filter: blur(16px) saturate(1.6);
+	-webkit-backdrop-filter: blur(16px) saturate(1.6);
+}
+
+.wr-player__close {
+	position: relative;
+}
+
+/* A hairline between the media controls and close, so the exit is never
+   mistaken for pause. */
+.wr-player__close::before {
+	content: '';
+	position: absolute;
+	inset-block: 9px;
+	inset-inline-start: -1px;
+	width: 1px;
+	background: rgb(255 255 255 / 0.16);
+}
+
+.wr-player__close:first-child::before {
+	display: none;
 }
 
 /* The click-outside target. It sits under the layout, and the layout lets
@@ -135,7 +275,7 @@ body.wr-player-open {
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	gap: 20px;
+	gap: 24px;
 	width: 100%;
 	height: 100%;
 	padding: 4vh 16px;
@@ -146,9 +286,40 @@ body.wr-player-open {
 	pointer-events: auto;
 }
 
+/*
+ * Vertical: the up and down chevrons stack on the stage's end side, one
+ * just above its middle and one just below, the way a desktop reels feed
+ * keeps them. A two-column grid places them: the stage spans both rows, so
+ * the seam between the rows is the stage's centre line and the buttons
+ * meet there — whatever the viewport, and on the left in RTL.
+ */
 .wr-player--vertical .wr-player__layout {
-	/* Up/down chevrons stack beside the stage instead of flanking it. */
-	flex-wrap: wrap;
+	display: grid;
+	grid-template-columns: auto auto;
+	grid-template-rows: 1fr 1fr;
+	align-content: center;
+	justify-content: center;
+	gap: 12px 24px;
+}
+
+.wr-player--vertical .wr-player__stage {
+	grid-column: 1;
+	grid-row: 1 / span 2;
+	/* Grid items stretch by default; the stage keeps its own size. */
+	align-self: center;
+	justify-self: center;
+}
+
+.wr-player--vertical .wr-player__nav--prev {
+	grid-column: 2;
+	grid-row: 1;
+	align-self: end;
+}
+
+.wr-player--vertical .wr-player__nav--next {
+	grid-column: 2;
+	grid-row: 2;
+	align-self: start;
 }
 
 .wr-player__stage {
@@ -159,11 +330,42 @@ body.wr-player-open {
 	aspect-ratio: 9 / 16;
 	overflow: hidden;
 	background: #000;
-	border-radius: 18px;
-	box-shadow: 0 30px 80px rgb(0 0 0 / 0.6);
+	border-radius: 20px;
+	/* A hairline ring keeps the edge crisp where dark footage meets the dark
+	   backdrop; the long shadow lifts the stage off the page. */
+	box-shadow:
+		0 0 0 1px rgb(255 255 255 / 0.1),
+		0 48px 120px -24px rgb(0 0 0 / 0.9),
+		0 16px 40px rgb(0 0 0 / 0.4);
 	touch-action: none;
 	user-select: none;
 	-webkit-user-select: none;
+	animation: wr-stage-in 560ms var(--wr-p-out);
+}
+
+.wr-player.is-closing .wr-player__stage {
+	animation: wr-stage-out 240ms var(--wr-p-in) forwards;
+}
+
+@keyframes wr-stage-in {
+	from {
+		opacity: 0;
+		scale: 0.94;
+		translate: 0 24px;
+	}
+	to {
+		opacity: 1;
+		scale: 1;
+		translate: 0 0;
+	}
+}
+
+@keyframes wr-stage-out {
+	to {
+		opacity: 0;
+		scale: 0.97;
+		translate: 0 10px;
+	}
 }
 
 .wr-player--mobile .wr-player__layout {
@@ -180,13 +382,22 @@ body.wr-player-open {
 	box-shadow: none;
 }
 
+/* On a phone the stage is the screen: it fades up rather than lands. */
+.wr-player--mobile .wr-player__stage {
+	animation-name: wr-player-in;
+}
+
+.wr-player--mobile.is-closing .wr-player__stage {
+	animation-name: wr-player-out;
+}
+
 /* ---------------------------------------------------------------- Track */
 
 .wr-player__track {
 	display: flex;
 	width: 100%;
 	height: 100%;
-	transition: transform 320ms var(--wr-p-ease);
+	transition: transform 360ms var(--wr-p-out);
 	will-change: transform;
 }
 
@@ -220,14 +431,22 @@ body.wr-player-open {
 	object-fit: contain;
 }
 
-.wr-player__poster--blank {
-	display: block;
-	background: linear-gradient(160deg, #1f2937, #0b1220);
+/* Full-screen on a phone: a 9:16 reel fills a taller-than-9:16 screen edge to
+   edge, the way every reels feed does, rather than sitting between two black
+   bars. Providers stay as they are — an iframe cannot be cropped. */
+.wr-player--mobile .wr-player__video,
+.wr-player--mobile .wr-player__poster {
+	object-fit: cover;
 }
 
-/* Providers: the iframe fills the box. A Short is a 9:16 video inside a
-   16:9 YouTube frame, so the frame is scaled until that inner video is
-   exactly the width of the stage. */
+.wr-player__poster--blank {
+	display: block;
+	background: linear-gradient(160deg, #23262e, #0b0d12);
+}
+
+/* Providers: the iframe fills the box, and the provider fits the video
+   inside it — a Short fills a 9:16 stage, a landscape video sits between
+   two bars. */
 .wr-player__frame {
 	position: absolute;
 	inset: 0;
@@ -238,17 +457,27 @@ body.wr-player-open {
 	height: 100%;
 }
 
-.wr-player__frame--youtube iframe {
-	position: absolute;
-	inset-block-start: 0;
-	inset-inline-start: 50%;
-	width: calc(100% * 256 / 81);
-	height: 100%;
-	translate: -50% 0;
+/* YouTube paints its own chrome inside the iframe whenever the video is not
+   playing: a title bar with share and watch-later along the top, its logo
+   along the bottom. No playerVar removes them any more. They hug the
+   iframe's edges, so the iframe is made taller than the stage and centred:
+   the bands they live in fall outside the clip, while the video, which
+   YouTube centres in the iframe, lands exactly where it did. The overscan
+   is well past the bars' height and well short of any video's edge — the
+   video is fitted to the stage width, so it never reaches the bands. */
+.wr-player__frame--youtube {
+	--wr-yt-overscan: 72px;
+
+	overflow: hidden;
 }
 
-[dir='rtl'] .wr-player__frame--youtube iframe {
-	translate: 50% 0;
+.wr-player__frame--youtube iframe {
+	position: absolute;
+	inset-inline: 0;
+	inset-block-start: calc(-1 * var(--wr-yt-overscan));
+	width: 100%;
+	max-width: none;
+	height: calc(100% + 2 * var(--wr-yt-overscan));
 }
 
 .wr-player__fallback {
@@ -277,15 +506,43 @@ body.wr-player-open {
 	cursor: pointer;
 }
 
+/* The paused mark: a frosted disc that pops in with a little give. The SVG
+   is only the triangle; the disc is the span. */
 .wr-player__bigplay {
-	display: block;
-	filter: drop-shadow(0 4px 16px rgb(0 0 0 / 0.5));
-	animation: wr-pop 200ms var(--wr-p-ease);
+	display: grid;
+	place-items: center;
+	width: 76px;
+	height: 76px;
+	background: rgb(255 255 255 / 0.14);
+	border: 1px solid rgb(255 255 255 / 0.32);
+	border-radius: 50%;
+	box-shadow:
+		inset 0 1px 0 rgb(255 255 255 / 0.2),
+		0 16px 48px -12px rgb(0 0 0 / 0.7);
+	backdrop-filter: blur(14px) saturate(1.4);
+	-webkit-backdrop-filter: blur(14px) saturate(1.4);
+	animation: wr-pop 360ms var(--wr-p-spring);
+	transition: scale 240ms var(--wr-p-spring);
+}
+
+.wr-player__bigplay svg {
+	/* Optically centred: a triangle's weight sits left of its box. */
+	translate: 2px 0;
+	filter: drop-shadow(0 2px 6px rgb(0 0 0 / 0.35));
+}
+
+.wr-player__tap:hover .wr-player__bigplay {
+	scale: 1.06;
+}
+
+.wr-player__tap:active .wr-player__bigplay {
+	scale: 0.94;
+	transition-duration: 100ms;
 }
 
 @keyframes wr-pop {
 	from {
-		scale: 0.85;
+		scale: 0.8;
 		opacity: 0;
 	}
 	to {
@@ -296,18 +553,24 @@ body.wr-player-open {
 
 .wr-player__dots {
 	position: absolute;
-	inset-block-start: 10px;
+	inset-block-start: 8px;
 	inset-inline: 12px;
-	z-index: 2;
+	z-index: 5;
 	display: flex;
 	gap: 4px;
+}
+
+.wr-player--mobile .wr-player__dots {
+	inset-block-start: calc(8px + env(safe-area-inset-top, 0px));
 }
 
 .wr-player__dot {
 	flex: 1;
 	height: 3px;
-	background: rgb(255 255 255 / 0.35);
+	background: rgb(255 255 255 / 0.3);
 	border-radius: 999px;
+	box-shadow: 0 1px 2px rgb(0 0 0 / 0.3);
+	transition: background-color 240ms var(--wr-p-ease);
 }
 
 .wr-player__dot.is-on {
@@ -324,9 +587,37 @@ body.wr-player-open {
 	display: flex;
 	flex-direction: column;
 	gap: 10px;
-	padding: 48px 14px 10px;
-	background: linear-gradient(to top, rgb(0 0 0 / 0.72), rgb(0 0 0 / 0));
+	padding: 72px 14px 12px;
+	background: linear-gradient(
+		to top,
+		rgb(0 0 0 / 0.78) 0%,
+		rgb(0 0 0 / 0.56) 30%,
+		rgb(0 0 0 / 0.24) 62%,
+		rgb(0 0 0 / 0) 100%
+	);
 	pointer-events: none;
+}
+
+/* The foot rises once the stage has landed — only while the player is
+   opening. A step between reels remounts the slides, and a foot that rose
+   again on every step would be a foot that blinked. */
+.wr-player.is-opening .wr-player__slide.is-active .wr-player__foot {
+	animation: wr-foot-in 640ms var(--wr-p-out) 260ms backwards;
+}
+
+@keyframes wr-foot-in {
+	from {
+		opacity: 0;
+		translate: 0 18px;
+	}
+}
+
+.wr-player--no-bar .wr-player__foot {
+	padding-block-end: 16px;
+}
+
+.wr-player--mobile.wr-player--no-bar .wr-player__foot {
+	padding-block-end: calc(16px + env(safe-area-inset-bottom, 0px));
 }
 
 .wr-player__foot > * {
@@ -335,10 +626,12 @@ body.wr-player-open {
 
 .wr-player__title {
 	margin: 0;
+	padding-inline: 2px;
 	font-size: 15px;
 	font-weight: 600;
-	line-height: 1.3;
-	text-shadow: 0 1px 3px rgb(0 0 0 / 0.5);
+	line-height: 1.35;
+	letter-spacing: -0.01em;
+	text-shadow: 0 1px 3px rgb(0 0 0 / 0.45);
 	overflow: hidden;
 	display: -webkit-box;
 	-webkit-line-clamp: 2;
@@ -351,28 +644,61 @@ body.wr-player-open {
 	gap: 8px;
 }
 
+/* A custom link: a white bar with a hairline edge, the arrow tucked at its
+   end. It lifts a pixel under the pointer, and the arrow sets off. */
 .wr-cta {
 	display: inline-flex;
 	align-items: center;
 	justify-content: space-between;
 	gap: 8px;
 	width: 100%;
-	min-height: 44px;
-	padding: 10px 16px;
+	min-height: 46px;
+	padding: 12px 14px 12px 16px;
 	font-size: 14px;
 	font-weight: 600;
 	line-height: 1.2;
-	color: #111827;
+	letter-spacing: -0.01em;
+	color: var(--wr-p-ink-text);
 	text-decoration: none;
 	background: #fff;
 	border-radius: 12px;
-	box-shadow: 0 6px 18px rgb(0 0 0 / 0.25);
-	transition: transform 150ms var(--wr-p-ease), background-color 150ms var(--wr-p-ease);
+	box-shadow:
+		0 0 0 1px rgb(0 0 0 / 0.04),
+		0 1px 2px rgb(0 0 0 / 0.08),
+		0 12px 32px -12px rgb(0 0 0 / 0.5);
+	transition:
+		translate 240ms var(--wr-p-ease),
+		scale 240ms var(--wr-p-spring),
+		background-color 200ms var(--wr-p-ease),
+		box-shadow 240ms var(--wr-p-ease);
 }
 
 .wr-cta:hover {
-	background: #f3f4f6;
-	transform: translateY(-1px);
+	background: #f6f6f7;
+	translate: 0 -1px;
+	box-shadow:
+		0 0 0 1px rgb(0 0 0 / 0.04),
+		0 2px 4px rgb(0 0 0 / 0.08),
+		0 16px 36px -12px rgb(0 0 0 / 0.55);
+}
+
+.wr-cta:active {
+	scale: 0.985;
+	translate: 0 0;
+	transition-duration: 100ms;
+}
+
+.wr-cta svg {
+	flex: none;
+	opacity: 0.7;
+	transition:
+		translate 240ms var(--wr-p-out),
+		opacity 200ms var(--wr-p-ease);
+}
+
+.wr-cta:hover svg {
+	translate: 2px -2px;
+	opacity: 1;
 }
 
 .wr-cta__text {
@@ -392,12 +718,13 @@ body.wr-player-open {
 
 .wr-product--modern {
 	padding: 8px;
-	background: var(--wr-p-glass);
-	border: 1px solid var(--wr-p-glass-border);
-	border-radius: 14px;
-	backdrop-filter: blur(14px);
-	-webkit-backdrop-filter: blur(14px);
-	box-shadow: 0 10px 30px rgb(0 0 0 / 0.3);
+	/* The same ink glass as the controls, so the stage reads as one kit. */
+	background: var(--wr-p-ink);
+	border: 1px solid var(--wr-p-ink-border);
+	border-radius: 16px;
+	box-shadow: var(--wr-p-ink-glow), 0 12px 36px -12px rgb(0 0 0 / 0.6);
+	backdrop-filter: blur(18px) saturate(1.6);
+	-webkit-backdrop-filter: blur(18px) saturate(1.6);
 }
 
 .wr-product--classic {
@@ -407,29 +734,39 @@ body.wr-player-open {
 		'img text'
 		'act act';
 	align-items: start;
-	width: min(240px, 100%);
+	width: min(248px, 100%);
 	padding: 10px;
-	color: #111827;
+	color: var(--wr-p-ink-text);
 	background: #fff;
-	border-radius: 12px;
-	box-shadow: 0 10px 30px rgb(0 0 0 / 0.3);
+	border: 1px solid var(--wr-p-hair);
+	border-radius: 14px;
+	box-shadow:
+		0 1px 2px rgb(0 0 0 / 0.06),
+		0 16px 40px -12px rgb(0 0 0 / 0.5);
 }
 
 .wr-product__img {
 	flex: none;
 	display: block;
-	width: 48px;
-	height: 48px;
+	width: 50px;
+	height: 50px;
 	overflow: hidden;
-	background: rgb(255 255 255 / 0.2);
+	background: rgb(255 255 255 / 0.16);
 	border-radius: 10px;
+	box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.08);
+	transition: scale 240ms var(--wr-p-ease);
+}
+
+.wr-product__img:hover {
+	scale: 1.04;
 }
 
 .wr-product--classic .wr-product__img {
 	grid-area: img;
 	width: 56px;
 	height: 56px;
-	background: #f3f4f6;
+	background: #f4f4f5;
+	box-shadow: inset 0 0 0 1px rgb(0 0 0 / 0.05);
 }
 
 .wr-product__img img,
@@ -444,7 +781,7 @@ body.wr-player-open {
 	flex: 1;
 	display: flex;
 	flex-direction: column;
-	gap: 2px;
+	gap: 3px;
 	min-width: 0;
 }
 
@@ -457,19 +794,23 @@ body.wr-player-open {
 	font-size: 13px;
 	font-weight: 600;
 	line-height: 1.25;
+	letter-spacing: -0.01em;
 	text-decoration: none;
 	display: -webkit-box;
 	-webkit-line-clamp: 2;
 	-webkit-box-orient: vertical;
+	transition: opacity 160ms var(--wr-p-ease);
 }
 
 .wr-product__name:hover {
 	text-decoration: underline;
+	text-underline-offset: 2px;
 }
 
 .wr-product__price {
 	font-size: 12px;
 	font-weight: 600;
+	font-variant-numeric: tabular-nums;
 	opacity: 0.92;
 }
 
@@ -488,13 +829,14 @@ body.wr-player-open {
 	align-items: center;
 	gap: 4px;
 	font-size: 11px;
+	font-variant-numeric: tabular-nums;
 	opacity: 0.85;
 }
 
 .wr-stars {
 	display: inline-flex;
 	gap: 1px;
-	color: #f59e0b;
+	color: #f5a524;
 }
 
 .wr-product__action {
@@ -503,9 +845,11 @@ body.wr-player-open {
 
 .wr-product--classic .wr-product__action {
 	grid-area: act;
-	margin-block-start: 8px;
+	margin-block-start: 10px;
 }
 
+/* The buy button. Modern: a white pill on the glass. Classic: ink on the
+   white card. Both give a little under a press. */
 .wr-product__btn {
 	display: inline-flex;
 	align-items: center;
@@ -516,27 +860,39 @@ body.wr-player-open {
 	font-size: 13px;
 	font-weight: 600;
 	line-height: 1;
-	color: #111827;
+	letter-spacing: -0.01em;
+	color: var(--wr-p-ink-text);
 	text-decoration: none;
 	white-space: nowrap;
 	background: #fff;
 	border-radius: 10px;
-	transition: background-color 150ms var(--wr-p-ease), opacity 150ms var(--wr-p-ease);
+	box-shadow: 0 1px 2px rgb(0 0 0 / 0.12);
+	transition:
+		background-color 180ms var(--wr-p-ease),
+		color 180ms var(--wr-p-ease),
+		opacity 180ms var(--wr-p-ease),
+		scale 240ms var(--wr-p-spring);
 }
 
 .wr-product--classic .wr-product__btn {
 	width: 100%;
 	min-height: 40px;
 	color: #fff;
-	background: #111827;
+	background: var(--wr-p-ink-text);
+	box-shadow: none;
 }
 
 .wr-product__btn:hover:not([disabled]):not(.is-disabled) {
-	background: #e5e7eb;
+	background: #ececee;
 }
 
 .wr-product--classic .wr-product__btn:hover:not([disabled]):not(.is-disabled) {
-	background: #1f2937;
+	background: #2c2c2e;
+}
+
+.wr-product__btn:active:not([disabled]):not(.is-disabled) {
+	scale: 0.96;
+	transition-duration: 100ms;
 }
 
 .wr-product__btn[disabled],
@@ -545,36 +901,69 @@ body.wr-player-open {
 	cursor: not-allowed;
 }
 
+/* Added: the button turns green and its tick draws in. */
 .wr-product__btn--done {
 	color: #fff;
-	background: #16a34a;
+	background: #1a8a4f;
+	animation: wr-pop 360ms var(--wr-p-spring);
 }
 
 .wr-product--classic .wr-product__btn--done,
 .wr-product__btn--done:hover {
-	background: #15803d;
+	background: #157a45;
 }
 
+.wr-product__btn--done svg path {
+	stroke-dasharray: 24;
+	stroke-dashoffset: 24;
+	animation: wr-tick 360ms var(--wr-p-out) 120ms forwards;
+}
+
+@keyframes wr-tick {
+	to {
+		stroke-dashoffset: 0;
+	}
+}
+
+/* Skeleton lines while the lookup answers: a sheen sweeps across. */
 .wr-product.is-loading .wr-product__line {
 	display: block;
 	height: 10px;
 	margin-block: 3px;
-	background: rgb(255 255 255 / 0.25);
+	background: linear-gradient(
+		90deg,
+		rgb(255 255 255 / 0.22) 0%,
+		rgb(255 255 255 / 0.22) 35%,
+		rgb(255 255 255 / 0.06) 50%,
+		rgb(255 255 255 / 0.22) 65%,
+		rgb(255 255 255 / 0.22) 100%
+	);
+	background-size: 240% 100%;
 	border-radius: 4px;
-	animation: wr-shimmer 1.2s ease-in-out infinite;
+	animation: wr-sweep 1.6s linear infinite;
 }
 
 .wr-product--classic.is-loading .wr-product__line {
-	background: #e5e7eb;
+	background-image: linear-gradient(
+		90deg,
+		#e8e8ea 0%,
+		#e8e8ea 35%,
+		#f5f5f6 50%,
+		#e8e8ea 65%,
+		#e8e8ea 100%
+	);
 }
 
 .wr-product__line--short {
 	width: 50%;
 }
 
-@keyframes wr-shimmer {
-	50% {
-		opacity: 0.45;
+@keyframes wr-sweep {
+	from {
+		background-position: 120% 0;
+	}
+	to {
+		background-position: -120% 0;
 	}
 }
 
@@ -590,6 +979,8 @@ body.wr-player-open {
 
 /* ------------------------------------------------------------ Controls */
 
+/* The bar is now the seek strip alone, running the width of the stage; the
+   rest of the controls moved up into the head. */
 .wr-player__bar {
 	position: absolute;
 	inset-inline: 0;
@@ -597,10 +988,15 @@ body.wr-player-open {
 	z-index: 3;
 	display: flex;
 	align-items: center;
-	gap: 6px;
 	height: var(--wr-p-bar-h);
-	padding: 0 8px 0 12px;
-	background: linear-gradient(to top, rgb(0 0 0 / 0.6), rgb(0 0 0 / 0));
+	padding: 0 14px;
+	background: linear-gradient(to top, rgb(0 0 0 / 0.55), rgb(0 0 0 / 0));
+	animation: wr-player-in 480ms var(--wr-p-out) 220ms backwards;
+}
+
+.wr-player--mobile .wr-player__bar {
+	height: calc(var(--wr-p-bar-h) + env(safe-area-inset-bottom, 0px));
+	padding-block-end: env(safe-area-inset-bottom, 0px);
 }
 
 .wr-seek {
@@ -617,9 +1013,17 @@ body.wr-player-open {
 	position: relative;
 	display: block;
 	width: 100%;
-	height: 4px;
-	background: rgb(255 255 255 / 0.3);
+	height: 3px;
+	background: rgb(255 255 255 / 0.26);
 	border-radius: 999px;
+	transition: height 200ms var(--wr-p-ease);
+}
+
+/* The track thickens under the pointer so the target grows with intent. */
+.wr-seek:hover .wr-seek__track,
+.wr-seek.is-scrubbing .wr-seek__track,
+.wr-seek:focus-visible .wr-seek__track {
+	height: 5px;
 }
 
 .wr-seek__fill {
@@ -627,18 +1031,22 @@ body.wr-player-open {
 	height: 100%;
 	background: #fff;
 	border-radius: inherit;
+	box-shadow: 0 0 12px rgb(255 255 255 / 0.35);
 }
 
 .wr-seek__thumb {
 	position: absolute;
 	inset-block-start: 50%;
-	width: 12px;
-	height: 12px;
+	width: 13px;
+	height: 13px;
 	background: #fff;
 	border-radius: 50%;
-	box-shadow: 0 1px 4px rgb(0 0 0 / 0.4);
+	box-shadow:
+		0 0 0 4px rgb(255 255 255 / 0.18),
+		0 1px 4px rgb(0 0 0 / 0.4);
 	translate: -50% -50%;
-	transition: scale 150ms var(--wr-p-ease);
+	scale: 0;
+	transition: scale 240ms var(--wr-p-spring);
 }
 
 [dir='rtl'] .wr-seek__thumb {
@@ -648,7 +1056,7 @@ body.wr-player-open {
 .wr-seek:hover .wr-seek__thumb,
 .wr-seek.is-scrubbing .wr-seek__thumb,
 .wr-seek:focus-visible .wr-seek__thumb {
-	scale: 1.3;
+	scale: 1;
 }
 
 .wr-player__ctl {
@@ -659,15 +1067,25 @@ body.wr-player-open {
 	height: 36px;
 	color: #fff;
 	border-radius: 50%;
-	transition: background-color 150ms var(--wr-p-ease);
+	transition:
+		background-color 180ms var(--wr-p-ease),
+		scale 240ms var(--wr-p-spring);
 }
 
 .wr-player__ctl:hover {
-	background: rgb(255 255 255 / 0.15);
+	background: rgb(255 255 255 / 0.14);
 }
 
+.wr-player__ctl:active {
+	scale: 0.9;
+	transition-duration: 100ms;
+}
+
+/* The slider unrolls towards the start side, away from play and close, so
+   the pill grows without shoving its neighbours. */
 .wr-volume {
 	display: flex;
+	flex-direction: row-reverse;
 	align-items: center;
 	flex: none;
 }
@@ -680,20 +1098,22 @@ body.wr-player-open {
 	overflow: hidden;
 	cursor: pointer;
 	touch-action: none;
-	transition: width 200ms var(--wr-p-ease), margin 200ms var(--wr-p-ease);
+	transition:
+		width 280ms var(--wr-p-out),
+		margin 280ms var(--wr-p-out);
 }
 
 .wr-volume:hover .wr-volume__slider,
 .wr-volume:focus-within .wr-volume__slider {
 	width: 64px;
-	margin-inline-end: 6px;
+	margin-inline-start: 12px;
 }
 
 .wr-volume__track {
 	display: block;
 	width: 100%;
 	height: 4px;
-	background: rgb(255 255 255 / 0.3);
+	background: rgb(255 255 255 / 0.28);
 	border-radius: 999px;
 }
 
@@ -704,23 +1124,41 @@ body.wr-player-open {
 	border-radius: inherit;
 }
 
+/* Sits just under the head so it never fights the controls for the corner. */
 .wr-player__sound {
 	position: absolute;
-	inset-block-start: 22px;
+	inset-block-start: 68px;
 	inset-inline-start: 50%;
 	z-index: 4;
 	display: inline-flex;
 	align-items: center;
-	gap: 6px;
-	padding: 8px 14px;
+	gap: 7px;
+	padding: 9px 15px 9px 12px;
 	font-size: 13px;
 	font-weight: 600;
-	color: #111827;
+	letter-spacing: -0.01em;
+	color: var(--wr-p-ink-text);
 	background: #fff;
 	border-radius: 999px;
-	box-shadow: 0 6px 20px rgb(0 0 0 / 0.35);
+	box-shadow:
+		0 0 0 1px rgb(0 0 0 / 0.04),
+		0 8px 24px -6px rgb(0 0 0 / 0.5);
 	translate: -50% 0;
-	animation: wr-pop 200ms var(--wr-p-ease);
+	animation: wr-pop 360ms var(--wr-p-spring);
+	transition: scale 240ms var(--wr-p-spring);
+}
+
+.wr-player__sound:hover {
+	scale: 1.04;
+}
+
+.wr-player__sound:active {
+	scale: 0.96;
+	transition-duration: 100ms;
+}
+
+.wr-player--mobile .wr-player__sound {
+	inset-block-start: calc(68px + env(safe-area-inset-top, 0px));
 }
 
 /* ------------------------------------------------------------------ Nav */
@@ -730,18 +1168,89 @@ body.wr-player-open {
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
-	width: 44px;
-	height: 44px;
+	width: 48px;
+	height: 48px;
 	color: var(--wr-pbtn-fg, #374151);
 	background: var(--wr-pbtn-bg, #fff);
 	border-radius: var(--wr-pbtn-radius, 40px);
-	box-shadow: 0 4px 14px rgb(0 0 0 / 0.3);
-	transition: background-color 150ms var(--wr-p-ease), color 150ms var(--wr-p-ease);
+	box-shadow:
+		0 0 0 1px rgb(255 255 255 / 0.06),
+		0 1px 2px rgb(0 0 0 / 0.2),
+		0 12px 32px -8px rgb(0 0 0 / 0.6);
+	animation: wr-nav-in 480ms var(--wr-p-out) 300ms backwards;
+	transition:
+		background-color 180ms var(--wr-p-ease),
+		color 180ms var(--wr-p-ease),
+		scale 320ms var(--wr-p-spring),
+		box-shadow 240ms var(--wr-p-ease);
+}
+
+/* Each button slides in from its own side of the stage. */
+.wr-player--horizontal .wr-player__nav--prev {
+	--wr-nav-from: -10px 0;
+}
+
+.wr-player--horizontal .wr-player__nav--next {
+	--wr-nav-from: 10px 0;
+}
+
+.wr-player--vertical .wr-player__nav--prev {
+	--wr-nav-from: 0 -10px;
+}
+
+.wr-player--vertical .wr-player__nav--next {
+	--wr-nav-from: 0 10px;
+}
+
+@keyframes wr-nav-in {
+	from {
+		opacity: 0;
+		translate: var(--wr-nav-from, 0 0);
+	}
 }
 
 .wr-player__nav:hover {
 	color: var(--wr-pbtn-fg-hover, #374151);
 	background: var(--wr-pbtn-bg-hover, #fff);
+	scale: 1.06;
+	box-shadow:
+		0 0 0 1px rgb(255 255 255 / 0.1),
+		0 2px 4px rgb(0 0 0 / 0.2),
+		0 16px 40px -8px rgb(0 0 0 / 0.7);
+}
+
+.wr-player__nav:active {
+	scale: 0.94;
+	transition-duration: 100ms;
+}
+
+/* The chevron nudges along its own direction of travel on hover. */
+.wr-player__nav svg {
+	transition: translate 240ms var(--wr-p-ease);
+}
+
+.wr-player--horizontal .wr-player__nav--prev:hover svg {
+	translate: -2px 0;
+}
+
+.wr-player--horizontal .wr-player__nav--next:hover svg {
+	translate: 2px 0;
+}
+
+[dir='rtl'] .wr-player--horizontal .wr-player__nav--prev:hover svg {
+	translate: 2px 0;
+}
+
+[dir='rtl'] .wr-player--horizontal .wr-player__nav--next:hover svg {
+	translate: -2px 0;
+}
+
+.wr-player--vertical .wr-player__nav--prev:hover svg {
+	translate: 0 -2px;
+}
+
+.wr-player--vertical .wr-player__nav--next:hover svg {
+	translate: 0 2px;
 }
 
 /* Horizontal chevrons point along the reading direction; mirror for RTL. */
@@ -749,62 +1258,76 @@ body.wr-player-open {
 	scale: -1 1;
 }
 
-.wr-player--vertical .wr-player__nav--prev {
+/* Both buttons come before the stage in the DOM; "next" belongs after it.
+   (The vertical player places them by grid area, up in the layout block.) */
+.wr-player--horizontal .wr-player__nav--next {
 	order: 1;
-	align-self: flex-start;
-	margin-block-start: 18vh;
-}
-
-.wr-player--vertical .wr-player__nav--next {
-	order: 2;
-	align-self: flex-end;
-	margin-block-end: 18vh;
-}
-
-.wr-player--vertical .wr-player__stage {
-	order: 0;
 }
 
 /* ---------------------------------------------------------------- Toast */
 
+/* A dark pill with a status dot, rising from the bottom edge. */
 .wr-player__toast {
 	position: fixed;
 	inset-block-end: 24px;
 	inset-inline-start: 50%;
 	z-index: 6;
+	display: flex;
+	align-items: center;
+	gap: 10px;
 	max-width: min(420px, calc(100vw - 32px));
-	padding: 12px 16px;
+	padding: 12px 18px 12px 14px;
 	font-size: 13px;
 	font-weight: 500;
+	letter-spacing: -0.005em;
 	color: #fff;
-	background: #111827;
-	border-inline-start: 3px solid #16a34a;
-	border-radius: 10px;
-	box-shadow: 0 16px 48px rgb(0 0 0 / 0.5);
+	background: rgb(20 22 26 / 0.92);
+	border: 1px solid rgb(255 255 255 / 0.1);
+	border-radius: 12px;
+	box-shadow:
+		inset 0 1px 0 rgb(255 255 255 / 0.06),
+		0 20px 48px -12px rgb(0 0 0 / 0.7);
+	backdrop-filter: blur(16px) saturate(1.4);
+	-webkit-backdrop-filter: blur(16px) saturate(1.4);
 	translate: -50% 0;
-	animation: wr-toast-in 200ms var(--wr-p-ease);
+	animation: wr-toast-in 420ms var(--wr-p-out);
 }
 
-.wr-player__toast--error {
-	border-inline-start-color: #dc2626;
+.wr-player__toast::before {
+	content: '';
+	flex: none;
+	width: 8px;
+	height: 8px;
+	background: #34c77b;
+	border-radius: 50%;
+	box-shadow: 0 0 0 3px rgb(52 199 123 / 0.22);
+}
+
+.wr-player__toast--error::before {
+	background: #ff5c5c;
+	box-shadow: 0 0 0 3px rgb(255 92 92 / 0.22);
 }
 
 @keyframes wr-toast-in {
 	from {
 		opacity: 0;
-		translate: -50% 8px;
+		translate: -50% 12px;
+		scale: 0.96;
 	}
 	to {
 		opacity: 1;
 		translate: -50% 0;
+		scale: 1;
 	}
 }
 
+/* Less motion: everything lands at once, delays included. */
 @media (prefers-reduced-motion: reduce) {
 	.wr-portal-root *,
 	.wr-portal-root *::before,
 	.wr-portal-root *::after {
 		animation-duration: 0.01ms !important;
+		animation-delay: 0s !important;
 		transition-duration: 0.01ms !important;
 	}
 }

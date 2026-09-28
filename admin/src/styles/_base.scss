@@ -2,19 +2,45 @@
  * App shell, typography and the handful of WordPress overrides needed to stop
  * wp-admin styling from leaking into the app.
  *
- * Everything is scoped under #wooreels-admin-app. This stylesheet must never
- * change a pixel outside it.
+ * Everything is scoped under #productreels-admin-app, or under the
+ * body.productreels-screen class PHP adds on our screens alone. This
+ * stylesheet must never change a pixel on any other admin screen.
  */
 
-.wooreels-wrap {
+.productreels-wrap {
 	margin-inline: 0;
 	padding-inline-end: 20px;
 }
 
-#wooreels-admin-app {
+/**
+ * Fill the screen edge to edge. Core pads the bottom of #wpbody-content for
+ * the footer line this plugin hides and gives .wrap a top margin; both would
+ * show as a grey band under the app, with the page scrolling just far enough
+ * to reveal it.
+ */
+body.productreels-screen {
+	#wpbody-content {
+		padding-block-end: 0;
+	}
+
+	#wpfooter {
+		display: none;
+	}
+
+	.productreels-wrap {
+		margin-block-start: 0;
+	}
+}
+
+#productreels-admin-app {
 	box-sizing: border-box;
 	margin-inline-start: -20px;
 	min-height: calc(100vh - 32px);
+
+	/* The admin bar grows to 46px on narrow screens. */
+	@media screen and (max-width: 782px) {
+		min-height: calc(100vh - 46px);
+	}
 	background: var(--wr-bg-muted);
 	color: var(--wr-fg);
 	font-family: var(--wr-font);
@@ -36,22 +62,30 @@
 	}
 
 	/**
-	 * Deliberately does NOT reset background or border.
+	 * Deliberately does NOT reset background or border, and skips the embed.
 	 *
-	 * This selector is `#wooreels-admin-app button`, which out-specifies any
-	 * class the shared embed styles can reasonably use — so resetting those two
-	 * here silently stripped the border and card background off every thumbnail
-	 * in the live preview, and the editor lied about what the frontend would
-	 * render. Each admin control clears its own instead.
+	 * This selector is `#productreels-admin-app button`, which out-specifies any
+	 * class the shared embed styles can reasonably use — so resetting
+	 * background and border here silently stripped the border and card
+	 * background off every thumbnail in the live preview, and later the
+	 * margin reset cancelled the auto margins that align a carousel rail. The
+	 * editor lied about what the frontend would render both times. The embed
+	 * carries its own zero-specificity reset, so it is left out here entirely
+	 * and each admin control clears its own.
+	 *
+	 * The exclusion sits inside :where() so it adds no specificity: a bare
+	 * :not(.productreels-embed *) counts as a class, and that was enough for the
+	 * `color: inherit` here to beat `.wr-btn--primary` and turn a primary
+	 * button's white label ink-on-blue.
 	 */
-	button {
+	button:where(:not(.productreels-embed *)) {
 		margin: 0;
 		font: inherit;
 		color: inherit;
 		cursor: pointer;
 	}
 
-	button[disabled] {
+	button[disabled]:where(:not(.productreels-embed *)) {
 		cursor: not-allowed;
 	}
 
@@ -81,10 +115,12 @@
 		color: var(--wr-primary-hover);
 	}
 
-	h1,
-	h2,
-	h3,
-	p {
+	/* The preview's widget title is the embed's own h2, with the owner's
+	   margins on it; the reset keeps its hands off anything in the embed. */
+	h1:where(:not(.productreels-embed *)),
+	h2:where(:not(.productreels-embed *)),
+	h3:where(:not(.productreels-embed *)),
+	p:where(:not(.productreels-embed *)) {
 		margin: 0;
 		padding: 0;
 		font-weight: inherit;
@@ -101,6 +137,10 @@
 	display: flex;
 	flex-direction: column;
 	min-height: calc(100vh - 32px);
+
+	@media screen and (max-width: 782px) {
+		min-height: calc(100vh - 46px);
+	}
 }
 
 .wr-app__body {
@@ -187,7 +227,7 @@
 }
 
 @media (max-width: 782px) {
-	#wooreels-admin-app {
+	#productreels-admin-app {
 		margin-inline-start: -10px;
 	}
 
@@ -201,9 +241,9 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-	#wooreels-admin-app *,
-	#wooreels-admin-app *::before,
-	#wooreels-admin-app *::after {
+	#productreels-admin-app *,
+	#productreels-admin-app *::before,
+	#productreels-admin-app *::after {
 		animation-duration: 0.01ms !important;
 		animation-iteration-count: 1 !important;
 		transition-duration: 0.01ms !important;

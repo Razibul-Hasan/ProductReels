@@ -1,5 +1,5 @@
 /**
- * WooReels build configuration.
+ * ProductReels build configuration.
  *
  * Three entry points, deliberately separate: the admin SPA, the public
  * renderer and the block editor script never share a bundle, so a shop page
@@ -25,9 +25,9 @@ const defaultConfig = require( '@wordpress/scripts/config/webpack.config' );
 module.exports = {
 	...defaultConfig,
 	entry: {
-		'admin/dist/wooreels-admin': path.resolve( __dirname, 'admin/src/index.js' ),
-		'public/dist/wooreels-public': path.resolve( __dirname, 'public/src/index.js' ),
-		'block/dist/wooreels-block': path.resolve( __dirname, 'block/src/index.js' ),
+		'admin/dist/productreels-admin': path.resolve( __dirname, 'admin/src/index.js' ),
+		'public/dist/productreels-public': path.resolve( __dirname, 'public/src/index.js' ),
+		'block/dist/productreels-block': path.resolve( __dirname, 'block/src/index.js' ),
 	},
 	output: {
 		...defaultConfig.output,

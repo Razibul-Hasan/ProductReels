@@ -36,8 +36,7 @@ export const LinkStack = ( {
 		return null;
 	}
 
-	const track = ( link, product ) =>
-		services.trackClick( reel, link, product );
+	const track = ( link ) => services.trackClick( reel, link );
 
 	return (
 		<div className="wr-links" data-wr-no-swipe="">
@@ -61,7 +60,10 @@ export const LinkStack = ( {
 							showRatings={ styles.showRatings }
 							showAddToCart={ styles.showAddToCart }
 							addToCartText={ styles.addToCartText }
+							directCheckout={ styles.directCheckout }
+							directCheckoutText={ styles.directCheckoutText }
 							cartUrl={ services.cartUrl }
+							checkoutUrl={ services.checkoutUrl }
 							onAddToCart={ services.addToCart }
 							onNavigate={ track }
 							onToast={ onToast }

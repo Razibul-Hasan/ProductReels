@@ -77,6 +77,15 @@ export const IconButton = ( {
 
 	const hide = useCallback( () => setAt( null ), [] );
 
+	// Focus alone is not a request for the tooltip: a modal moves focus onto
+	// its close button the moment it opens, and the label would pop up with
+	// nothing hovered. Only keyboard focus (focus-visible) shows it.
+	const showOnKeyboardFocus = useCallback( () => {
+		if ( button.current?.matches( ':focus-visible' ) ) {
+			show();
+		}
+	}, [ show ] );
+
 	return (
 		<>
 			<button
@@ -92,7 +101,7 @@ export const IconButton = ( {
 					.join( ' ' ) }
 				onPointerEnter={ show }
 				onPointerLeave={ hide }
-				onFocus={ show }
+				onFocus={ showOnKeyboardFocus }
 				onBlur={ hide }
 				{ ...rest }
 			>
@@ -112,7 +121,7 @@ export const IconButton = ( {
 					>
 						{ label }
 					</span>,
-					document.getElementById( 'wooreels-admin-app' ) ||
+					document.getElementById( 'productreels-admin-app' ) ||
 						document.body
 				) }
 		</>

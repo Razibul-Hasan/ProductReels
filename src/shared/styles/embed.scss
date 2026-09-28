@@ -1,24 +1,77 @@
 /**
  * The embed stylesheet.
  *
- * Everything here is scoped under .wooreels-embed and is loaded by both the
+ * Everything here is scoped under .productreels-embed and is loaded by both the
  * admin preview and the public bundle — the same rules paint both, which is
  * what stops the editor's preview drifting from what a visitor sees.
  *
  * Sizes and colours arrive as custom properties from WidgetRenderer.styleVars(),
  * so this file never needs to know the shape of the style object.
+ *
+ * The look is a quiet storefront component: hairline edges, a two-part shadow
+ * (a tight contact line and a long soft ambient one) that scales with the
+ * owner's shadow setting, and one easing family for every movement — an
+ * expo-out for things arriving, a short spring for things being pressed.
  */
 
-.wooreels-embed {
-	--wr-e-fg: #111827;
-	--wr-e-bg: #ffffff;
-	--wr-e-muted: #6b7280;
+/* The rail's edge fade animates only if the browser knows the property is a
+   length; without this it snaps, which is fine too. */
+@property --wr-fade-s {
+	syntax: '<length>';
+	inherits: false;
+	initial-value: 0px;
+}
+
+@property --wr-fade-e {
+	syntax: '<length>';
+	inherits: false;
+	initial-value: 0px;
+}
+
+.productreels-embed {
+	/* Hover and settling. */
 	--wr-e-ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+	/* Arrivals: fast out of the gate, a long soft landing. */
+	--wr-e-out: cubic-bezier(0.16, 1, 0.3, 1);
+	/* Presses and pops: a touch of overshoot. */
+	--wr-e-spring: cubic-bezier(0.34, 1.3, 0.64, 1);
+	--wr-e-hair: rgb(0 0 0 / 0.06);
+	--wr-e-ink: #1a1a1a;
+	--wr-e-mute: #ececee;
+
+	/* The responsive values arrive as per-device buckets on the inline style;
+	   the desktop bucket is the default and the rules at the foot of this file
+	   swap in the others. Nothing here may be set inline, or no media query or
+	   device class could ever override it. */
+	--wr-size: var(--wr-size-desk, 200px);
+	--wr-gap: var(--wr-gap-desk, 16px);
+	--wr-radius: var(--wr-radius-desk, 0);
+
+	/* The owner's shadow size, and the two layers cut from it: a contact line
+	   a sixteenth as tall and an ambient one half as tall, both of which
+	   vanish together when the setting is zero. */
+	--wr-sh: var(--wr-shadow-size, 0px);
+	--wr-shadow:
+		0 calc(var(--wr-sh) * 0.0625) calc(var(--wr-sh) * 0.125) rgb(0 0 0 / 0.05),
+		0 calc(var(--wr-sh) * 0.5) calc(var(--wr-sh) * 1.25) calc(var(--wr-sh) * -0.25) rgb(0 0 0 / 0.16);
+	--wr-shadow-raised:
+		0 1px 2px rgb(0 0 0 / 0.05),
+		0 calc(var(--wr-sh) * 0.5 + 12px) calc(var(--wr-sh) * 1.25 + 20px) calc(var(--wr-sh) * -0.25 - 6px) rgb(0 0 0 / 0.24);
 
 	box-sizing: border-box;
+	/* The widget always spans its container. Themes drop shortcodes into flex
+	   rows and grids whose items shrink-wrap, and a shrink-wrapped grid has no
+	   width for auto-fill to fill: it collapses to one column. */
+	display: block;
+	flex: 1 1 auto;
+	width: 100%;
+	min-width: 0;
 	padding-block: var(--wr-pad-block, 0);
-	color: var(--wr-e-fg);
+	/* The page's own text colour, never a guess from the OS colour scheme: a
+	   light theme under a visitor in dark mode was getting white-on-white. */
+	color: inherit;
 	font-family: inherit;
+	-webkit-font-smoothing: antialiased;
 
 	*,
 	*::before,
@@ -26,50 +79,102 @@
 		box-sizing: border-box;
 	}
 
-	/**
-	 * Deliberately does NOT reset background or border.
-	 *
-	 * `.wooreels-embed button` out-specifies `.wr-thumb`, so clearing those two
-	 * here silently removed the border and card background from every
-	 * thumbnail — on the frontend as well as in the editor preview. Each
-	 * component below clears its own instead.
-	 */
-	button {
-		margin: 0;
-		padding: 0;
-		font: inherit;
-		color: inherit;
-		cursor: pointer;
-	}
-
-	:focus-visible {
-		outline: 2px solid #60a5fa;
-		outline-offset: 2px;
-	}
-
-	img,
-	video {
-		display: block;
-		max-width: 100%;
-	}
 }
 
-/* The frontend follows the visitor's preference; the admin preview does not,
-   because it sits inside a light admin screen. */
-@media (prefers-color-scheme: dark) {
-	.wooreels-embed:not(.wooreels-embed--in-editor) {
-		--wr-e-fg: #f3f4f6;
-		--wr-e-bg: #111827;
-		--wr-e-muted: #9ca3af;
-	}
+/*
+ * Zero-specificity reset. `.productreels-embed button` out-specified `.wr-thumb`
+ * and friends, so anything cleared here was silently stripped from the
+ * components; :where() keeps the scope and lets each component's own rule
+ * win. Background and border are still left alone — a thumbnail's card
+ * background and border are the component's business.
+ */
+:where(.productreels-embed) button {
+	margin: 0;
+	padding: 0;
+	font: inherit;
+	color: inherit;
+	cursor: pointer;
+	-webkit-tap-highlight-color: transparent;
 }
 
-.wr-widget-title {
-	margin: 0 0 12px;
+/* The focus ring is drawn in the page's own ink, offset so it never touches
+   the card's edge: it reads on a light theme and a dark one alike. */
+:where(.productreels-embed) :focus-visible {
+	outline: 2px solid currentColor;
+	outline-offset: 3px;
+}
+
+/* Focus that did not come from the keyboard shows no ring. Block themes
+   outline every `:focus` in the page (`:where(.wp-site-blocks :focus)`),
+   which drew a box around a thumbnail the moment the player closed and
+   handed focus back to it after a click. */
+:where(.productreels-embed) :focus:not(:focus-visible) {
+	outline: 0;
+}
+
+:where(.productreels-embed) img,
+:where(.productreels-embed) video {
+	display: block;
+	max-width: 100%;
+}
+
+/* Scoped under the root on purpose: the air above and below the title is
+   the owner's setting, and a theme's `.entry-content h2` margin must not
+   out-specify it. */
+.productreels-embed .wr-widget-title {
+	margin: var(--wr-title-mt, 0) 0 var(--wr-title-mb, 16px);
 	font-size: var(--wr-title-size, 24px);
 	font-weight: 600;
-	line-height: 1.25;
+	line-height: 1.2;
+	letter-spacing: -0.02em;
 	color: var(--wr-title-color, currentColor);
+}
+
+/* ------------------------------------------------------------------ Entrance */
+
+/*
+ * The cards rise into place the first time the widget is seen, each a beat
+ * after the last. The renderer marks the widget `--reveal` on a public page
+ * and `is-revealed` once it has scrolled into view; the editor preview and
+ * the popup (which has an entrance of its own) never get the first class,
+ * so nothing here touches them.
+ *
+ * `backwards` holds each card at the first keyframe through its delay, and
+ * no fill afterwards leaves the card on its own styles once it has landed.
+ * The stagger is capped so a long grid does not take a second to finish.
+ */
+.productreels-embed--reveal:not(.is-revealed) .wr-thumb {
+	opacity: 0;
+}
+
+.productreels-embed--reveal.is-revealed .wr-thumb {
+	animation: wr-e-reveal 760ms var(--wr-e-out) backwards;
+	animation-delay: min(calc(var(--wr-index, 0) * 60ms), 480ms);
+}
+
+/* A deck rises as one. Its cards mount and unmount with every step, so a
+   per-card reveal would replay on each; the deck's own choreography owns
+   what a card does after that. */
+.productreels-embed--reveal:not(.is-revealed) .wr-stacked__card > .wr-thumb,
+.productreels-embed--reveal.is-revealed .wr-stacked__card > .wr-thumb {
+	opacity: 1;
+	animation: none;
+}
+
+.productreels-embed--reveal:not(.is-revealed) .wr-stacked__deck {
+	opacity: 0;
+}
+
+.productreels-embed--reveal.is-revealed .wr-stacked__deck {
+	animation: wr-e-reveal 760ms var(--wr-e-out) backwards;
+}
+
+@keyframes wr-e-reveal {
+	from {
+		opacity: 0;
+		translate: 0 20px;
+		scale: 0.98;
+	}
 }
 
 /* ------------------------------------------------------------------ Thumbnail */
@@ -82,8 +187,10 @@
 	background: var(--wr-card-bg, transparent);
 	border: var(--wr-border-w, 0) solid var(--wr-border-c, transparent);
 	border-radius: var(--wr-radius, 0);
-	box-shadow: 0 4px var(--wr-shadow-size, 0) rgb(0 0 0 / 0.16);
-	transition: box-shadow 200ms var(--wr-e-ease);
+	box-shadow: var(--wr-shadow);
+	transition:
+		box-shadow 320ms var(--wr-e-ease),
+		translate 320ms var(--wr-e-ease);
 }
 
 .wr-thumb__media {
@@ -92,18 +199,116 @@
 	/* Declared up front so nothing reflows when the poster or video arrives. */
 	aspect-ratio: 9 / 16;
 	overflow: hidden;
-	background: #e5e7eb;
+	background: var(--wr-e-mute);
+	border-radius: inherit;
+	/* Safari keeps a scaled child inside its rounded parent only with this. */
+	isolation: isolate;
+}
+
+/* The clip box for the footage. On a rectangle it is the media box itself;
+   on a circle it is the disc inside the ring. */
+.wr-thumb__frame {
+	display: block;
+	width: 100%;
+	height: 100%;
+	overflow: hidden;
 	border-radius: inherit;
 }
 
+/*
+ * Circle: a story ring.
+ *
+ * The card's border, background and shadow leave the button and become the
+ * ring around the disc, with a hairline of air between ring and footage so
+ * the ring reads as a ring and not as an edge. The button itself turns into
+ * a column: disc on top, title and views underneath — nothing is written
+ * over a circle, because a gradient scrim clipped to a circle looks like a
+ * mistake. The width stays the same, so a rail of circles and a rail of
+ * rectangles line up.
+ */
 .wr-thumb--circle {
-	width: var(--wr-size, 200px);
-	border-radius: 50%;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 10px;
+	background: none;
+	border: 0;
+	border-radius: 0;
+	box-shadow: none;
 }
 
 .wr-thumb--circle .wr-thumb__media {
+	--wr-ring-gap: clamp(0px, var(--wr-border-w, 0px) * 99, 3px);
+
+	width: 100%;
 	aspect-ratio: 1 / 1;
+	/* An aspect-ratio box that does not clip takes its minimum height from
+	   its content, and a 9:16 video would stretch the disc into an egg. */
+	min-height: 0;
+	/* The gap between ring and disc — none when there is no ring to gap. */
+	padding: var(--wr-ring-gap);
+	overflow: visible;
+	background: var(--wr-card-bg, transparent);
+	border: var(--wr-border-w, 0) solid var(--wr-border-c, transparent);
 	border-radius: 50%;
+	box-shadow: var(--wr-shadow);
+	transition:
+		box-shadow 320ms var(--wr-e-ease),
+		scale 320ms var(--wr-e-spring);
+}
+
+.wr-thumb--circle .wr-thumb__frame {
+	border-radius: 50%;
+	background: var(--wr-e-mute);
+}
+
+/* The ring wakes up under the pointer: a soft halo in its own colour, and
+   the disc leans forward a touch. */
+.wr-thumb--circle:hover .wr-thumb__media {
+	scale: 1.03;
+	box-shadow:
+		var(--wr-shadow),
+		0 0 0 4px color-mix(in srgb, var(--wr-border-c, #9ca3af) 24%, transparent);
+}
+
+/* Keyboard focus is shown on the disc, not on the column of disc, title
+   and views: a box drawn around a circle reads as a mistake. The outline
+   follows the disc's own radius, a little outside the ring. */
+.wr-thumb--circle:focus-visible {
+	outline: 0;
+}
+
+.wr-thumb--circle:focus-visible .wr-thumb__media {
+	outline: 2px solid currentColor;
+	outline-offset: 4px;
+}
+
+.wr-thumb--circle:active .wr-thumb__media {
+	scale: 0.98;
+	transition-duration: 120ms;
+}
+
+/* The lift stays on the whole column, so the title rises with the disc. */
+.wr-thumb--circle.wr-thumb--hover-lift:hover {
+	box-shadow: none;
+}
+
+/* Title and views under the disc, stacked and centred like a handle. */
+.wr-thumb__under {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 6px;
+	width: 100%;
+	min-width: 0;
+}
+
+.wr-thumb__under .wr-thumb__below {
+	margin-block-start: 0;
+	width: 100%;
+	font-weight: 600;
+	line-height: 1.25;
+	overflow-wrap: anywhere;
 }
 
 .wr-thumb__video,
@@ -115,23 +320,24 @@
 	/* The button is the target; a click on the media must not focus the media. */
 	pointer-events: none;
 	/* The media scales inside the clipped box — never the box itself, so a
-	   hover can never reflow the grid around it. */
-	transition: scale 240ms var(--wr-e-ease);
+	   hover can never reflow the grid around it. Slow on purpose: a zoom
+	   that takes its time reads as a lens, not a twitch. */
+	transition: scale 900ms var(--wr-e-out);
 }
 
 .wr-thumb__blank {
 	display: block;
-	background: linear-gradient(135deg, #e5e7eb, #f3f4f6);
+	background: linear-gradient(135deg, #e9e9ec, #f6f6f7);
 }
 
 .wr-thumb--hover-zoom-in:hover .wr-thumb__video,
 .wr-thumb--hover-zoom-in:hover .wr-thumb__img {
-	scale: 1.08;
+	scale: 1.06;
 }
 
 .wr-thumb--hover-zoom-out .wr-thumb__video,
 .wr-thumb--hover-zoom-out .wr-thumb__img {
-	scale: 1.08;
+	scale: 1.06;
 }
 
 .wr-thumb--hover-zoom-out:hover .wr-thumb__video,
@@ -139,30 +345,74 @@
 	scale: 1;
 }
 
+/* Lift: the whole card rises on a longer shadow. The rail's block padding is
+   what keeps the risen card inside its scroll box. */
+.wr-thumb--hover-lift:hover {
+	translate: 0 -6px;
+	box-shadow: var(--wr-shadow-raised);
+}
+
+/*
+ * The play mark: a frosted disc in the owner's colour. The SVG draws the
+ * tint and the ring; the span behind it blurs the footage into a lens, so
+ * the mark reads on a white product shot and a night scene alike. It leans
+ * in under the pointer and gives under a press, whatever hover effect the
+ * card itself was given.
+ */
 .wr-thumb__play {
 	position: absolute;
 	inset-block-start: 50%;
 	inset-inline-start: 50%;
 	translate: -50% -50%;
+	overflow: hidden;
+	border-radius: 50%;
+	box-shadow: 0 8px 24px -8px rgb(0 0 0 / 0.45);
+	backdrop-filter: blur(10px) saturate(1.4);
+	-webkit-backdrop-filter: blur(10px) saturate(1.4);
 	pointer-events: none;
+	transition: scale 360ms var(--wr-e-spring);
 }
 
+.wr-thumb__play svg {
+	display: block;
+}
+
+.wr-thumb:hover .wr-thumb__play {
+	scale: 1.08;
+}
+
+.wr-thumb:active .wr-thumb__play {
+	scale: 0.94;
+	transition-duration: 100ms;
+}
+
+/*
+ * The scrim is an eased gradient, not a straight ramp: dense at the foot,
+ * thinning quickly, then trailing off — so there is no visible band where a
+ * linear gradient meets the footage. The plain ramp stays as the fallback
+ * for a browser without color-mix().
+ */
 .wr-thumb__scrim {
+	--wr-scrim: var(--wr-scrim-c, rgb(0 0 0 / 0.72));
+
 	position: absolute;
 	inset-inline: 0;
 	inset-block-end: 0;
 	display: flex;
 	align-items: flex-end;
-	min-height: 46%;
-	padding: 10px;
-	background: linear-gradient(to top, rgb(0 0 0 / 0.72), rgb(0 0 0 / 0));
+	min-height: 50%;
+	padding: 12px;
+	background: linear-gradient(to top, var(--wr-scrim), transparent);
+	background: linear-gradient(
+		to top,
+		var(--wr-scrim) 0%,
+		color-mix(in srgb, var(--wr-scrim) 74%, transparent) 30%,
+		color-mix(in srgb, var(--wr-scrim) 32%, transparent) 64%,
+		transparent 100%
+	);
 	border-end-start-radius: inherit;
 	border-end-end-radius: inherit;
 	pointer-events: none;
-}
-
-.wr-thumb--circle .wr-thumb__scrim {
-	border-radius: 0 0 50% 50%;
 }
 
 .wr-thumb__caption {
@@ -171,23 +421,203 @@
 	font-size: 13px;
 	font-weight: 600;
 	line-height: 1.3;
+	letter-spacing: -0.01em;
 	text-align: start;
-	color: #fff;
-	text-shadow: 0 1px 2px rgb(0 0 0 / 0.4);
+	color: var(--wr-caption-c, #fff);
+	text-shadow: 0 1px 2px rgb(0 0 0 / 0.35);
 	display: -webkit-box;
 	-webkit-line-clamp: 2;
 	-webkit-box-orient: vertical;
+	transition: translate 360ms var(--wr-e-out);
+}
+
+/* The words lift a hair under the pointer: the card answers even when its
+   own hover effect is set to none. */
+.wr-thumb:hover .wr-thumb__caption {
+	translate: 0 -2px;
+}
+
+/* ------------------------------------------------------- Product on thumb */
+
+/* The scrim under a product card is deeper than under a caption: two lines
+   of small type and a photo need more separation from the footage. */
+.wr-thumb__scrim--product {
+	min-height: 58%;
+	padding: 8px;
+	background: linear-gradient(to top, var(--wr-scrim) 30%, transparent);
+	background: linear-gradient(
+		to top,
+		var(--wr-scrim) 0%,
+		color-mix(in srgb, var(--wr-scrim) 80%, transparent) 36%,
+		color-mix(in srgb, var(--wr-scrim) 30%, transparent) 72%,
+		transparent 100%
+	);
+}
+
+.wr-thumb__product {
+	display: flex;
+	align-items: center;
+	gap: 9px;
+	width: 100%;
+	min-width: 0;
+	padding: 7px;
+	text-align: start;
+	border-radius: 12px;
+	transition: translate 360ms var(--wr-e-out);
+}
+
+.wr-thumb:hover .wr-thumb__product {
+	translate: 0 -2px;
+}
+
+/* Modern: ink glass over the footage, a lit top edge, white type. */
+.wr-thumb__product--modern {
+	color: #fff;
+	background: rgb(14 16 20 / 0.5);
+	border: 1px solid rgb(255 255 255 / 0.12);
+	box-shadow:
+		inset 0 1px 0 rgb(255 255 255 / 0.07),
+		0 8px 24px -8px rgb(0 0 0 / 0.5);
+	backdrop-filter: blur(16px) saturate(1.5);
+	-webkit-backdrop-filter: blur(16px) saturate(1.5);
+}
+
+/* Classic: a solid card, hairline edge, dark type. */
+.wr-thumb__product--classic {
+	color: var(--wr-e-ink);
+	background: #fff;
+	border: 1px solid var(--wr-e-hair);
+	box-shadow:
+		0 1px 2px rgb(0 0 0 / 0.06),
+		0 10px 28px -10px rgb(0 0 0 / 0.35);
+}
+
+.wr-thumb__product-img {
+	flex: none;
+	display: block;
+	width: 38px;
+	height: 38px;
+	overflow: hidden;
+	background: rgb(255 255 255 / 0.16);
+	border-radius: 8px;
+	box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.08);
+}
+
+.wr-thumb__product--classic .wr-thumb__product-img {
+	background: #f4f4f5;
+	box-shadow: inset 0 0 0 1px rgb(0 0 0 / 0.05);
+}
+
+.wr-thumb__product-img img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+}
+
+.wr-thumb__product-text {
+	display: flex;
+	flex: 1;
+	flex-direction: column;
+	gap: 3px;
+	min-width: 0;
+}
+
+.wr-thumb__product-name {
+	overflow: hidden;
+	font-size: 12px;
+	font-weight: 600;
+	line-height: 1.25;
+	letter-spacing: -0.01em;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+}
+
+/* Stars and price side by side when they fit, price on its own line when
+   the card is narrow — never a clipped number. */
+.wr-thumb__product-meta {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 1px 6px;
+	min-width: 0;
+	font-size: 11px;
+	font-weight: 500;
+	line-height: 1.2;
+	font-variant-numeric: tabular-nums;
+	opacity: 0.92;
+}
+
+.wr-thumb__product-meta .wr-stars {
+	display: inline-flex;
+	flex: none;
+	gap: 1px;
+	color: #f5a524;
+}
+
+.wr-thumb__product-meta .wr-stars svg {
+	width: 10px;
+	height: 10px;
+}
+
+.wr-thumb__product-price {
+	white-space: nowrap;
+}
+
+.wr-thumb__product-price del {
+	margin-inline-end: 3px;
+	font-weight: 400;
+	opacity: 0.6;
+}
+
+.wr-thumb__product-price ins {
+	text-decoration: none;
+}
+
+/* Skeleton lines while the lookup answers: a sheen sweeps across rather
+   than the line blinking. */
+.wr-thumb__product-line {
+	display: block;
+	width: 80%;
+	height: 9px;
+	margin-block: 2px;
+	background: linear-gradient(
+		90deg,
+		currentColor 0%,
+		currentColor 35%,
+		transparent 50%,
+		currentColor 65%,
+		currentColor 100%
+	);
+	background-size: 240% 100%;
+	border-radius: 4px;
+	opacity: 0.2;
+	animation: wr-e-sweep 1.6s linear infinite;
+}
+
+.wr-thumb__product-line--short {
+	width: 45%;
+}
+
+@keyframes wr-e-sweep {
+	from {
+		background-position: 120% 0;
+	}
+
+	to {
+		background-position: -120% 0;
+	}
 }
 
 .wr-thumb__below {
 	display: block;
-	margin-block-start: 8px;
+	margin-block-start: 10px;
 	overflow: hidden;
 	font-size: 13px;
 	font-weight: 500;
 	line-height: 1.35;
+	letter-spacing: -0.005em;
 	text-align: center;
-	color: var(--wr-e-fg);
+	color: var(--wr-below-c, inherit);
 	display: -webkit-box;
 	-webkit-line-clamp: 2;
 	-webkit-box-orient: vertical;
@@ -200,12 +630,18 @@
 	display: inline-flex;
 	align-items: center;
 	gap: 4px;
-	padding: 3px 7px;
+	padding: 4px 8px 4px 7px;
 	font-size: 11px;
 	font-weight: 600;
 	font-variant-numeric: tabular-nums;
+	letter-spacing: 0.01em;
 	line-height: 1;
 	border-radius: 999px;
+	box-shadow:
+		inset 0 0 0 1px rgb(255 255 255 / 0.1),
+		0 1px 3px rgb(0 0 0 / 0.2);
+	backdrop-filter: blur(8px);
+	-webkit-backdrop-filter: blur(8px);
 }
 
 /**
@@ -216,34 +652,50 @@
  * out as a fragment. The top corner is always free.
  */
 .wr-views--rectangle {
-	inset-block-start: 8px;
-	inset-inline-start: 8px;
+	inset-block-start: 10px;
+	inset-inline-start: 10px;
 }
 
-/* A circle has no corner to tuck into without clipping, so it sits underneath. */
+/* A circle has no corner to tuck into; the badge is a line under the disc. */
 .wr-views--circle {
-	inset-block-end: -10px;
-	inset-inline-start: 50%;
-	translate: -50% 0;
+	position: static;
 }
 
 /* -------------------------------------------------------------------- Grid */
 
+/* Wrapping rows rather than grid tracks: alignment then means what it says
+   for every row, the last partial one included. Grid tracks fill the width,
+   so with a full first row there was nothing left to move and the leftover
+   cards always sat at the start. Cards keep their own width and wrap as the
+   container allows; a container narrower than one card shrinks the card. */
 .wr-grid {
-	display: grid;
-	grid-template-columns: repeat(auto-fill, minmax(var(--wr-size, 200px), 1fr));
+	display: flex;
+	flex-wrap: wrap;
 	gap: var(--wr-gap, 16px);
-	justify-items: center;
+	justify-content: center;
+}
+
+.productreels-embed--align-left .wr-grid {
+	justify-content: flex-start;
+}
+
+.productreels-embed--align-right .wr-grid {
+	justify-content: flex-end;
 }
 
 .wr-grid .wr-thumb {
-	width: 100%;
-	max-width: var(--wr-size, 200px);
+	max-width: 100%;
 }
 
 /* ---------------------------------------------------------------- Carousel */
 
 .wr-carousel {
+	/* Room above and below the cards for a lifted shadow or a ring's halo,
+	   which the rail would otherwise clip. The rail pads by this much and
+	   pulls itself back by the same margin, so the widget is no taller for
+	   it: the padding lives outside the flow, and only shadows paint there. */
+	--wr-rail-pad: calc(var(--wr-sh) * 0.75 + 8px);
+
 	position: relative;
 	display: flex;
 	align-items: center;
@@ -251,15 +703,55 @@
 }
 
 .wr-carousel__rail {
+	--wr-fade-s: 0px;
+	--wr-fade-e: 0px;
+
 	display: flex;
 	gap: var(--wr-gap, 16px);
 	flex: 1;
 	min-width: 0;
-	padding-block: 4px;
+	margin-block: calc(-1 * var(--wr-rail-pad));
+	padding-block: var(--wr-rail-pad);
 	overflow-x: auto;
 	scroll-snap-type: x mandatory;
 	scrollbar-width: none;
 	overscroll-behavior-x: contain;
+	/* The overflowing edge dissolves rather than cuts. The two lengths are
+	   set by the template as the rail moves: zero at an end it has reached,
+	   so nothing fades that could not be scrolled to. The gradient runs from
+	   the start edge, which the RTL rule below moves to the right; a custom
+	   property, because the RTL build does not mirror gradient directions. */
+	--wr-fade-dir: to right;
+
+	-webkit-mask-image: linear-gradient(
+		var(--wr-fade-dir),
+		transparent,
+		#000 var(--wr-fade-s),
+		#000 calc(100% - var(--wr-fade-e)),
+		transparent
+	);
+	mask-image: linear-gradient(
+		var(--wr-fade-dir),
+		transparent,
+		#000 var(--wr-fade-s),
+		#000 calc(100% - var(--wr-fade-e)),
+		transparent
+	);
+	transition:
+		--wr-fade-s 320ms var(--wr-e-ease),
+		--wr-fade-e 320ms var(--wr-e-ease);
+}
+
+[dir='rtl'] .wr-carousel__rail {
+	--wr-fade-dir: to left;
+}
+
+.wr-carousel:not(.is-start) .wr-carousel__rail {
+	--wr-fade-s: 48px;
+}
+
+.wr-carousel:not(.is-end) .wr-carousel__rail {
+	--wr-fade-e: 48px;
 }
 
 .wr-carousel__rail::-webkit-scrollbar {
@@ -270,24 +762,73 @@
 	scroll-snap-align: start;
 }
 
+/* Alignment on a rail is done with auto margins, not justify-content: once
+   the rail overflows, auto margins collapse to nothing and every card stays
+   reachable, where a centred flex container would clip its first cards
+   behind the scroll start. */
+.productreels-embed--align-center .wr-carousel__rail > .wr-thumb:first-child,
+.productreels-embed--align-right .wr-carousel__rail > .wr-thumb:first-child {
+	margin-inline-start: auto;
+}
+
+.productreels-embed--align-center .wr-carousel__rail > .wr-thumb:last-child,
+.productreels-embed--align-left .wr-carousel__rail > .wr-thumb:last-child {
+	margin-inline-end: auto;
+}
+
+/*
+ * The rail's buttons: a disc with a hairline edge and a soft drop, in the
+ * owner's colours. It leans forward under the pointer, gives under a press,
+ * and its chevron nudges along the way it is about to travel.
+ */
 .wr-nav {
 	border: 0;
 	display: inline-flex;
 	flex: none;
 	align-items: center;
 	justify-content: center;
-	width: 36px;
-	height: 36px;
+	width: 40px;
+	height: 40px;
 	color: var(--wr-nav-fg, #1f2937);
 	background: var(--wr-nav-bg, #fff);
 	border-radius: var(--wr-nav-radius, 40px);
-	box-shadow: 0 2px 8px rgb(0 0 0 / 0.14);
-	transition: background-color 150ms var(--wr-e-ease), color 150ms var(--wr-e-ease), opacity 150ms var(--wr-e-ease);
+	box-shadow:
+		0 0 0 1px rgb(0 0 0 / 0.06),
+		0 1px 2px rgb(0 0 0 / 0.06),
+		0 8px 20px -6px rgb(0 0 0 / 0.22);
+	transition:
+		background-color 180ms var(--wr-e-ease),
+		color 180ms var(--wr-e-ease),
+		opacity 240ms var(--wr-e-ease),
+		scale 320ms var(--wr-e-spring),
+		box-shadow 240ms var(--wr-e-ease);
+}
+
+.wr-nav svg {
+	transition: translate 240ms var(--wr-e-ease);
 }
 
 .wr-nav:hover:not([disabled]) {
 	color: var(--wr-nav-fg-hover, #1f2937);
-	background: var(--wr-nav-bg-hover, #dbeafe);
+	background: var(--wr-nav-bg-hover, #f4f4f5);
+	scale: 1.06;
+	box-shadow:
+		0 0 0 1px rgb(0 0 0 / 0.06),
+		0 2px 4px rgb(0 0 0 / 0.06),
+		0 14px 28px -8px rgb(0 0 0 / 0.28);
+}
+
+.wr-nav:active:not([disabled]) {
+	scale: 0.95;
+	transition-duration: 100ms;
+}
+
+.wr-nav--prev:hover:not([disabled]) svg {
+	translate: -1.5px 0;
+}
+
+.wr-nav--next:hover:not([disabled]) svg {
+	translate: 1.5px 0;
 }
 
 .wr-nav[disabled] {
@@ -302,11 +843,40 @@
 }
 
 .wr-carousel--nav-inside .wr-nav--prev {
-	inset-inline-start: 6px;
+	inset-inline-start: 8px;
 }
 
 .wr-carousel--nav-inside .wr-nav--next {
-	inset-inline-end: 6px;
+	inset-inline-end: 8px;
+}
+
+/* A circle's card is disc plus title, and a button centred on that lands on
+   the disc's lower edge. Centre it on the disc itself: the disc is as tall as
+   the card is wide, and starts at the carousel's top edge. */
+.wr-carousel--circle {
+	align-items: flex-start;
+}
+
+.wr-carousel--circle .wr-nav {
+	margin-block-start: calc(var(--wr-size, 200px) / 2 - 20px);
+}
+
+.wr-carousel--circle.wr-carousel--nav-inside .wr-nav {
+	inset-block-start: calc(var(--wr-size, 200px) / 2 - 20px);
+	margin-block-start: 0;
+}
+
+/* An inside button that can go nowhere has no reason to sit over the card. */
+.wr-carousel--nav-inside .wr-nav[disabled] {
+	opacity: 0;
+	pointer-events: none;
+}
+
+/* A finger scrolls the rail directly; the buttons only cover the cards. */
+@media (hover: none) and (pointer: coarse) {
+	.wr-carousel .wr-nav {
+		display: none;
+	}
 }
 
 /* The chevrons are direction-aware, so mirror them for RTL. */
@@ -314,10 +884,37 @@
 	scale: -1 1;
 }
 
+[dir='rtl'] .wr-nav--prev:hover:not([disabled]) svg {
+	translate: 1.5px 0;
+}
+
+[dir='rtl'] .wr-nav--next:hover:not([disabled]) svg {
+	translate: -1.5px 0;
+}
+
 /* ----------------------------------------------------------------- Marquee */
 
 .wr-marquee {
+	--wr-rail-pad: calc(var(--wr-sh) * 0.75 + 8px);
+
+	margin-block: calc(-1 * var(--wr-rail-pad));
+	padding-block: var(--wr-rail-pad);
 	overflow: hidden;
+	/* Both ends dissolve: the rail is endless, so neither is ever a stop. */
+	-webkit-mask-image: linear-gradient(
+		to right,
+		transparent,
+		#000 56px,
+		#000 calc(100% - 56px),
+		transparent
+	);
+	mask-image: linear-gradient(
+		to right,
+		transparent,
+		#000 56px,
+		#000 calc(100% - 56px),
+		transparent
+	);
 }
 
 .wr-marquee__track {
@@ -325,6 +922,11 @@
 	gap: var(--wr-gap, 16px);
 	width: max-content;
 	will-change: transform;
+}
+
+.wr-marquee.is-static {
+	-webkit-mask-image: none;
+	mask-image: none;
 }
 
 .wr-marquee.is-static .wr-marquee__track {
@@ -338,25 +940,188 @@
 .wr-stacked {
 	display: flex;
 	flex-direction: column;
-	gap: 12px;
+	gap: 16px;
 	align-items: center;
 	touch-action: pan-y;
 }
 
-.wr-stacked__deck {
-	position: relative;
-	width: var(--wr-size, 200px);
-	/* The deck reserves the front card's height plus room for the offsets. */
-	min-height: calc(var(--wr-size, 200px) * 16 / 9);
+.productreels-embed--align-left .wr-stacked {
+	align-items: flex-start;
 }
 
+.productreels-embed--align-right .wr-stacked {
+	align-items: flex-end;
+}
+
+.wr-stacked__deck {
+	/* How far the back cards show under the front one: their downward shift
+	   less what the scale takes off their height. The template hands over
+	   the shift and the shrink; the height is the shape's. */
+	--wr-stack-h: calc(var(--wr-size, 200px) * 16 / 9);
+	--wr-stack-peek: max(0px, calc(var(--wr-stack-shift, 0px) - var(--wr-stack-shrink, 0) * var(--wr-stack-h)));
+
+	position: relative;
+	width: var(--wr-size, 200px);
+}
+
+.wr-stacked__deck:has(.wr-thumb--circle) {
+	--wr-stack-h: var(--wr-size, 200px);
+}
+
+/* The front card sits in the flow and gives the deck its height; the ones
+   behind it are pinned to the same spot and pushed down by their offset.
+   The template hands each card its place as custom properties so the
+   arrivals below can start a little off it. A step is one settling motion,
+   the same curve as an arrival, rippling back from the front a beat at a
+   time. */
 .wr-stacked__card {
 	position: absolute;
 	inset-inline-start: 0;
 	inset-block-start: 0;
 	width: 100%;
 	transform-origin: top center;
-	transition: translate 320ms var(--wr-e-ease), scale 320ms var(--wr-e-ease), opacity 320ms var(--wr-e-ease);
+	translate: 0 var(--wr-card-y, 0px);
+	scale: var(--wr-card-s, 1);
+	opacity: var(--wr-card-o, 1);
+	transition:
+		translate 560ms var(--wr-e-out),
+		scale 560ms var(--wr-e-out),
+		opacity 560ms var(--wr-e-out);
+	transition-delay: calc(var(--wr-layer, 0) * 45ms);
+}
+
+.wr-stacked__card.is-front {
+	position: relative;
+	translate: var(--wr-drag-x, 0px) var(--wr-card-y, 0px);
+}
+
+/* The front card follows the pointer while it is held, tilting a little
+   the way it is pulled, and eases home when it is let go short of a step. */
+.wr-stacked__card.is-front > .wr-thumb {
+	rotate: var(--wr-drag-r, 0deg);
+	transition:
+		box-shadow 320ms var(--wr-e-ease),
+		translate 320ms var(--wr-e-ease),
+		rotate 560ms var(--wr-e-out);
+}
+
+.wr-stacked__deck[data-dragging] .wr-stacked__card.is-front,
+.wr-stacked__deck[data-dragging] .wr-stacked__card.is-front > .wr-thumb {
+	transition-duration: 0ms;
+}
+
+/* Next: the front card is thrown off the way it was swiped, tilting as it
+   goes, while a new one surfaces at the back. The clone that is thrown starts
+   from wherever the finger let go. */
+.wr-stacked__card.is-throw {
+	animation: wr-stack-throw 460ms cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+/* Anchored to the deck so they outrank the reveal reset above. */
+.wr-stacked__deck .wr-stacked__card.is-throw > .wr-thumb {
+	animation: wr-stack-throw-tilt 460ms cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+.wr-stacked__card.is-surface {
+	animation: wr-stack-surface 560ms var(--wr-e-out) 90ms backwards;
+}
+
+/* Previous: the card returns from where it was thrown and lands on top,
+   while the last card sinks away under the deck. */
+.wr-stacked__card.is-return {
+	animation: wr-stack-return 600ms var(--wr-e-out) both;
+}
+
+.wr-stacked__deck .wr-stacked__card.is-return > .wr-thumb {
+	animation: wr-stack-return-tilt 600ms var(--wr-e-out) both;
+}
+
+.wr-stacked__card.is-sink {
+	animation: wr-stack-sink 380ms var(--wr-e-ease) both;
+}
+
+/* The caption belongs to the front card alone, so it rises with whichever
+   card has just taken the front. */
+.wr-stacked__card.is-front .wr-thumb > .wr-thumb__under,
+.wr-stacked__card.is-front .wr-thumb > .wr-thumb__below {
+	animation: wr-stack-caption 480ms var(--wr-e-out) 120ms backwards;
+}
+
+@keyframes wr-stack-throw {
+	from {
+		translate: var(--wr-from-x, 0px) 0px;
+		opacity: 1;
+	}
+
+	to {
+		translate: calc(-0.9 * var(--wr-size, 200px)) -14px;
+		opacity: 0;
+	}
+}
+
+@keyframes wr-stack-throw-tilt {
+	from {
+		rotate: var(--wr-from-r, 0deg);
+	}
+
+	to {
+		rotate: -9deg;
+	}
+}
+
+@keyframes wr-stack-return {
+	from {
+		translate: calc(-0.9 * var(--wr-size, 200px)) -14px;
+		opacity: 0;
+	}
+}
+
+@keyframes wr-stack-return-tilt {
+	from {
+		rotate: -9deg;
+	}
+}
+
+@keyframes wr-stack-surface {
+	from {
+		translate: 0 calc(var(--wr-card-y, 0px) + 16px);
+		scale: calc(var(--wr-card-s, 1) * 0.94);
+		opacity: 0;
+	}
+}
+
+@keyframes wr-stack-sink {
+	to {
+		translate: 0 calc(var(--wr-card-y, 0px) + 12px);
+		scale: calc(var(--wr-card-s, 1) * 0.94);
+		opacity: 0;
+	}
+}
+
+@keyframes wr-stack-caption {
+	from {
+		translate: 0 6px;
+		opacity: 0;
+	}
+}
+
+/* The cards behind are decoration: they are footage only, so what peeks out
+   under the front card is their edge and not a box that once held a title. */
+.wr-stacked__card:not(.is-front) .wr-thumb__under,
+.wr-stacked__card:not(.is-front) .wr-thumb__below {
+	display: none;
+}
+
+/* The back cards peek out under the front card's footage; its title moves
+   down past them so the deck reads as a deck with a caption, not as words
+   over cards. A deck with no caption reserves the peek itself. */
+.wr-stacked__card.is-front .wr-thumb > .wr-thumb__under,
+.wr-stacked__card.is-front .wr-thumb > .wr-thumb__below {
+	margin-block-start: calc(var(--wr-stack-peek, 0px) + 10px);
+}
+
+.wr-stacked__deck:not(:has(.is-front .wr-thumb__under, .is-front .wr-thumb__below)) {
+	padding-block-end: var(--wr-stack-peek, 0px);
 }
 
 .wr-stacked.is-static .wr-stacked__card {
@@ -365,22 +1130,52 @@
 
 .wr-stacked__nav {
 	display: flex;
-	gap: 10px;
+	gap: 12px;
 	align-items: center;
 }
 
 .wr-stacked__count {
+	min-width: 3.5em;
 	font-size: 12px;
+	font-weight: 500;
 	font-variant-numeric: tabular-nums;
-	color: var(--wr-e-muted);
+	letter-spacing: 0.04em;
+	text-align: center;
+	opacity: 0.6;
 }
 
 /* ------------------------------------------------------------------- Popup */
 
+/*
+ * A card that slides in from the edge it is pinned to.
+ *
+ * Two layers, each with one job. The root (`.wr-popup`) is where the bubble
+ * sits on the page and how it arrives and leaves: pinned to a corner, and
+ * animated along the axis from that corner's edges. The card inside is the
+ * chrome — a white mat with a soft, layered shadow, the hover lift and a
+ * short attention pulse — so hover motion never fights the entrance.
+ *
+ * Direction is per corner: a bubble at the end edge comes in from the end
+ * edge, a bottom one rises, a top one settles down. The offsets are custom
+ * properties so one keyframe serves all four corners; the RTL block flips
+ * the horizontal ones, since a custom property is not something the RTL
+ * build knows to mirror.
+ */
 .wr-popup {
+	--wr-popup-dx: 0px;
+	--wr-popup-dy: 0px;
+
 	position: fixed;
 	z-index: 99990;
-	width: var(--wr-popup-size, 180px);
+	width: var(--wr-size, 200px);
+	/* `backwards`, not `both`: once landed the root should carry no transform
+	   of its own, so nothing inside is measured against a moved box. */
+	animation: wr-popup-in 640ms var(--wr-e-out) backwards;
+}
+
+.wr-popup--closing {
+	animation: wr-popup-out 240ms cubic-bezier(0.4, 0, 1, 1) forwards;
+	pointer-events: none;
 }
 
 .wr-popup .wr-thumb {
@@ -388,47 +1183,245 @@
 }
 
 .wr-popup--bottom-right {
-	inset-block-end: 20px;
-	inset-inline-end: 20px;
+	--wr-popup-dx: 40px;
+	--wr-popup-dy: 24px;
+
+	inset-block-end: 24px;
+	inset-inline-end: 24px;
 }
 
 .wr-popup--bottom-left {
-	inset-block-end: 20px;
-	inset-inline-start: 20px;
+	--wr-popup-dx: -40px;
+	--wr-popup-dy: 24px;
+
+	inset-block-end: 24px;
+	inset-inline-start: 24px;
 }
 
 .wr-popup--top-right {
-	inset-block-start: 20px;
-	inset-inline-end: 20px;
+	--wr-popup-dx: 40px;
+	--wr-popup-dy: -24px;
+
+	inset-block-start: 24px;
+	inset-inline-end: 24px;
 }
 
 .wr-popup--top-left {
-	inset-block-start: 20px;
-	inset-inline-start: 20px;
+	--wr-popup-dx: -40px;
+	--wr-popup-dy: -24px;
+
+	inset-block-start: 24px;
+	inset-inline-start: 24px;
 }
 
-/* In the editor the bubble is shown in place, not pinned to the viewport. */
+/* The inline-end corner is on the left in RTL, so it slides in from there. */
+[dir='rtl'] .wr-popup--bottom-right,
+[dir='rtl'] .wr-popup--top-right {
+	--wr-popup-dx: -40px;
+}
+
+[dir='rtl'] .wr-popup--bottom-left,
+[dir='rtl'] .wr-popup--top-left {
+	--wr-popup-dx: 40px;
+}
+
+/*
+ * In the editor the bubble cannot pin to the viewport, so the embed stands
+ * in for the page: a dashed sheet with a few grey lines of "content", and the
+ * bubble in the corner it was given. The corner classes above still place
+ * it; only the reference box changes.
+ */
 .wr-popup--inline {
-	position: relative;
-	inset: auto;
-	margin-inline: auto;
+	position: absolute;
 }
 
+.productreels-embed--in-editor[data-template='popup'] {
+	position: relative;
+	/* Room for the tallest bubble — a 9:16 card plus its mat and margins. */
+	min-height: calc(var(--wr-size, 200px) * 1.78 + 108px);
+	overflow: hidden;
+	border: 1px dashed rgb(17 24 39 / 0.18);
+	border-radius: 14px;
+}
+
+.productreels-embed--in-editor[data-template='popup']::before {
+	content: '';
+	position: absolute;
+	inset-block-start: 50%;
+	inset-inline-start: 32px;
+	width: min(38%, 260px);
+	height: 74px;
+	translate: 0 -50%;
+	background:
+		linear-gradient(rgb(17 24 39 / 0.14), rgb(17 24 39 / 0.14)) 0 0 / 68% 14px
+			no-repeat,
+		linear-gradient(rgb(17 24 39 / 0.08), rgb(17 24 39 / 0.08)) 0 30px / 100% 8px
+			no-repeat,
+		linear-gradient(rgb(17 24 39 / 0.08), rgb(17 24 39 / 0.08)) 0 46px / 88% 8px
+			no-repeat,
+		linear-gradient(rgb(17 24 39 / 0.08), rgb(17 24 39 / 0.08)) 0 62px / 56% 8px
+			no-repeat;
+	pointer-events: none;
+}
+
+/* The "content" keeps out of the bubble's way: a left-corner bubble sends it
+   to the other side. Only the editor asks for this, so :has() is fine. */
+.productreels-embed--in-editor[data-template='popup']:has(.wr-popup--bottom-left, .wr-popup--top-left)::before {
+	inset-inline-start: auto;
+	inset-inline-end: 32px;
+}
+
+/*
+ * The card. A 6px white mat that follows the thumbnail's own corner radius,
+ * a hairline edge and a shadow in two parts — a tight one for contact and a
+ * long soft one for lift — the way a storefront card sits on a page.
+ */
+.wr-popup__card {
+	position: relative;
+	padding: 6px;
+	background: #fff;
+	border: 1px solid var(--wr-e-hair);
+	border-radius: calc(var(--wr-radius, 0px) + 6px);
+	box-shadow:
+		0 1px 2px rgb(17 24 39 / 0.06),
+		0 20px 48px -14px rgb(17 24 39 / 0.32);
+	transition:
+		translate 320ms var(--wr-e-ease),
+		box-shadow 320ms var(--wr-e-ease);
+}
+
+.wr-popup:hover .wr-popup__card,
+.wr-popup:focus-within .wr-popup__card {
+	translate: 0 -4px;
+	box-shadow:
+		0 1px 2px rgb(17 24 39 / 0.06),
+		0 28px 56px -14px rgb(17 24 39 / 0.38);
+}
+
+/* One quiet pulse once the card has landed: a ring that swells and fades. */
+.wr-popup__card::after {
+	content: '';
+	position: absolute;
+	inset: -1px;
+	border-radius: inherit;
+	box-shadow: 0 0 0 0 rgb(17 24 39 / 0.2);
+	animation: wr-popup-pulse 1.6s var(--wr-e-out) 720ms 2;
+	pointer-events: none;
+}
+
+.wr-popup--closing .wr-popup__card::after {
+	animation: none;
+}
+
+/* The mat's own shadow and lift replace the thumbnail's: the card is one
+   object, and a thumbnail rising inside its mat would look unstuck. */
+.wr-popup__card .wr-thumb,
+.wr-popup__card .wr-thumb--hover-lift:hover {
+	translate: none;
+	box-shadow: none;
+}
+
+/* A circle is a story ring: no mat, no edge — the ring is the chrome. */
+.wr-popup--circle .wr-popup__card {
+	padding: 0;
+	background: none;
+	border: 0;
+	border-radius: 50%;
+	box-shadow: none;
+}
+
+.wr-popup--circle .wr-popup__card::after {
+	display: none;
+}
+
+/*
+ * Close: a frosted disc inside the card's corner, over the footage, so it
+ * reads on any thumbnail. It fades in a beat after the card lands, so the
+ * arrival is one motion and the control appears once there is something to
+ * dismiss.
+ */
 .wr-popup__close {
 	border: 0;
 	position: absolute;
-	inset-block-start: -8px;
-	inset-inline-end: -8px;
+	inset-block-start: 14px;
+	inset-inline-end: 14px;
 	z-index: 2;
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
-	width: 24px;
-	height: 24px;
-	color: #111827;
-	background: #fff;
+	width: 28px;
+	height: 28px;
+	color: #fff;
+	background: rgb(14 16 20 / 0.55);
 	border-radius: 50%;
-	box-shadow: 0 2px 8px rgb(0 0 0 / 0.2);
+	box-shadow:
+		inset 0 0 0 1px rgb(255 255 255 / 0.12),
+		0 1px 3px rgb(0 0 0 / 0.24);
+	backdrop-filter: blur(10px) saturate(1.4);
+	-webkit-backdrop-filter: blur(10px) saturate(1.4);
+	animation: wr-popup-fade 320ms var(--wr-e-out) 480ms backwards;
+	transition:
+		background-color 160ms var(--wr-e-ease),
+		scale 240ms var(--wr-e-spring);
+}
+
+.wr-popup__close:hover {
+	background: rgb(14 16 20 / 0.82);
+	scale: 1.08;
+}
+
+.wr-popup__close:active {
+	scale: 0.92;
+	transition-duration: 100ms;
+}
+
+/* A circle's bounding-box corner is empty air; the button sits on the ring
+   instead, where the top-right 45° point of the disc falls (about 15% in). */
+.wr-popup--circle .wr-popup__close {
+	inset-block-start: 6%;
+	inset-inline-end: 6%;
+}
+
+@keyframes wr-popup-in {
+	from {
+		opacity: 0;
+		transform: translate(var(--wr-popup-dx), var(--wr-popup-dy)) scale(0.94);
+	}
+
+	to {
+		opacity: 1;
+		transform: translate(0, 0) scale(1);
+	}
+}
+
+@keyframes wr-popup-out {
+	from {
+		opacity: 1;
+		transform: translate(0, 0) scale(1);
+	}
+
+	to {
+		opacity: 0;
+		transform: translate(var(--wr-popup-dx), var(--wr-popup-dy)) scale(0.96);
+	}
+}
+
+@keyframes wr-popup-pulse {
+	to {
+		box-shadow: 0 0 0 14px rgb(17 24 39 / 0);
+	}
+}
+
+@keyframes wr-popup-fade {
+	from {
+		opacity: 0;
+		scale: 0.8;
+	}
+
+	to {
+		opacity: 1;
+		scale: 1;
+	}
 }
 
 @media (max-width: 782px) {
@@ -440,7 +1433,7 @@
 /* ------------------------------------------------- Responsive style buckets */
 
 @media (max-width: 1024px) {
-	.wooreels-embed {
+	.productreels-embed {
 		--wr-size: var(--wr-size-tab);
 		--wr-gap: var(--wr-gap-tab);
 		--wr-radius: var(--wr-radius-tab);
@@ -448,7 +1441,7 @@
 }
 
 @media (max-width: 600px) {
-	.wooreels-embed {
+	.productreels-embed {
 		--wr-size: var(--wr-size-mob);
 		--wr-gap: var(--wr-gap-mob);
 		--wr-radius: var(--wr-radius-mob);
@@ -456,24 +1449,35 @@
 }
 
 /* The editor's device toggle drives the same buckets by class, because the
-   preview pane is narrower than the viewport it is standing in for. */
-.wooreels-embed--tablet {
+   preview pane is narrower than the viewport it is standing in for. These sit
+   after the media queries so the chosen device wins whatever the window
+   width, including desktop in a narrow admin window. */
+.productreels-embed--desktop {
+	--wr-size: var(--wr-size-desk);
+	--wr-gap: var(--wr-gap-desk);
+	--wr-radius: var(--wr-radius-desk);
+}
+
+.productreels-embed--tablet {
 	--wr-size: var(--wr-size-tab);
 	--wr-gap: var(--wr-gap-tab);
 	--wr-radius: var(--wr-radius-tab);
 }
 
-.wooreels-embed--mobile {
+.productreels-embed--mobile {
 	--wr-size: var(--wr-size-mob);
 	--wr-gap: var(--wr-gap-mob);
 	--wr-radius: var(--wr-radius-mob);
 }
 
+/* Less motion: everything lands at once. The delays go too, or a staggered
+   card would sit invisible through a delay it no longer needs. */
 @media (prefers-reduced-motion: reduce) {
-	.wooreels-embed *,
-	.wooreels-embed *::before,
-	.wooreels-embed *::after {
+	.productreels-embed *,
+	.productreels-embed *::before,
+	.productreels-embed *::after {
 		animation-duration: 0.01ms !important;
+		animation-delay: 0s !important;
 		transition-duration: 0.01ms !important;
 	}
 }

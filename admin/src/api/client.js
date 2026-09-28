@@ -8,7 +8,7 @@
 import apiFetch from '@wordpress/api-fetch';
 import { __ } from '@wordpress/i18n';
 
-export const boot = window.wooreelsAdmin || {};
+export const boot = window.productreelsAdmin || {};
 
 if ( boot.nonce ) {
 	apiFetch.use( apiFetch.createNonceMiddleware( boot.nonce ) );
@@ -18,7 +18,7 @@ if ( boot.restUrl ) {
 	apiFetch.use( apiFetch.createRootURLMiddleware( boot.restUrl ) );
 }
 
-const NAMESPACE = 'wooreels/v1';
+const NAMESPACE = 'productreels/v1';
 
 const toQuery = ( params = {} ) => {
 	const search = new URLSearchParams();
@@ -55,11 +55,14 @@ const toError = ( error ) => {
 	const message =
 		error && typeof error.message === 'string' && error.message
 			? error.message
-			: __( 'Something went wrong. Please try again.', 'wooreels' );
+			: __(
+					'Something went wrong. Please try again.',
+					'productreels-shoppable-video-reels-for-woocommerce'
+				);
 
 	const wrapped = new Error( message );
 
-	wrapped.code = error?.code || 'wooreels_request_failed';
+	wrapped.code = error?.code || 'productreels_request_failed';
 	wrapped.status = error?.data?.status || 0;
 
 	return wrapped;

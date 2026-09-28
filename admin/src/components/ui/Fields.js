@@ -68,7 +68,10 @@ export const SearchInput = ( { value, onChange, placeholder, label } ) => (
 			<button
 				type="button"
 				className="wr-search__clear"
-				aria-label={ __( 'Clear', 'wooreels' ) }
+				aria-label={ __(
+					'Clear',
+					'productreels-shoppable-video-reels-for-woocommerce'
+				) }
 				onClick={ () => onChange( '' ) }
 			>
 				<IconClose size={ 14 } />

@@ -124,7 +124,10 @@ export const ToastProvider = ( { children } ) => {
 			<div
 				className="wr-toasts"
 				role="region"
-				aria-label={ __( 'Notifications', 'wooreels' ) }
+				aria-label={ __(
+					'Notifications',
+					'productreels-shoppable-video-reels-for-woocommerce'
+				) }
 			>
 				{ toasts.map( ( toast ) => {
 					const Icon = ICONS[ toast.variant ] || IconCheck;
@@ -149,7 +152,10 @@ export const ToastProvider = ( { children } ) => {
 								type="button"
 								className="wr-icon-btn"
 								style={ { width: 20, height: 20 } }
-								aria-label={ __( 'Cancel', 'wooreels' ) }
+								aria-label={ __(
+									'Dismiss',
+									'productreels-shoppable-video-reels-for-woocommerce'
+								) }
 								onClick={ () => dismiss( toast.id ) }
 							>
 								<IconClose size={ 12 } />
