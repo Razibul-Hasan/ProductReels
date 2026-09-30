@@ -121,7 +121,7 @@ const ReelCard = ( {
 						label={ sprintf(
 							/* translators: %s: reel title. */ __(
 								'Select %s',
-								'productreels-shoppable-video-reels-for-woocommerce'
+								'productreels'
 							),
 							reel.title
 						) }
@@ -140,7 +140,7 @@ const ReelCard = ( {
 						icon={ IconEye }
 						label={ __(
 							'Preview',
-							'productreels-shoppable-video-reels-for-woocommerce'
+							'productreels'
 						) }
 						onClick={ onPreview }
 					/>
@@ -148,7 +148,7 @@ const ReelCard = ( {
 						icon={ IconEdit }
 						label={ __(
 							'Edit',
-							'productreels-shoppable-video-reels-for-woocommerce'
+							'productreels'
 						) }
 						onClick={ onEdit }
 					/>
@@ -156,7 +156,7 @@ const ReelCard = ( {
 						icon={ IconTrash }
 						label={ __(
 							'Delete',
-							'productreels-shoppable-video-reels-for-woocommerce'
+							'productreels'
 						) }
 						tone="danger"
 						onClick={ onDelete }
@@ -293,7 +293,7 @@ export const ReelsLibrary = () => {
 			toasts.success(
 				__(
 					'Reel deleted successfully!',
-					'productreels-shoppable-video-reels-for-woocommerce'
+					'productreels'
 				)
 			);
 			setConfirming( null );
@@ -319,7 +319,7 @@ export const ReelsLibrary = () => {
 							'%d reel deleted successfully!',
 							'%d reels deleted successfully!',
 							result.deleted,
-							'productreels-shoppable-video-reels-for-woocommerce'
+							'productreels'
 						),
 						result.deleted
 					)
@@ -334,7 +334,7 @@ export const ReelsLibrary = () => {
 							'%d reel failed to delete.',
 							'%d reels failed to delete.',
 							result.failed.length,
-							'productreels-shoppable-video-reels-for-woocommerce'
+							'productreels'
 						),
 						result.failed.length
 					)
@@ -376,7 +376,7 @@ export const ReelsLibrary = () => {
 					<h1 className="wr-page-head__title">
 						{ __(
 							'All Reels',
-							'productreels-shoppable-video-reels-for-woocommerce'
+							'productreels'
 						) }
 						{ ! loading && total > 0 && (
 							<span className="wr-count-chip">
@@ -387,7 +387,7 @@ export const ReelsLibrary = () => {
 					<p className="wr-page-head__sub">
 						{ __(
 							'Each reel lives on its own and can appear in as many widgets as you like.',
-							'productreels-shoppable-video-reels-for-woocommerce'
+							'productreels'
 						) }
 					</p>
 				</div>
@@ -402,7 +402,7 @@ export const ReelsLibrary = () => {
 								/* translators: %d: number of selected reels. */
 								__(
 									'Delete Selected (%d)',
-									'productreels-shoppable-video-reels-for-woocommerce'
+									'productreels'
 								),
 								selected.length
 							) }
@@ -413,7 +413,7 @@ export const ReelsLibrary = () => {
 						onChange={ setSearch }
 						placeholder={ __(
 							'Search reels…',
-							'productreels-shoppable-video-reels-for-woocommerce'
+							'productreels'
 						) }
 					/>
 					<Button
@@ -423,7 +423,7 @@ export const ReelsLibrary = () => {
 					>
 						{ __(
 							'Add Reel',
-							'productreels-shoppable-video-reels-for-woocommerce'
+							'productreels'
 						) }
 					</Button>
 				</div>
@@ -436,7 +436,7 @@ export const ReelsLibrary = () => {
 						<Button onClick={ load }>
 							{ __(
 								'Try again',
-								'productreels-shoppable-video-reels-for-woocommerce'
+								'productreels'
 							) }
 						</Button>
 					</div>
@@ -449,22 +449,22 @@ export const ReelsLibrary = () => {
 								search === ''
 									? __(
 											"You don't have any reels yet.",
-											'productreels-shoppable-video-reels-for-woocommerce'
+											'productreels'
 										)
 									: __(
 											'No reels match that search.',
-											'productreels-shoppable-video-reels-for-woocommerce'
+											'productreels'
 										)
 							}
 							text={
 								search === ''
 									? __(
 											'A reel is one vertical video, a title, and the buttons or products you want to sell from it.',
-											'productreels-shoppable-video-reels-for-woocommerce'
+											'productreels'
 										)
 									: __(
 											'Try a different title, or clear the search to see everything.',
-											'productreels-shoppable-video-reels-for-woocommerce'
+											'productreels'
 										)
 							}
 							action={
@@ -478,14 +478,14 @@ export const ReelsLibrary = () => {
 									>
 										{ __(
 											'Add Reel',
-											'productreels-shoppable-video-reels-for-woocommerce'
+											'productreels'
 										) }
 									</Button>
 								) : (
 									<Button onClick={ () => setSearch( '' ) }>
 										{ __(
 											'Clear',
-											'productreels-shoppable-video-reels-for-woocommerce'
+											'productreels'
 										) }
 									</Button>
 								)
@@ -527,7 +527,7 @@ export const ReelsLibrary = () => {
 								/* translators: 1: reels shown so far, 2: total reels. */
 								__(
 									'Load more (%1$s of %2$s)',
-									'productreels-shoppable-video-reels-for-woocommerce'
+									'productreels'
 								),
 								formatNumber( items.length ),
 								formatNumber( total )
@@ -570,13 +570,13 @@ export const ReelsLibrary = () => {
 									/* translators: %d: number of reels. */
 									__(
 										'Are you sure you want to remove %d reels?',
-										'productreels-shoppable-video-reels-for-woocommerce'
+										'productreels'
 									),
 									selected.length
 								)
 							: __(
 									'Are you sure you want to remove this reel?',
-									'productreels-shoppable-video-reels-for-woocommerce'
+									'productreels'
 								)
 					}
 					busy={ deleting }
@@ -585,7 +585,7 @@ export const ReelsLibrary = () => {
 				>
 					{ __(
 						'This also removes it from every widget it appears in. Widgets themselves are kept.',
-						'productreels-shoppable-video-reels-for-woocommerce'
+						'productreels'
 					) }
 				</ConfirmDialog>
 			) }

@@ -87,7 +87,7 @@ export const TitleAppearanceDialog = ( { name, styles, set, onClose } ) => {
 		<Modal
 			title={ __(
 				'Widget title',
-				'productreels-shoppable-video-reels-for-woocommerce'
+				'productreels'
 			) }
 			size="sm"
 			onClose={ onClose }
@@ -102,14 +102,14 @@ export const TitleAppearanceDialog = ( { name, styles, set, onClose } ) => {
 						>
 							{ __(
 								'Reset',
-								'productreels-shoppable-video-reels-for-woocommerce'
+								'productreels'
 							) }
 						</Button>
 					) }
 					<Button variant="primary" onClick={ onClose }>
 						{ __(
 							'Done',
-							'productreels-shoppable-video-reels-for-woocommerce'
+							'productreels'
 						) }
 					</Button>
 				</>
@@ -119,7 +119,7 @@ export const TitleAppearanceDialog = ( { name, styles, set, onClose } ) => {
 				<p className="wr-title-dialog__lede">
 					{ __(
 						'The widget name can sit above the reels on the page. Choose where, or keep it off.',
-						'productreels-shoppable-video-reels-for-woocommerce'
+						'productreels'
 					) }
 				</p>
 
@@ -137,7 +137,7 @@ export const TitleAppearanceDialog = ( { name, styles, set, onClose } ) => {
 							<IconEyeOff size={ 14 } />
 							{ __(
 								'Title stays off the page',
-								'productreels-shoppable-video-reels-for-woocommerce'
+								'productreels'
 							) }
 						</span>
 					) : (
@@ -154,7 +154,7 @@ export const TitleAppearanceDialog = ( { name, styles, set, onClose } ) => {
 							{ name ||
 								__(
 									'Untitled widget',
-									'productreels-shoppable-video-reels-for-woocommerce'
+									'productreels'
 								) }
 						</span>
 					) }
@@ -169,7 +169,7 @@ export const TitleAppearanceDialog = ( { name, styles, set, onClose } ) => {
 				<IconToggleGroup
 					label={ __(
 						'Position',
-						'productreels-shoppable-video-reels-for-woocommerce'
+						'productreels'
 					) }
 					value={ title.alignment }
 					onChange={ ( value ) =>
@@ -180,7 +180,7 @@ export const TitleAppearanceDialog = ( { name, styles, set, onClose } ) => {
 							value: 'left',
 							label: __(
 								'Left',
-								'productreels-shoppable-video-reels-for-woocommerce'
+								'productreels'
 							),
 							icon: IconTextLeft,
 							showLabel: false,
@@ -189,7 +189,7 @@ export const TitleAppearanceDialog = ( { name, styles, set, onClose } ) => {
 							value: 'center',
 							label: __(
 								'Centre',
-								'productreels-shoppable-video-reels-for-woocommerce'
+								'productreels'
 							),
 							icon: IconTextCenter,
 							showLabel: false,
@@ -198,7 +198,7 @@ export const TitleAppearanceDialog = ( { name, styles, set, onClose } ) => {
 							value: 'right',
 							label: __(
 								'Right',
-								'productreels-shoppable-video-reels-for-woocommerce'
+								'productreels'
 							),
 							icon: IconTextRight,
 							showLabel: false,
@@ -207,7 +207,7 @@ export const TitleAppearanceDialog = ( { name, styles, set, onClose } ) => {
 							value: 'hidden',
 							label: __(
 								'Hidden',
-								'productreels-shoppable-video-reels-for-woocommerce'
+								'productreels'
 							),
 							icon: IconEyeOff,
 						},
@@ -221,7 +221,7 @@ export const TitleAppearanceDialog = ( { name, styles, set, onClose } ) => {
 					<Field
 						label={ __(
 							'Size',
-							'productreels-shoppable-video-reels-for-woocommerce'
+							'productreels'
 						) }
 					>
 						<div className="wr-slider__row">
@@ -234,7 +234,7 @@ export const TitleAppearanceDialog = ( { name, styles, set, onClose } ) => {
 								disabled={ hidden }
 								aria-label={ __(
 									'Size',
-									'productreels-shoppable-video-reels-for-woocommerce'
+									'productreels'
 								) }
 								onChange={ ( event ) =>
 									set(
@@ -253,7 +253,7 @@ export const TitleAppearanceDialog = ( { name, styles, set, onClose } ) => {
 									disabled={ hidden }
 									aria-label={ __(
 										'Size (px)',
-										'productreels-shoppable-video-reels-for-woocommerce'
+										'productreels'
 									) }
 									onChange={ ( event ) =>
 										set(
@@ -272,7 +272,7 @@ export const TitleAppearanceDialog = ( { name, styles, set, onClose } ) => {
 					<ColorPicker
 						label={ __(
 							'Colour',
-							'productreels-shoppable-video-reels-for-woocommerce'
+							'productreels'
 						) }
 						value={ title.color }
 						disabled={ hidden }
@@ -284,14 +284,14 @@ export const TitleAppearanceDialog = ( { name, styles, set, onClose } ) => {
 					<Field
 						label={ __(
 							'Spacing',
-							'productreels-shoppable-video-reels-for-woocommerce'
+							'productreels'
 						) }
 					>
 						<div className="wr-title-dialog__spacing">
 							<SpacingInput
 								label={ __(
 									'Top',
-									'productreels-shoppable-video-reels-for-woocommerce'
+									'productreels'
 								) }
 								value={ title.spacingTop }
 								disabled={ hidden }
@@ -302,7 +302,7 @@ export const TitleAppearanceDialog = ( { name, styles, set, onClose } ) => {
 							<SpacingInput
 								label={ __(
 									'Bottom',
-									'productreels-shoppable-video-reels-for-woocommerce'
+									'productreels'
 								) }
 								value={ title.spacingBottom }
 								disabled={ hidden }

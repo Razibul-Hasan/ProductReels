@@ -126,7 +126,7 @@ export const ToastProvider = ( { children } ) => {
 				role="region"
 				aria-label={ __(
 					'Notifications',
-					'productreels-shoppable-video-reels-for-woocommerce'
+					'productreels'
 				) }
 			>
 				{ toasts.map( ( toast ) => {
@@ -154,7 +154,7 @@ export const ToastProvider = ( { children } ) => {
 								style={ { width: 20, height: 20 } }
 								aria-label={ __(
 									'Dismiss',
-									'productreels-shoppable-video-reels-for-woocommerce'
+									'productreels'
 								) }
 								onClick={ () => dismiss( toast.id ) }
 							>

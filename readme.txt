@@ -1,4 +1,4 @@
-=== ProductReels – Shoppable Video Reels for WooCommerce ===
+=== ProductReels ===
 Contributors: razibulhasan
 Donate link: https://bestwebexpert.com/
 Tags: woocommerce, video, reels, shoppable video, stories
@@ -7,7 +7,7 @@ Tested up to: 7.1
 Requires PHP: 7.4
 Stable tag: 1.0.0
 License: GPLv2 or later
-License URI: http://www.gnu.org/licenses/gpl-2.0.html
+License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
 Turn product videos and customer UGC into shoppable Instagram-style reels with a fullscreen player, product tagging and built-in analytics.
 
@@ -63,6 +63,10 @@ ProductReels sends nothing about your site or your visitors anywhere. It contact
 * **YouTube** — a YouTube reel's poster is the thumbnail YouTube publishes for that video (`https://img.youtube.com/vi/…`). Opening a YouTube reel loads the YouTube IFrame Player API (`https://www.youtube.com/iframe_api`) in the visitor's browser. [Terms of service](https://www.youtube.com/t/terms) · [Privacy policy](https://policies.google.com/privacy)
 
 Neither SDK is loaded on a page until a visitor actually opens a reel from that provider. Reels from your media library or a self-hosted URL involve no third party at all. The `productreels_allow_provider_lookup` filter turns the Vimeo oEmbed lookup off entirely.
+
+= Source code and build instructions =
+
+The readable JavaScript, JSX and SCSS source is included in `admin/src`, `public/src`, `block/src` and `src/shared`. See `README.md` for the build commands and `THIRD-PARTY-NOTICES.txt` for bundled dependency licenses.
 
 == Installation ==
 

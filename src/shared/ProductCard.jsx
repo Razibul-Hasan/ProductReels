@@ -156,13 +156,13 @@ export const ProductCard = ( {
 							/* translators: %s: the error message from WooCommerce. */
 							__(
 								'Failed to add to cart: %s',
-								'productreels-shoppable-video-reels-for-woocommerce'
+								'productreels'
 							),
 							error.message
 						)
 					: __(
 							'Failed to add to cart. Please try again.',
-							'productreels-shoppable-video-reels-for-woocommerce'
+							'productreels'
 						)
 			);
 		}
@@ -190,7 +190,7 @@ export const ProductCard = ( {
 					'success',
 					__(
 						'Product added to cart!',
-						'productreels-shoppable-video-reels-for-woocommerce'
+						'productreels'
 					)
 				);
 			}
@@ -236,7 +236,7 @@ export const ProductCard = ( {
 				>
 					{ __(
 						'Out of stock',
-						'productreels-shoppable-video-reels-for-woocommerce'
+						'productreels'
 					) }
 				</span>
 			);
@@ -250,7 +250,7 @@ export const ProductCard = ( {
 					<Check />
 					{ __(
 						'View cart',
-						'productreels-shoppable-video-reels-for-woocommerce'
+						'productreels'
 					) }
 				</a>
 			);
@@ -264,7 +264,7 @@ export const ProductCard = ( {
 				>
 					{ __(
 						'Select options',
-						'productreels-shoppable-video-reels-for-woocommerce'
+						'productreels'
 					) }
 				</a>
 			);
@@ -281,7 +281,7 @@ export const ProductCard = ( {
 					{ directCheckoutText ||
 						__(
 							'Buy now',
-							'productreels-shoppable-video-reels-for-woocommerce'
+							'productreels'
 						) }
 				</button>
 			);
@@ -298,12 +298,12 @@ export const ProductCard = ( {
 					{ state === 'adding'
 						? __(
 								'Adding…',
-								'productreels-shoppable-video-reels-for-woocommerce'
+								'productreels'
 							)
 						: addToCartText ||
 							__(
 								'Add to cart',
-								'productreels-shoppable-video-reels-for-woocommerce'
+								'productreels'
 							) }
 				</button>
 			);

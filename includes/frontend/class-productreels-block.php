@@ -62,7 +62,7 @@ class Productreels_Block {
 				true
 			);
 
-			wp_set_script_translations( self::HANDLE, 'productreels-shoppable-video-reels-for-woocommerce', PRODUCTREELS_PATH . 'languages' );
+			wp_set_script_translations( self::HANDLE, 'productreels', PRODUCTREELS_PATH . 'languages' );
 
 			wp_add_inline_script(
 				self::HANDLE,

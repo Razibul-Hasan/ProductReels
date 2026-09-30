@@ -175,7 +175,7 @@ class Productreels_Rest_Widgets extends Productreels_Rest_Controller {
 		$widget = $this->widgets->find( $request->get_param( 'id' ) );
 
 		if ( null === $widget ) {
-			return $this->not_found( __( 'That widget no longer exists.', 'productreels-shoppable-video-reels-for-woocommerce' ) );
+			return $this->not_found( __( 'That widget no longer exists.', 'productreels' ) );
 		}
 
 		return rest_ensure_response( $widget );
@@ -225,7 +225,7 @@ class Productreels_Rest_Widgets extends Productreels_Rest_Controller {
 		}
 
 		if ( ! $this->widgets->exists( $id ) ) {
-			return $this->not_found( __( 'That widget no longer exists.', 'productreels-shoppable-video-reels-for-woocommerce' ) );
+			return $this->not_found( __( 'That widget no longer exists.', 'productreels' ) );
 		}
 
 		$widget = $this->widgets->update( $id, $changes );
@@ -248,7 +248,7 @@ class Productreels_Rest_Widgets extends Productreels_Rest_Controller {
 		$id = $request->get_param( 'id' );
 
 		if ( ! $this->widgets->exists( $id ) ) {
-			return $this->not_found( __( 'That widget no longer exists.', 'productreels-shoppable-video-reels-for-woocommerce' ) );
+			return $this->not_found( __( 'That widget no longer exists.', 'productreels' ) );
 		}
 
 		$copy = $this->widgets->duplicate( $id );
@@ -274,7 +274,7 @@ class Productreels_Rest_Widgets extends Productreels_Rest_Controller {
 		$id = $request->get_param( 'id' );
 
 		if ( ! $this->widgets->exists( $id ) ) {
-			return $this->not_found( __( 'That widget no longer exists.', 'productreels-shoppable-video-reels-for-woocommerce' ) );
+			return $this->not_found( __( 'That widget no longer exists.', 'productreels' ) );
 		}
 
 		if ( ! $this->widgets->delete( $id ) ) {
@@ -304,7 +304,7 @@ class Productreels_Rest_Widgets extends Productreels_Rest_Controller {
 		);
 
 		if ( null === $stats ) {
-			return $this->not_found( __( 'That widget no longer exists.', 'productreels-shoppable-video-reels-for-woocommerce' ) );
+			return $this->not_found( __( 'That widget no longer exists.', 'productreels' ) );
 		}
 
 		$buttons = array();

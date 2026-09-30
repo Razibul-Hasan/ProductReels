@@ -92,11 +92,11 @@ export const VolumeControl = ( { muted, volume, onToggleMute, onVolume } ) => {
 					muted
 						? __(
 								'Unmute',
-								'productreels-shoppable-video-reels-for-woocommerce'
+								'productreels'
 							)
 						: __(
 								'Mute',
-								'productreels-shoppable-video-reels-for-woocommerce'
+								'productreels'
 							)
 				}
 				aria-pressed={ muted ? 'true' : 'false' }
@@ -111,7 +111,7 @@ export const VolumeControl = ( { muted, volume, onToggleMute, onVolume } ) => {
 				tabIndex={ 0 }
 				aria-label={ __(
 					'Volume',
-					'productreels-shoppable-video-reels-for-woocommerce'
+					'productreels'
 				) }
 				aria-valuemin={ 0 }
 				aria-valuemax={ 100 }

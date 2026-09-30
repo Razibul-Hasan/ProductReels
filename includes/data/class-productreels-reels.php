@@ -419,6 +419,6 @@ class Productreels_Reels extends Productreels_Repository {
 	 */
 	private function next_untitled_title() {
 		/* translators: %d: sequential number for an automatically named reel. */
-		return sprintf( __( 'Untitled reel %d', 'productreels-shoppable-video-reels-for-woocommerce' ), $this->next_number() );
+		return sprintf( __( 'Untitled reel %d', 'productreels' ), $this->next_number() );
 	}
 }

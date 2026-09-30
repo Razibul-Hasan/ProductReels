@@ -627,13 +627,13 @@ export const Player = ( {
 				/* translators: %s: reel title. */
 				__(
 					'Reel player: %s',
-					'productreels-shoppable-video-reels-for-woocommerce'
+					'productreels'
 				),
 				current.reel.title || widget.name || ''
 			)
 		: __(
 				'Reel player',
-				'productreels-shoppable-video-reels-for-woocommerce'
+				'productreels'
 			);
 
 	const hasFile = !! ( current && current.file );
@@ -743,11 +743,11 @@ export const Player = ( {
 										playing
 											? __(
 													'Pause',
-													'productreels-shoppable-video-reels-for-woocommerce'
+													'productreels'
 												)
 											: __(
 													'Play',
-													'productreels-shoppable-video-reels-for-woocommerce'
+													'productreels'
 												)
 									}
 									onClick={ toggle }
@@ -760,7 +760,7 @@ export const Player = ( {
 								className="wr-player__ctl wr-player__close"
 								aria-label={ __(
 									'Close',
-									'productreels-shoppable-video-reels-for-woocommerce'
+									'productreels'
 								) }
 								onClick={ requestClose }
 							>
@@ -779,7 +779,7 @@ export const Player = ( {
 							<SoundIcon />
 							{ __(
 								'Tap for sound',
-								'productreels-shoppable-video-reels-for-woocommerce'
+								'productreels'
 							) }
 						</button>
 					) }

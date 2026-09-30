@@ -108,7 +108,7 @@ const Edit = ( { attributes, setAttributes } ) => {
 					/* translators: 1: widget name, 2: reel count. */
 					__(
 						'%1$s (%2$s)',
-						'productreels-shoppable-video-reels-for-woocommerce'
+						'productreels'
 					),
 					entry.name,
 					sprintf(
@@ -117,7 +117,7 @@ const Edit = ( { attributes, setAttributes } ) => {
 							'%d reel',
 							'%d reels',
 							entry.reel_count,
-							'productreels-shoppable-video-reels-for-woocommerce'
+							'productreels'
 						),
 						entry.reel_count
 					)
@@ -132,7 +132,7 @@ const Edit = ( { attributes, setAttributes } ) => {
 			__next40pxDefaultSize
 			label={ __(
 				'Widget',
-				'productreels-shoppable-video-reels-for-woocommerce'
+				'productreels'
 			) }
 			value={ widgetId || null }
 			options={ options }
@@ -143,11 +143,11 @@ const Edit = ( { attributes, setAttributes } ) => {
 				widgets === null
 					? __(
 							'Loading…',
-							'productreels-shoppable-video-reels-for-woocommerce'
+							'productreels'
 						)
 					: __(
 							'Search widgets…',
-							'productreels-shoppable-video-reels-for-woocommerce'
+							'productreels'
 						)
 			}
 		/>
@@ -165,7 +165,7 @@ const Edit = ( { attributes, setAttributes } ) => {
 				<PanelBody
 					title={ __(
 						'ProductReels',
-						'productreels-shoppable-video-reels-for-woocommerce'
+						'productreels'
 					) }
 				>
 					{ picker }
@@ -175,11 +175,11 @@ const Edit = ( { attributes, setAttributes } ) => {
 								{ widgetId
 									? __(
 											'Open in ProductReels',
-											'productreels-shoppable-video-reels-for-woocommerce'
+											'productreels'
 										)
 									: __(
 											'Create Widget',
-											'productreels-shoppable-video-reels-for-woocommerce'
+											'productreels'
 										) }
 							</ExternalLink>
 						</p>
@@ -193,11 +193,11 @@ const Edit = ( { attributes, setAttributes } ) => {
 						icon={ <ProductReelsIcon /> }
 						label={ __(
 							'ProductReels',
-							'productreels-shoppable-video-reels-for-woocommerce'
+							'productreels'
 						) }
 						instructions={ __(
 							'Choose which widget to show here.',
-							'productreels-shoppable-video-reels-for-woocommerce'
+							'productreels'
 						) }
 					>
 						<div className="wr-block__picker">
@@ -205,7 +205,7 @@ const Edit = ( { attributes, setAttributes } ) => {
 								<Notice status="info" isDismissible={ false }>
 									{ __(
 										"You haven't created any widget yet!",
-										'productreels-shoppable-video-reels-for-woocommerce'
+										'productreels'
 									) }
 									{ canManage && (
 										<>
@@ -215,7 +215,7 @@ const Edit = ( { attributes, setAttributes } ) => {
 											>
 												{ __(
 													'Create Widget',
-													'productreels-shoppable-video-reels-for-woocommerce'
+													'productreels'
 												) }
 											</ExternalLink>
 										</>
@@ -234,7 +234,7 @@ const Edit = ( { attributes, setAttributes } ) => {
 							/* translators: %d: widget id. */
 							__(
 								'Widget #%d no longer exists. Choose another one.',
-								'productreels-shoppable-video-reels-for-woocommerce'
+								'productreels'
 							),
 							Number( widgetId )
 						) }
@@ -262,7 +262,7 @@ const Edit = ( { attributes, setAttributes } ) => {
 										/* translators: 1: number of reels (already pluralised), 2: template name. */
 										__(
 											'%1$s · %2$s',
-											'productreels-shoppable-video-reels-for-woocommerce'
+											'productreels'
 										),
 										sprintf(
 											/* translators: %d: number of reels. */
@@ -270,7 +270,7 @@ const Edit = ( { attributes, setAttributes } ) => {
 												'%d reel',
 												'%d reels',
 												widget.reels.length,
-												'productreels-shoppable-video-reels-for-woocommerce'
+												'productreels'
 											),
 											widget.reels.length
 										),
@@ -285,7 +285,7 @@ const Edit = ( { attributes, setAttributes } ) => {
 								>
 									{ __(
 										'Edit',
-										'productreels-shoppable-video-reels-for-woocommerce'
+										'productreels'
 									) }
 								</ExternalLink>
 							) }
@@ -326,7 +326,7 @@ const Edit = ( { attributes, setAttributes } ) => {
 							<p className="wr-block__empty">
 								{ __(
 									'No reels have been added to this widget yet.',
-									'productreels-shoppable-video-reels-for-woocommerce'
+									'productreels'
 								) }
 							</p>
 						) }

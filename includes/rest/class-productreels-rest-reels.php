@@ -185,7 +185,7 @@ class Productreels_Rest_Reels extends Productreels_Rest_Controller {
 		$reel = $this->reels->find( $request->get_param( 'id' ) );
 
 		if ( null === $reel ) {
-			return $this->not_found( __( 'That reel no longer exists.', 'productreels-shoppable-video-reels-for-woocommerce' ) );
+			return $this->not_found( __( 'That reel no longer exists.', 'productreels' ) );
 		}
 
 		return rest_ensure_response( $reel );
@@ -247,7 +247,7 @@ class Productreels_Rest_Reels extends Productreels_Rest_Controller {
 		}
 
 		if ( ! $this->reels->exists( $id ) ) {
-			return $this->not_found( __( 'That reel no longer exists.', 'productreels-shoppable-video-reels-for-woocommerce' ) );
+			return $this->not_found( __( 'That reel no longer exists.', 'productreels' ) );
 		}
 
 		// Only what the client sent is checked; an untouched field keeps
@@ -281,7 +281,7 @@ class Productreels_Rest_Reels extends Productreels_Rest_Controller {
 		$id = $request->get_param( 'id' );
 
 		if ( ! $this->reels->exists( $id ) ) {
-			return $this->not_found( __( 'That reel no longer exists.', 'productreels-shoppable-video-reels-for-woocommerce' ) );
+			return $this->not_found( __( 'That reel no longer exists.', 'productreels' ) );
 		}
 
 		if ( ! $this->reels->delete( $id ) ) {
@@ -307,7 +307,7 @@ class Productreels_Rest_Reels extends Productreels_Rest_Controller {
 		$ids = (array) $request->get_param( 'ids' );
 
 		if ( empty( $ids ) ) {
-			return $this->invalid( 'productreels_reels_bulk_delete_failed', __( 'Select at least one reel to delete.', 'productreels-shoppable-video-reels-for-woocommerce' ) );
+			return $this->invalid( 'productreels_reels_bulk_delete_failed', __( 'Select at least one reel to delete.', 'productreels' ) );
 		}
 
 		return rest_ensure_response( $this->reels->bulk_delete( $ids ) );
@@ -329,7 +329,7 @@ class Productreels_Rest_Reels extends Productreels_Rest_Controller {
 		if ( ! $description['valid'] ) {
 			return $this->invalid(
 				'productreels_url_invalid',
-				__( 'That link is not a video we can play. Use a YouTube, Vimeo or direct MP4 URL.', 'productreels-shoppable-video-reels-for-woocommerce' )
+				__( 'That link is not a video we can play. Use a YouTube, Vimeo or direct MP4 URL.', 'productreels' )
 			);
 		}
 
@@ -353,14 +353,14 @@ class Productreels_Rest_Reels extends Productreels_Rest_Controller {
 		if ( null !== $files && empty( Productreels_Validator::validate_files( $files ) ) ) {
 			return $this->invalid(
 				'productreels_reel_no_files',
-				__( 'Add at least one video to save this reel.', 'productreels-shoppable-video-reels-for-woocommerce' )
+				__( 'Add at least one video to save this reel.', 'productreels' )
 			);
 		}
 
 		if ( null !== $links && empty( Productreels_Validator::validate_links( $links ) ) ) {
 			return $this->invalid(
 				'productreels_reel_no_links',
-				__( 'Add at least one link to save this reel.', 'productreels-shoppable-video-reels-for-woocommerce' )
+				__( 'Add at least one link to save this reel.', 'productreels' )
 			);
 		}
 

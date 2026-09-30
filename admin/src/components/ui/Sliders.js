@@ -17,7 +17,7 @@ const DEVICES = [
 		icon: IconDesktop,
 		label: __(
 			'Desktop',
-			'productreels-shoppable-video-reels-for-woocommerce'
+			'productreels'
 		),
 	},
 	{
@@ -25,7 +25,7 @@ const DEVICES = [
 		icon: IconTablet,
 		label: __(
 			'Tablet',
-			'productreels-shoppable-video-reels-for-woocommerce'
+			'productreels'
 		),
 	},
 	{
@@ -33,7 +33,7 @@ const DEVICES = [
 		icon: IconMobile,
 		label: __(
 			'Mobile',
-			'productreels-shoppable-video-reels-for-woocommerce'
+			'productreels'
 		),
 	},
 ];
@@ -62,7 +62,7 @@ export const Slider = ( {
 							icon={ IconReset }
 							label={ __(
 								'Reset',
-								'productreels-shoppable-video-reels-for-woocommerce'
+								'productreels'
 							) }
 							size={ 14 }
 							onClick={ onReset }
@@ -126,7 +126,7 @@ export const ResponsiveSlider = ( {
 						role="group"
 						aria-label={ __(
 							'Device',
-							'productreels-shoppable-video-reels-for-woocommerce'
+							'productreels'
 						) }
 					>
 						{ DEVICES.map( ( entry ) => {
@@ -155,7 +155,7 @@ export const ResponsiveSlider = ( {
 							icon={ IconReset }
 							label={ __(
 								'Reset',
-								'productreels-shoppable-video-reels-for-woocommerce'
+								'productreels'
 							) }
 							size={ 14 }
 							onClick={ () =>

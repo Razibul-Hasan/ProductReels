@@ -80,7 +80,7 @@ const DEVICES = [
 		icon: IconDesktop,
 		label: __(
 			'Desktop',
-			'productreels-shoppable-video-reels-for-woocommerce'
+			'productreels'
 		),
 		width: '100%',
 	},
@@ -89,7 +89,7 @@ const DEVICES = [
 		icon: IconTablet,
 		label: __(
 			'Tablet',
-			'productreels-shoppable-video-reels-for-woocommerce'
+			'productreels'
 		),
 		width: '768px',
 	},
@@ -98,7 +98,7 @@ const DEVICES = [
 		icon: IconMobile,
 		label: __(
 			'Mobile',
-			'productreels-shoppable-video-reels-for-woocommerce'
+			'productreels'
 		),
 		width: '390px',
 	},
@@ -182,7 +182,7 @@ const SortableReel = ( { reel, onRemove, onPreview } ) => {
 					/* translators: %s: reel title. */
 					__(
 						'Reorder %s',
-						'productreels-shoppable-video-reels-for-woocommerce'
+						'productreels'
 					),
 					reel.title
 				) }
@@ -208,7 +208,7 @@ const SortableReel = ( { reel, onRemove, onPreview } ) => {
 				icon={ IconPlay }
 				label={ __(
 					'Preview',
-					'productreels-shoppable-video-reels-for-woocommerce'
+					'productreels'
 				) }
 				size={ 14 }
 				onClick={ ( event ) => onPreview( reel, event.currentTarget ) }
@@ -218,7 +218,7 @@ const SortableReel = ( { reel, onRemove, onPreview } ) => {
 				icon={ IconTrash }
 				label={ __(
 					'Delete',
-					'productreels-shoppable-video-reels-for-woocommerce'
+					'productreels'
 				) }
 				tone="danger"
 				size={ 14 }
@@ -494,11 +494,11 @@ export const WidgetEditor = ( { widgetId, navigate } ) => {
 				isNew && ! savedId
 					? __(
 							'Widget created successfully!',
-							'productreels-shoppable-video-reels-for-woocommerce'
+							'productreels'
 						)
 					: __(
 							'Changes saved successfully!',
-							'productreels-shoppable-video-reels-for-woocommerce'
+							'productreels'
 						)
 			);
 
@@ -541,7 +541,7 @@ export const WidgetEditor = ( { widgetId, navigate } ) => {
 			toasts.success(
 				__(
 					'Widget deleted successfully!',
-					'productreels-shoppable-video-reels-for-woocommerce'
+					'productreels'
 				)
 			);
 			navigate( '#/widgets' );
@@ -570,7 +570,7 @@ export const WidgetEditor = ( { widgetId, navigate } ) => {
 		toasts.success(
 			__(
 				'Copied!',
-				'productreels-shoppable-video-reels-for-woocommerce'
+				'productreels'
 			)
 		);
 		setTimeout( () => setCopied( false ), 1600 );
@@ -597,7 +597,7 @@ export const WidgetEditor = ( { widgetId, navigate } ) => {
 			toasts.success(
 				__(
 					'Widget created successfully!',
-					'productreels-shoppable-video-reels-for-woocommerce'
+					'productreels'
 				)
 			);
 			navigate( `#/widgets/${ copy.id }` );
@@ -628,7 +628,7 @@ export const WidgetEditor = ( { widgetId, navigate } ) => {
 						icon={ IconChevronLeft }
 						label={ __(
 							'Back',
-							'productreels-shoppable-video-reels-for-woocommerce'
+							'productreels'
 						) }
 						onClick={ () => navigate( '#/widgets' ) }
 					/>
@@ -636,7 +636,7 @@ export const WidgetEditor = ( { widgetId, navigate } ) => {
 						className="wr-crumbs"
 						aria-label={ __(
 							'Breadcrumb',
-							'productreels-shoppable-video-reels-for-woocommerce'
+							'productreels'
 						) }
 					>
 						<button
@@ -646,7 +646,7 @@ export const WidgetEditor = ( { widgetId, navigate } ) => {
 						>
 							{ __(
 								'All Widgets',
-								'productreels-shoppable-video-reels-for-woocommerce'
+								'productreels'
 							) }
 						</button>
 						<IconChevronRight size={ 12 } />
@@ -655,11 +655,11 @@ export const WidgetEditor = ( { widgetId, navigate } ) => {
 								? name ||
 									__(
 										'Untitled widget',
-										'productreels-shoppable-video-reels-for-woocommerce'
+										'productreels'
 									)
 								: __(
 										'Create Widget',
-										'productreels-shoppable-video-reels-for-woocommerce'
+										'productreels'
 									) }
 						</span>
 					</nav>
@@ -672,11 +672,11 @@ export const WidgetEditor = ( { widgetId, navigate } ) => {
 						value={ name }
 						placeholder={ __(
 							'Enter widget title',
-							'productreels-shoppable-video-reels-for-woocommerce'
+							'productreels'
 						) }
 						aria-label={ __(
 							'Widget Name',
-							'productreels-shoppable-video-reels-for-woocommerce'
+							'productreels'
 						) }
 						onChange={ ( event ) => rename( event.target.value ) }
 					/>
@@ -686,11 +686,11 @@ export const WidgetEditor = ( { widgetId, navigate } ) => {
 							titleHidden
 								? __(
 										'Title appearance (not shown on the page)',
-										'productreels-shoppable-video-reels-for-woocommerce'
+										'productreels'
 									)
 								: __(
 										'Title appearance',
-										'productreels-shoppable-video-reels-for-woocommerce'
+										'productreels'
 									)
 						}
 						className="wr-editor-head__title-btn"
@@ -706,7 +706,7 @@ export const WidgetEditor = ( { widgetId, navigate } ) => {
 							icon={ IconUndo }
 							label={ __(
 								'Discard changes',
-								'productreels-shoppable-video-reels-for-woocommerce'
+								'productreels'
 							) }
 							onClick={ discard }
 						/>
@@ -732,7 +732,7 @@ export const WidgetEditor = ( { widgetId, navigate } ) => {
 							icon={ IconDuplicate }
 							label={ __(
 								'Duplicate',
-								'productreels-shoppable-video-reels-for-woocommerce'
+								'productreels'
 							) }
 							disabled={ duplicating || dirty }
 							onClick={ duplicateWidget }
@@ -744,7 +744,7 @@ export const WidgetEditor = ( { widgetId, navigate } ) => {
 							icon={ IconTrash }
 							label={ __(
 								'Delete',
-								'productreels-shoppable-video-reels-for-woocommerce'
+								'productreels'
 							) }
 							tone="danger"
 							onClick={ () => setConfirming( true ) }
@@ -757,11 +757,11 @@ export const WidgetEditor = ( { widgetId, navigate } ) => {
 							( narrow ? panelOpen : ! panelHidden )
 								? __(
 										'Hide customization',
-										'productreels-shoppable-video-reels-for-woocommerce'
+										'productreels'
 									)
 								: __(
 										'Show customization',
-										'productreels-shoppable-video-reels-for-woocommerce'
+										'productreels'
 									)
 						}
 						aria-pressed={
@@ -786,11 +786,11 @@ export const WidgetEditor = ( { widgetId, navigate } ) => {
 						{ savedId > 0
 							? __(
 									'Update',
-									'productreels-shoppable-video-reels-for-woocommerce'
+									'productreels'
 								)
 							: __(
 									'Save',
-									'productreels-shoppable-video-reels-for-woocommerce'
+									'productreels'
 								) }
 					</Button>
 				</div>
@@ -809,20 +809,20 @@ export const WidgetEditor = ( { widgetId, navigate } ) => {
 					className="wr-editor__pane wr-editor__picker"
 					aria-label={ __(
 						'All Reels',
-						'productreels-shoppable-video-reels-for-woocommerce'
+						'productreels'
 					) }
 				>
 					<header className="wr-editor__pane-head">
 						<h2 className="wr-editor__pane-title">
 							{ __(
 								'All Reels',
-								'productreels-shoppable-video-reels-for-woocommerce'
+								'productreels'
 							) }
 						</h2>
 						<p className="wr-editor__pane-sub">
 							{ __(
 								'Choose reels to attach in this widget',
-								'productreels-shoppable-video-reels-for-woocommerce'
+								'productreels'
 							) }
 						</p>
 					</header>
@@ -835,7 +835,7 @@ export const WidgetEditor = ( { widgetId, navigate } ) => {
 						>
 							{ __(
 								'Add Reel',
-								'productreels-shoppable-video-reels-for-woocommerce'
+								'productreels'
 							) }
 						</Button>
 						<SearchInput
@@ -843,7 +843,7 @@ export const WidgetEditor = ( { widgetId, navigate } ) => {
 							onChange={ setSearch }
 							placeholder={ __(
 								'Search reels…',
-								'productreels-shoppable-video-reels-for-woocommerce'
+								'productreels'
 							) }
 						/>
 					</div>
@@ -864,7 +864,7 @@ export const WidgetEditor = ( { widgetId, navigate } ) => {
 							<p className="wr-editor__empty">
 								{ __(
 									'No reels are available to add.',
-									'productreels-shoppable-video-reels-for-woocommerce'
+									'productreels'
 								) }
 							</p>
 						) }
@@ -891,7 +891,7 @@ export const WidgetEditor = ( { widgetId, navigate } ) => {
 								>
 									{ __(
 										'Load more',
-										'productreels-shoppable-video-reels-for-woocommerce'
+										'productreels'
 									) }
 								</Button>
 							</div>
@@ -903,7 +903,7 @@ export const WidgetEditor = ( { widgetId, navigate } ) => {
 					className="wr-editor__pane wr-editor__preview"
 					aria-label={ __(
 						'Preview',
-						'productreels-shoppable-video-reels-for-woocommerce'
+						'productreels'
 					) }
 				>
 					<header className="wr-editor__pane-head wr-editor__preview-head">
@@ -911,13 +911,13 @@ export const WidgetEditor = ( { widgetId, navigate } ) => {
 							<h2 className="wr-editor__pane-title">
 								{ __(
 									'Preview',
-									'productreels-shoppable-video-reels-for-woocommerce'
+									'productreels'
 								) }
 							</h2>
 							<p className="wr-editor__pane-sub">
 								{ __(
 									'This is a representation of how the widget will appear to visitors.',
-									'productreels-shoppable-video-reels-for-woocommerce'
+									'productreels'
 								) }
 							</p>
 						</div>
@@ -927,7 +927,7 @@ export const WidgetEditor = ( { widgetId, navigate } ) => {
 							role="group"
 							aria-label={ __(
 								'Device',
-								'productreels-shoppable-video-reels-for-woocommerce'
+								'productreels'
 							) }
 						>
 							{ DEVICES.map( ( entry ) => {
@@ -970,11 +970,11 @@ export const WidgetEditor = ( { widgetId, navigate } ) => {
 								<EmptyState
 									title={ __(
 										'No reels have been added to this widget yet.',
-										'productreels-shoppable-video-reels-for-woocommerce'
+										'productreels'
 									) }
 									text={ __(
 										'Select some from the list on the left to get started.',
-										'productreels-shoppable-video-reels-for-woocommerce'
+										'productreels'
 									) }
 								/>
 							) }
@@ -1006,13 +1006,13 @@ export const WidgetEditor = ( { widgetId, navigate } ) => {
 									<h3 className="wr-section-label">
 										{ __(
 											'Attached videos',
-											'productreels-shoppable-video-reels-for-woocommerce'
+											'productreels'
 										) }
 									</h3>
 									<span className="wr-editor__pane-sub">
 										{ __(
 											'These reels will be shown in this reel widget',
-											'productreels-shoppable-video-reels-for-woocommerce'
+											'productreels'
 										) }
 									</span>
 								</div>
@@ -1047,20 +1047,20 @@ export const WidgetEditor = ( { widgetId, navigate } ) => {
 					className="wr-editor__pane wr-editor__style"
 					aria-label={ __(
 						'Customization',
-						'productreels-shoppable-video-reels-for-woocommerce'
+						'productreels'
 					) }
 				>
 					<header className="wr-editor__pane-head">
 						<h2 className="wr-editor__pane-title">
 							{ __(
 								'Customization',
-								'productreels-shoppable-video-reels-for-woocommerce'
+								'productreels'
 							) }
 						</h2>
 						<p className="wr-editor__pane-sub">
 							{ __(
 								'Customize your widget however you like',
-								'productreels-shoppable-video-reels-for-woocommerce'
+								'productreels'
 							) }
 						</p>
 					</header>
@@ -1083,7 +1083,7 @@ export const WidgetEditor = ( { widgetId, navigate } ) => {
 				>
 					{ __(
 						'Customization',
-						'productreels-shoppable-video-reels-for-woocommerce'
+						'productreels'
 					) }
 				</button>
 			</div>
@@ -1120,14 +1120,14 @@ export const WidgetEditor = ( { widgetId, navigate } ) => {
 				<ConfirmDialog
 					title={ __(
 						'Are you sure you want to delete this widget?',
-						'productreels-shoppable-video-reels-for-woocommerce'
+						'productreels'
 					) }
 					onConfirm={ removeWidget }
 					onClose={ () => setConfirming( false ) }
 				>
 					{ __(
 						'This widget and its click statistics will be removed. Its reels stay in your library and keep working in any other widget.',
-						'productreels-shoppable-video-reels-for-woocommerce'
+						'productreels'
 					) }
 				</ConfirmDialog>
 			) }

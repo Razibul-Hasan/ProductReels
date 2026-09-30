@@ -117,7 +117,7 @@ export const Modal = ( {
 						icon={ IconClose }
 						label={ __(
 							'Close',
-							'productreels-shoppable-video-reels-for-woocommerce'
+							'productreels'
 						) }
 						onClick={ onClose }
 					/>
@@ -134,7 +134,7 @@ export const ConfirmDialog = ( {
 	children,
 	confirmLabel = __(
 		'Delete',
-		'productreels-shoppable-video-reels-for-woocommerce'
+		'productreels'
 	),
 	tone = 'danger',
 	busy = false,
@@ -149,7 +149,7 @@ export const ConfirmDialog = ( {
 				<Button variant="ghost" onClick={ onClose } disabled={ busy }>
 					{ __(
 						'Cancel',
-						'productreels-shoppable-video-reels-for-woocommerce'
+						'productreels'
 					) }
 				</Button>
 				<Button

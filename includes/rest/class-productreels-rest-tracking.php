@@ -154,7 +154,7 @@ class Productreels_Rest_Tracking extends Productreels_Rest_Controller {
 		$summary = $this->widgets->summary( $request->get_param( 'id' ) );
 
 		if ( null === $summary ) {
-			return $this->not_found( __( 'That widget no longer exists.', 'productreels-shoppable-video-reels-for-woocommerce' ) );
+			return $this->not_found( __( 'That widget no longer exists.', 'productreels' ) );
 		}
 
 		$payload = Productreels_Render_Cache::get( $summary['id'], $summary['styles_json'] );
@@ -163,7 +163,7 @@ class Productreels_Rest_Tracking extends Productreels_Rest_Controller {
 			$widget = $this->widgets->find( $summary['id'] );
 
 			if ( null === $widget ) {
-				return $this->not_found( __( 'That widget no longer exists.', 'productreels-shoppable-video-reels-for-woocommerce' ) );
+				return $this->not_found( __( 'That widget no longer exists.', 'productreels' ) );
 			}
 
 			$payload = array(
@@ -193,7 +193,7 @@ class Productreels_Rest_Tracking extends Productreels_Rest_Controller {
 		$reel = $this->reels->find( $request->get_param( 'id' ) );
 
 		if ( null === $reel ) {
-			return $this->not_found( __( 'That reel no longer exists.', 'productreels-shoppable-video-reels-for-woocommerce' ) );
+			return $this->not_found( __( 'That reel no longer exists.', 'productreels' ) );
 		}
 
 		$styles             = Productreels_Settings::default_styles();
@@ -309,7 +309,7 @@ class Productreels_Rest_Tracking extends Productreels_Rest_Controller {
 		$reel_id   = $request->get_param( 'id' );
 
 		if ( ! $this->trackable( $widget_id, $reel_id ) ) {
-			return $this->not_found( __( 'That reel is not part of this widget.', 'productreels-shoppable-video-reels-for-woocommerce' ) );
+			return $this->not_found( __( 'That reel is not part of this widget.', 'productreels' ) );
 		}
 
 		if ( Productreels_Rate_Limiter::is_bot() ) {
@@ -330,7 +330,7 @@ class Productreels_Rest_Tracking extends Productreels_Rest_Controller {
 		if ( ! $allowed ) {
 			return new WP_Error(
 				'productreels_view_rate_limited',
-				__( 'This view has already been counted.', 'productreels-shoppable-video-reels-for-woocommerce' ),
+				__( 'This view has already been counted.', 'productreels' ),
 				array( 'status' => 429 )
 			);
 		}
@@ -375,18 +375,18 @@ class Productreels_Rest_Tracking extends Productreels_Rest_Controller {
 		$btn_uuid  = Productreels_Validator::uuid( $request->get_param( 'btn_uuid' ) );
 
 		if ( '' === $btn_uuid ) {
-			return $this->invalid( 'productreels_click_invalid', __( 'That button could not be identified.', 'productreels-shoppable-video-reels-for-woocommerce' ) );
+			return $this->invalid( 'productreels_click_invalid', __( 'That button could not be identified.', 'productreels' ) );
 		}
 
 		if ( ! $this->trackable( $widget_id, $reel_id ) ) {
-			return $this->not_found( __( 'That reel is not part of this widget.', 'productreels-shoppable-video-reels-for-woocommerce' ) );
+			return $this->not_found( __( 'That reel is not part of this widget.', 'productreels' ) );
 		}
 
 		$reel = $this->reels->find( $reel_id );
 		$link = null === $reel ? null : $this->link_on( $reel, $btn_uuid );
 
 		if ( null === $link ) {
-			return $this->not_found( __( 'That button is not part of this reel.', 'productreels-shoppable-video-reels-for-woocommerce' ) );
+			return $this->not_found( __( 'That button is not part of this reel.', 'productreels' ) );
 		}
 
 		// Counters belong to a widget; a standalone reel has none to report

@@ -7,7 +7,7 @@
 
 import apiFetch from '@wordpress/api-fetch';
 import { useEffect, useRef, useState } from '@wordpress/element';
-import { __, _n, sprintf } from '@wordpress/i18n';
+import { __, _n, _x, sprintf } from '@wordpress/i18n';
 import { boot, reels as reelsApi } from '../api';
 import {
 	IconCamera,
@@ -39,11 +39,11 @@ const SAFARI_SAFE = [ 'video/mp4', 'video/webm' ];
 const SOURCE_LABELS = {
 	native: __(
 		'Media Library',
-		'productreels-shoppable-video-reels-for-woocommerce'
+		'productreels'
 	),
 	hosted: __(
 		'Video URL',
-		'productreels-shoppable-video-reels-for-woocommerce'
+		'productreels'
 	),
 	vimeo: 'Vimeo',
 	youtube: 'YouTube',
@@ -166,7 +166,7 @@ const SOURCES = [
 		value: 'library',
 		label: __(
 			'Choose from Media',
-			'productreels-shoppable-video-reels-for-woocommerce'
+			'productreels'
 		),
 		icon: IconImage,
 	},
@@ -176,7 +176,7 @@ const SOURCES = [
 		value: 'hosted',
 		label: __(
 			'Url',
-			'productreels-shoppable-video-reels-for-woocommerce'
+			'productreels'
 		),
 		icon: IconLink,
 	},
@@ -187,33 +187,33 @@ const URL_SOURCE_COPY = {
 		placeholder: 'https://vimeo.com/123456789',
 		invalid: __(
 			'Enter a valid Vimeo video URL.',
-			'productreels-shoppable-video-reels-for-woocommerce'
+			'productreels'
 		),
 		help: __(
 			'Paste one URL per line to add several at once.',
-			'productreels-shoppable-video-reels-for-woocommerce'
+			'productreels'
 		),
 	},
 	youtube: {
 		placeholder: 'https://www.youtube.com/shorts/…',
 		invalid: __(
 			'Enter a valid YouTube Shorts URL.',
-			'productreels-shoppable-video-reels-for-woocommerce'
+			'productreels'
 		),
 		help: __(
 			'Paste one URL per line to add several at once.',
-			'productreels-shoppable-video-reels-for-woocommerce'
+			'productreels'
 		),
 	},
 	hosted: {
 		placeholder: 'https://cdn.example.com/reel.mp4',
 		invalid: __(
 			'Enter a valid video URL.',
-			'productreels-shoppable-video-reels-for-woocommerce'
+			'productreels'
 		),
 		help: __(
 			'For smooth playback across all browsers, use MP4 video URLs.',
-			'productreels-shoppable-video-reels-for-woocommerce'
+			'productreels'
 		),
 	},
 };
@@ -250,13 +250,13 @@ const openMediaFrame = ( onPicked ) => {
 	const frame = window.wp.media( {
 		title: __(
 			'Add Videos',
-			'productreels-shoppable-video-reels-for-woocommerce'
+			'productreels'
 		),
 		library: { type: 'video' },
 		button: {
 			text: __(
 				'Add Videos',
-				'productreels-shoppable-video-reels-for-woocommerce'
+				'productreels'
 			),
 		},
 		multiple: true,
@@ -293,13 +293,13 @@ const openPosterFrame = ( onPicked ) => {
 	const frame = window.wp.media( {
 		title: __(
 			'Choose from Media',
-			'productreels-shoppable-video-reels-for-woocommerce'
+			'productreels'
 		),
 		library: { type: 'image' },
 		button: {
 			text: __(
 				'Choose from Media',
-				'productreels-shoppable-video-reels-for-woocommerce'
+				'productreels'
 			),
 		},
 		multiple: false,
@@ -331,7 +331,7 @@ const SourcePicker = ( { onPick } ) => {
 			>
 				{ __(
 					'Add Videos',
-					'productreels-shoppable-video-reels-for-woocommerce'
+					'productreels'
 				) }
 				<IconChevronDown size={ 13 } />
 			</Button>
@@ -431,7 +431,7 @@ const UrlSourcePanel = ( { source, onAdd, onClose } ) => {
 					<Button variant="ghost" onClick={ onClose }>
 						{ __(
 							'Cancel',
-							'productreels-shoppable-video-reels-for-woocommerce'
+							'productreels'
 						) }
 					</Button>
 					{ rows.length === 0 ? (
@@ -443,7 +443,7 @@ const UrlSourcePanel = ( { source, onAdd, onClose } ) => {
 						>
 							{ __(
 								'Continue',
-								'productreels-shoppable-video-reels-for-woocommerce'
+								'productreels'
 							) }
 						</Button>
 					) : (
@@ -454,7 +454,7 @@ const UrlSourcePanel = ( { source, onAdd, onClose } ) => {
 						>
 							{ __(
 								'Add Videos',
-								'productreels-shoppable-video-reels-for-woocommerce'
+								'productreels'
 							) }
 						</Button>
 					) }
@@ -466,7 +466,7 @@ const UrlSourcePanel = ( { source, onAdd, onClose } ) => {
 					<label className="wr-field__label" htmlFor="wr-url-source">
 						{ __(
 							'Url',
-							'productreels-shoppable-video-reels-for-woocommerce'
+							'productreels'
 						) }
 					</label>
 					<textarea
@@ -551,7 +551,7 @@ const LinkChip = ( { link, index, onEdit, onRemove, onMove } ) => (
 			{ link.buttonText ||
 				__(
 					'Button Text',
-					'productreels-shoppable-video-reels-for-woocommerce'
+					'productreels'
 				) }
 		</span>
 		{ link.campaignName && (
@@ -562,7 +562,7 @@ const LinkChip = ( { link, index, onEdit, onRemove, onMove } ) => (
 				icon={ IconChevronDown }
 				label={ __(
 					'Move down',
-					'productreels-shoppable-video-reels-for-woocommerce'
+					'productreels'
 				) }
 				size={ 13 }
 				onClick={ () => onMove( index, index + 1 ) }
@@ -572,7 +572,7 @@ const LinkChip = ( { link, index, onEdit, onRemove, onMove } ) => (
 					icon={ IconEdit }
 					label={ __(
 						'Edit',
-						'productreels-shoppable-video-reels-for-woocommerce'
+						'productreels'
 					) }
 					size={ 13 }
 					onClick={ onEdit }
@@ -582,7 +582,7 @@ const LinkChip = ( { link, index, onEdit, onRemove, onMove } ) => (
 				icon={ IconClose }
 				label={ __(
 					'Delete',
-					'productreels-shoppable-video-reels-for-woocommerce'
+					'productreels'
 				) }
 				size={ 13 }
 				onClick={ onRemove }
@@ -744,12 +744,12 @@ export const ReelEditor = ( { reelId, onClose, onSaved } ) => {
 	if ( files.length === 0 ) {
 		blocker = __(
 			'Add at least one video to save this reel.',
-			'productreels-shoppable-video-reels-for-woocommerce'
+			'productreels'
 		);
 	} else if ( links.length === 0 ) {
 		blocker = __(
 			'Add at least one link to save this reel.',
-			'productreels-shoppable-video-reels-for-woocommerce'
+			'productreels'
 		);
 	}
 
@@ -771,7 +771,7 @@ export const ReelEditor = ( { reelId, onClose, onSaved } ) => {
 				toasts.success(
 					__(
 						'Reel created successfully!',
-						'productreels-shoppable-video-reels-for-woocommerce'
+						'productreels'
 					)
 				);
 			} else {
@@ -779,7 +779,7 @@ export const ReelEditor = ( { reelId, onClose, onSaved } ) => {
 				toasts.success(
 					__(
 						'Reel updated successfully!',
-						'productreels-shoppable-video-reels-for-woocommerce'
+						'productreels'
 					)
 				);
 			}
@@ -821,11 +821,11 @@ export const ReelEditor = ( { reelId, onClose, onSaved } ) => {
 					isNew
 						? __(
 								'Add Reel',
-								'productreels-shoppable-video-reels-for-woocommerce'
+								'productreels'
 							)
 						: __(
 								'Edit reel',
-								'productreels-shoppable-video-reels-for-woocommerce'
+								'productreels'
 							)
 				}
 				onClose={ onClose }
@@ -840,9 +840,10 @@ export const ReelEditor = ( { reelId, onClose, onSaved } ) => {
 								? blocker
 								: sprintf(
 										/* translators: 1: number of videos, 2: number of links. */
-										__(
+										_x(
 											'%1$s · %2$s',
-											'productreels-shoppable-video-reels-for-woocommerce'
+											'reel media and link counts',
+											'productreels'
 										),
 										sprintf(
 											/* translators: %d: number of videos. */
@@ -850,7 +851,7 @@ export const ReelEditor = ( { reelId, onClose, onSaved } ) => {
 												'%d video',
 												'%d videos',
 												files.length,
-												'productreels-shoppable-video-reels-for-woocommerce'
+												'productreels'
 											),
 											files.length
 										),
@@ -860,7 +861,7 @@ export const ReelEditor = ( { reelId, onClose, onSaved } ) => {
 												'%d link',
 												'%d links',
 												links.length,
-												'productreels-shoppable-video-reels-for-woocommerce'
+												'productreels'
 											),
 											links.length
 										)
@@ -873,7 +874,7 @@ export const ReelEditor = ( { reelId, onClose, onSaved } ) => {
 						>
 							{ __(
 								'Cancel',
-								'productreels-shoppable-video-reels-for-woocommerce'
+								'productreels'
 							) }
 						</Button>
 						<Button
@@ -885,11 +886,11 @@ export const ReelEditor = ( { reelId, onClose, onSaved } ) => {
 							{ isNew
 								? __(
 										'Save',
-										'productreels-shoppable-video-reels-for-woocommerce'
+										'productreels'
 									)
 								: __(
 										'Update',
-										'productreels-shoppable-video-reels-for-woocommerce'
+										'productreels'
 									) }
 						</Button>
 					</>
@@ -911,7 +912,7 @@ export const ReelEditor = ( { reelId, onClose, onSaved } ) => {
 								<span className="wr-section-label">
 									{ __(
 										'Video',
-										'productreels-shoppable-video-reels-for-woocommerce'
+										'productreels'
 									) }
 								</span>
 								{ files.length > 0 && (
@@ -941,17 +942,17 @@ export const ReelEditor = ( { reelId, onClose, onSaved } ) => {
 											{ uploading
 												? __(
 														'Uploading…',
-														'productreels-shoppable-video-reels-for-woocommerce'
+														'productreels'
 													)
 												: __(
 														'Add Videos',
-														'productreels-shoppable-video-reels-for-woocommerce'
+														'productreels'
 													) }
 										</span>
 										<span className="wr-dropzone__text">
 											{ __(
 												'Click or drag and drop files here',
-												'productreels-shoppable-video-reels-for-woocommerce'
+												'productreels'
 											) }
 										</span>
 									</button>
@@ -961,11 +962,11 @@ export const ReelEditor = ( { reelId, onClose, onSaved } ) => {
 											icon={ IconUpload }
 											label={ __(
 												'Media Library',
-												'productreels-shoppable-video-reels-for-woocommerce'
+												'productreels'
 											) }
 											hint={ __(
 												'MP4 or WebM from this site',
-												'productreels-shoppable-video-reels-for-woocommerce'
+												'productreels'
 											) }
 											onClick={ () =>
 												pickSource( 'library' )
@@ -976,7 +977,7 @@ export const ReelEditor = ( { reelId, onClose, onSaved } ) => {
 											label="Vimeo"
 											hint={ __(
 												'Paste video links',
-												'productreels-shoppable-video-reels-for-woocommerce'
+												'productreels'
 											) }
 											onClick={ () =>
 												pickSource( 'vimeo' )
@@ -987,7 +988,7 @@ export const ReelEditor = ( { reelId, onClose, onSaved } ) => {
 											label="YouTube Shorts"
 											hint={ __(
 												'Paste Shorts links',
-												'productreels-shoppable-video-reels-for-woocommerce'
+												'productreels'
 											) }
 											onClick={ () =>
 												pickSource( 'youtube' )
@@ -997,11 +998,11 @@ export const ReelEditor = ( { reelId, onClose, onSaved } ) => {
 											icon={ IconLink }
 											label={ __(
 												'Video URL',
-												'productreels-shoppable-video-reels-for-woocommerce'
+												'productreels'
 											) }
 											hint={ __(
 												'Hosted MP4 or WebM',
-												'productreels-shoppable-video-reels-for-woocommerce'
+												'productreels'
 											) }
 											onClick={ () =>
 												pickSource( 'hosted' )
@@ -1103,7 +1104,7 @@ export const ReelEditor = ( { reelId, onClose, onSaved } ) => {
 															}
 															label={ __(
 																'Move down',
-																'productreels-shoppable-video-reels-for-woocommerce'
+																'productreels'
 															) }
 															size={ 13 }
 															disabled={
@@ -1121,7 +1122,7 @@ export const ReelEditor = ( { reelId, onClose, onSaved } ) => {
 															icon={ IconTrash }
 															label={ __(
 																'Delete',
-																'productreels-shoppable-video-reels-for-woocommerce'
+																'productreels'
 															) }
 															tone="danger"
 															size={ 14 }
@@ -1164,11 +1165,11 @@ export const ReelEditor = ( { reelId, onClose, onSaved } ) => {
 													{ uploading
 														? __(
 																'Uploading…',
-																'productreels-shoppable-video-reels-for-woocommerce'
+																'productreels'
 															)
 														: __(
 																'Add more videos, or drop them here',
-																'productreels-shoppable-video-reels-for-woocommerce'
+																'productreels'
 															) }
 												</span>
 											</button>
@@ -1182,7 +1183,7 @@ export const ReelEditor = ( { reelId, onClose, onSaved } ) => {
 														'%d video may not play reliably on iOS/macOS Safari. Recommended format: MP4 (H.264/AAC).',
 														'%d video(s) may not play reliably on iOS/macOS Safari. Recommended format: MP4 (H.264/AAC).',
 														risky,
-														'productreels-shoppable-video-reels-for-woocommerce'
+														'productreels'
 													),
 													risky
 												) }
@@ -1197,11 +1198,11 @@ export const ReelEditor = ( { reelId, onClose, onSaved } ) => {
 							<TextField
 								label={ __(
 									'Reel Title',
-									'productreels-shoppable-video-reels-for-woocommerce'
+									'productreels'
 								) }
 								placeholder={ __(
 									'Enter reel title',
-									'productreels-shoppable-video-reels-for-woocommerce'
+									'productreels'
 								) }
 								value={ title }
 								onChange={ setTitle }
@@ -1212,7 +1213,7 @@ export const ReelEditor = ( { reelId, onClose, onSaved } ) => {
 									<span className="wr-section-label">
 										{ __(
 											'Thumbnail',
-											'productreels-shoppable-video-reels-for-woocommerce'
+											'productreels'
 										) }
 									</span>
 									{ thumbnail && (
@@ -1223,7 +1224,7 @@ export const ReelEditor = ( { reelId, onClose, onSaved } ) => {
 										>
 											{ __(
 												'Clear',
-												'productreels-shoppable-video-reels-for-woocommerce'
+												'productreels'
 											) }
 										</Button>
 									) }
@@ -1237,7 +1238,7 @@ export const ReelEditor = ( { reelId, onClose, onSaved } ) => {
 										}` }
 										aria-label={ __(
 											'Choose from Media',
-											'productreels-shoppable-video-reels-for-woocommerce'
+											'productreels'
 										) }
 										onClick={ () =>
 											openPosterFrame( setThumbnail )
@@ -1251,7 +1252,7 @@ export const ReelEditor = ( { reelId, onClose, onSaved } ) => {
 												<span>
 													{ __(
 														'Upload',
-														'productreels-shoppable-video-reels-for-woocommerce'
+														'productreels'
 													) }
 												</span>
 											</>
@@ -1268,7 +1269,7 @@ export const ReelEditor = ( { reelId, onClose, onSaved } ) => {
 										>
 											{ __(
 												'Choose from Media',
-												'productreels-shoppable-video-reels-for-woocommerce'
+												'productreels'
 											) }
 										</Button>
 										<Button
@@ -1281,13 +1282,13 @@ export const ReelEditor = ( { reelId, onClose, onSaved } ) => {
 										>
 											{ __(
 												'Capture frame',
-												'productreels-shoppable-video-reels-for-woocommerce'
+												'productreels'
 											) }
 										</Button>
 										<p className="wr-field__help">
 											{ __(
 												'Shown before the video plays. Without one, the first frame is used.',
-												'productreels-shoppable-video-reels-for-woocommerce'
+												'productreels'
 											) }
 										</p>
 									</div>
@@ -1299,7 +1300,7 @@ export const ReelEditor = ( { reelId, onClose, onSaved } ) => {
 									<span className="wr-section-label">
 										{ __(
 											'Links',
-											'productreels-shoppable-video-reels-for-woocommerce'
+											'productreels'
 										) }
 									</span>
 									{ links.length > 0 && (
@@ -1322,7 +1323,7 @@ export const ReelEditor = ( { reelId, onClose, onSaved } ) => {
 									>
 										{ __(
 											'Add Custom Link',
-											'productreels-shoppable-video-reels-for-woocommerce'
+											'productreels'
 										) }
 										<IconChevronRight
 											size={ 13 }
@@ -1342,7 +1343,7 @@ export const ReelEditor = ( { reelId, onClose, onSaved } ) => {
 									>
 										{ __(
 											'Tag Products',
-											'productreels-shoppable-video-reels-for-woocommerce'
+											'productreels'
 										) }
 										<IconChevronRight
 											size={ 13 }
@@ -1355,7 +1356,7 @@ export const ReelEditor = ( { reelId, onClose, onSaved } ) => {
 									<p className="wr-field__help">
 										{ __(
 											'Product tagging needs WooCommerce to be active.',
-											'productreels-shoppable-video-reels-for-woocommerce'
+											'productreels'
 										) }
 									</p>
 								) }
@@ -1364,7 +1365,7 @@ export const ReelEditor = ( { reelId, onClose, onSaved } ) => {
 									<p className="wr-field__help">
 										{ __(
 											'Add a button or tag a product and it appears over the video in the player.',
-											'productreels-shoppable-video-reels-for-woocommerce'
+											'productreels'
 										) }
 									</p>
 								) : (

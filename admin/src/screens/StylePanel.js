@@ -215,14 +215,14 @@ const ButtonColors = ( { label, styles, set, keys } ) => {
 						value: 'normal',
 						label: __(
 							'Normal',
-							'productreels-shoppable-video-reels-for-woocommerce'
+							'productreels'
 						),
 					},
 					{
 						value: 'hover',
 						label: __(
 							'Hover',
-							'productreels-shoppable-video-reels-for-woocommerce'
+							'productreels'
 						),
 					},
 				] }
@@ -230,7 +230,7 @@ const ButtonColors = ( { label, styles, set, keys } ) => {
 			<ColorPicker
 				label={ __(
 					'Background',
-					'productreels-shoppable-video-reels-for-woocommerce'
+					'productreels'
 				) }
 				value={ styles[ hover ? keys.hoverBg : keys.bg ] }
 				onChange={ ( value ) =>
@@ -240,7 +240,7 @@ const ButtonColors = ( { label, styles, set, keys } ) => {
 			<ColorPicker
 				label={ __(
 					'Icon Color',
-					'productreels-shoppable-video-reels-for-woocommerce'
+					'productreels'
 				) }
 				value={ styles[ hover ? keys.hoverFg : keys.fg ] }
 				onChange={ ( value ) =>
@@ -276,7 +276,7 @@ const LayoutSection = ( { styles, set, setDevice } ) => {
 		<CollapsibleSection
 			title={ __(
 				'Layout',
-				'productreels-shoppable-video-reels-for-woocommerce'
+				'productreels'
 			) }
 			icon={ IconLayout }
 			defaultOpen
@@ -284,7 +284,7 @@ const LayoutSection = ( { styles, set, setDevice } ) => {
 			<VisualOptionCards
 				label={ __(
 					'Template',
-					'productreels-shoppable-video-reels-for-woocommerce'
+					'productreels'
 				) }
 				value={ template }
 				onChange={ ( value ) => set( 'template', value ) }
@@ -293,7 +293,7 @@ const LayoutSection = ( { styles, set, setDevice } ) => {
 						value: 'grid',
 						label: __(
 							'Grid',
-							'productreels-shoppable-video-reels-for-woocommerce'
+							'productreels'
 						),
 						preview: <TemplateArt kind="grid" />,
 					},
@@ -301,7 +301,7 @@ const LayoutSection = ( { styles, set, setDevice } ) => {
 						value: 'carousel',
 						label: __(
 							'Carousel',
-							'productreels-shoppable-video-reels-for-woocommerce'
+							'productreels'
 						),
 						preview: <TemplateArt kind="carousel" />,
 					},
@@ -309,7 +309,7 @@ const LayoutSection = ( { styles, set, setDevice } ) => {
 						value: 'marquee',
 						label: __(
 							'Marquee',
-							'productreels-shoppable-video-reels-for-woocommerce'
+							'productreels'
 						),
 						preview: <TemplateArt kind="marquee" />,
 					},
@@ -317,7 +317,7 @@ const LayoutSection = ( { styles, set, setDevice } ) => {
 						value: 'stacked',
 						label: __(
 							'Stacked',
-							'productreels-shoppable-video-reels-for-woocommerce'
+							'productreels'
 						),
 						preview: <TemplateArt kind="stacked" />,
 					},
@@ -325,7 +325,7 @@ const LayoutSection = ( { styles, set, setDevice } ) => {
 						value: 'popup',
 						label: __(
 							'Popup',
-							'productreels-shoppable-video-reels-for-woocommerce'
+							'productreels'
 						),
 						preview: <TemplateArt kind="popup" />,
 					},
@@ -335,7 +335,7 @@ const LayoutSection = ( { styles, set, setDevice } ) => {
 			<IconToggleGroup
 				label={ __(
 					'Shape',
-					'productreels-shoppable-video-reels-for-woocommerce'
+					'productreels'
 				) }
 				value={ styles.shape }
 				onChange={ ( value ) => set( 'shape', value ) }
@@ -344,7 +344,7 @@ const LayoutSection = ( { styles, set, setDevice } ) => {
 						value: 'rectangle',
 						label: __(
 							'Rectangle',
-							'productreels-shoppable-video-reels-for-woocommerce'
+							'productreels'
 						),
 						icon: IconRectangle,
 					},
@@ -352,7 +352,7 @@ const LayoutSection = ( { styles, set, setDevice } ) => {
 						value: 'circle',
 						label: __(
 							'Circle',
-							'productreels-shoppable-video-reels-for-woocommerce'
+							'productreels'
 						),
 						icon: IconCircle,
 					},
@@ -363,11 +363,11 @@ const LayoutSection = ( { styles, set, setDevice } ) => {
 				<IconToggleGroup
 					label={ __(
 						'Alignment',
-						'productreels-shoppable-video-reels-for-woocommerce'
+						'productreels'
 					) }
 					help={ __(
 						'Where the reels sit when they do not fill the width.',
-						'productreels-shoppable-video-reels-for-woocommerce'
+						'productreels'
 					) }
 					value={ styles.alignment }
 					onChange={ ( value ) => set( 'alignment', value ) }
@@ -376,7 +376,7 @@ const LayoutSection = ( { styles, set, setDevice } ) => {
 							value: 'left',
 							label: __(
 								'Left',
-								'productreels-shoppable-video-reels-for-woocommerce'
+								'productreels'
 							),
 							icon: IconAlignLeft,
 						},
@@ -384,7 +384,7 @@ const LayoutSection = ( { styles, set, setDevice } ) => {
 							value: 'center',
 							label: __(
 								'Center',
-								'productreels-shoppable-video-reels-for-woocommerce'
+								'productreels'
 							),
 							icon: IconAlignCenter,
 						},
@@ -392,7 +392,7 @@ const LayoutSection = ( { styles, set, setDevice } ) => {
 							value: 'right',
 							label: __(
 								'Right',
-								'productreels-shoppable-video-reels-for-woocommerce'
+								'productreels'
 							),
 							icon: IconAlignRight,
 						},
@@ -403,7 +403,7 @@ const LayoutSection = ( { styles, set, setDevice } ) => {
 			<ResponsiveSlider
 				label={ __(
 					'Size',
-					'productreels-shoppable-video-reels-for-woocommerce'
+					'productreels'
 				) }
 				min={ 80 }
 				max={ 400 }
@@ -419,7 +419,7 @@ const LayoutSection = ( { styles, set, setDevice } ) => {
 			<ResponsiveSlider
 				label={ __(
 					'Gap',
-					'productreels-shoppable-video-reels-for-woocommerce'
+					'productreels'
 				) }
 				min={ 0 }
 				max={ 64 }
@@ -435,7 +435,7 @@ const LayoutSection = ( { styles, set, setDevice } ) => {
 			<Slider
 				label={ __(
 					'Top/bottom spacing',
-					'productreels-shoppable-video-reels-for-woocommerce'
+					'productreels'
 				) }
 				min={ 0 }
 				max={ 120 }
@@ -448,11 +448,11 @@ const LayoutSection = ( { styles, set, setDevice } ) => {
 				<Select
 					label={ __(
 						'Button position',
-						'productreels-shoppable-video-reels-for-woocommerce'
+						'productreels'
 					) }
 					help={ __(
 						'Where the previous and next buttons sit on the rail.',
-						'productreels-shoppable-video-reels-for-woocommerce'
+						'productreels'
 					) }
 					value={ styles.carouselBtnPosition }
 					onChange={ ( value ) =>
@@ -463,14 +463,14 @@ const LayoutSection = ( { styles, set, setDevice } ) => {
 							value: 'inside',
 							label: __(
 								'Inside',
-								'productreels-shoppable-video-reels-for-woocommerce'
+								'productreels'
 							),
 						},
 						{
 							value: 'outside',
 							label: __(
 								'Outside',
-								'productreels-shoppable-video-reels-for-woocommerce'
+								'productreels'
 							),
 						},
 					] }
@@ -482,13 +482,13 @@ const LayoutSection = ( { styles, set, setDevice } ) => {
 					<Group>
 						{ __(
 							'Marquee',
-							'productreels-shoppable-video-reels-for-woocommerce'
+							'productreels'
 						) }
 					</Group>
 					<Slider
 						label={ __(
 							'Speed',
-							'productreels-shoppable-video-reels-for-woocommerce'
+							'productreels'
 						) }
 						min={ 5 }
 						max={ 200 }
@@ -500,7 +500,7 @@ const LayoutSection = ( { styles, set, setDevice } ) => {
 					<IconToggleGroup
 						label={ __(
 							'Direction',
-							'productreels-shoppable-video-reels-for-woocommerce'
+							'productreels'
 						) }
 						value={ styles.marquee.direction }
 						onChange={ ( value ) =>
@@ -511,14 +511,14 @@ const LayoutSection = ( { styles, set, setDevice } ) => {
 								value: 'left',
 								label: __(
 									'Left',
-									'productreels-shoppable-video-reels-for-woocommerce'
+									'productreels'
 								),
 							},
 							{
 								value: 'right',
 								label: __(
 									'Right',
-									'productreels-shoppable-video-reels-for-woocommerce'
+									'productreels'
 								),
 							},
 						] }
@@ -526,7 +526,7 @@ const LayoutSection = ( { styles, set, setDevice } ) => {
 					<Switch
 						label={ __(
 							'Pause on hover',
-							'productreels-shoppable-video-reels-for-woocommerce'
+							'productreels'
 						) }
 						checked={ styles.marquee.pauseOnHover }
 						onChange={ ( value ) =>
@@ -541,13 +541,13 @@ const LayoutSection = ( { styles, set, setDevice } ) => {
 					<Group>
 						{ __(
 							'Stack',
-							'productreels-shoppable-video-reels-for-woocommerce'
+							'productreels'
 						) }
 					</Group>
 					<Slider
 						label={ __(
 							'Depth',
-							'productreels-shoppable-video-reels-for-woocommerce'
+							'productreels'
 						) }
 						min={ 2 }
 						max={ 5 }
@@ -559,7 +559,7 @@ const LayoutSection = ( { styles, set, setDevice } ) => {
 					<Slider
 						label={ __(
 							'Offset',
-							'productreels-shoppable-video-reels-for-woocommerce'
+							'productreels'
 						) }
 						min={ 0 }
 						max={ 80 }
@@ -570,7 +570,7 @@ const LayoutSection = ( { styles, set, setDevice } ) => {
 					<Slider
 						label={ __(
 							'Scale',
-							'productreels-shoppable-video-reels-for-woocommerce'
+							'productreels'
 						) }
 						min={ 0.5 }
 						max={ 1 }
@@ -588,13 +588,13 @@ const LayoutSection = ( { styles, set, setDevice } ) => {
 					<Group>
 						{ __(
 							'Popup',
-							'productreels-shoppable-video-reels-for-woocommerce'
+							'productreels'
 						) }
 					</Group>
 					<Select
 						label={ __(
 							'Trigger',
-							'productreels-shoppable-video-reels-for-woocommerce'
+							'productreels'
 						) }
 						value={ styles.popup.trigger }
 						onChange={ ( value ) => set( 'popup.trigger', value ) }
@@ -603,21 +603,21 @@ const LayoutSection = ( { styles, set, setDevice } ) => {
 								value: 'load',
 								label: __(
 									'Initial Page Load',
-									'productreels-shoppable-video-reels-for-woocommerce'
+									'productreels'
 								),
 							},
 							{
 								value: 'delay',
 								label: __(
 									'After Some Time',
-									'productreels-shoppable-video-reels-for-woocommerce'
+									'productreels'
 								),
 							},
 							{
 								value: 'scroll',
 								label: __(
 									'After Scrolling Distance',
-									'productreels-shoppable-video-reels-for-woocommerce'
+									'productreels'
 								),
 							},
 						] }
@@ -626,7 +626,7 @@ const LayoutSection = ( { styles, set, setDevice } ) => {
 						<Slider
 							label={ __(
 								'Delay',
-								'productreels-shoppable-video-reels-for-woocommerce'
+								'productreels'
 							) }
 							min={ 0 }
 							max={ 60 }
@@ -642,7 +642,7 @@ const LayoutSection = ( { styles, set, setDevice } ) => {
 						<Slider
 							label={ __(
 								'Scroll',
-								'productreels-shoppable-video-reels-for-woocommerce'
+								'productreels'
 							) }
 							min={ 0 }
 							max={ 100 }
@@ -657,7 +657,7 @@ const LayoutSection = ( { styles, set, setDevice } ) => {
 					<Select
 						label={ __(
 							'Position',
-							'productreels-shoppable-video-reels-for-woocommerce'
+							'productreels'
 						) }
 						value={ styles.popup.position }
 						onChange={ ( value ) => set( 'popup.position', value ) }
@@ -666,28 +666,28 @@ const LayoutSection = ( { styles, set, setDevice } ) => {
 								value: 'bottom-right',
 								label: __(
 									'Bottom right',
-									'productreels-shoppable-video-reels-for-woocommerce'
+									'productreels'
 								),
 							},
 							{
 								value: 'bottom-left',
 								label: __(
 									'Bottom left',
-									'productreels-shoppable-video-reels-for-woocommerce'
+									'productreels'
 								),
 							},
 							{
 								value: 'top-right',
 								label: __(
 									'Top right',
-									'productreels-shoppable-video-reels-for-woocommerce'
+									'productreels'
 								),
 							},
 							{
 								value: 'top-left',
 								label: __(
 									'Top left',
-									'productreels-shoppable-video-reels-for-woocommerce'
+									'productreels'
 								),
 							},
 						] }
@@ -695,7 +695,7 @@ const LayoutSection = ( { styles, set, setDevice } ) => {
 					<Switch
 						label={ __(
 							'Show on mobile',
-							'productreels-shoppable-video-reels-for-woocommerce'
+							'productreels'
 						) }
 						checked={ styles.popup.showOnMobile }
 						onChange={ ( value ) =>
@@ -705,11 +705,11 @@ const LayoutSection = ( { styles, set, setDevice } ) => {
 					<Select
 						label={ __(
 							'After closing, show again',
-							'productreels-shoppable-video-reels-for-woocommerce'
+							'productreels'
 						) }
 						help={ __(
 							'How long a visitor who closes the popup goes without seeing it.',
-							'productreels-shoppable-video-reels-for-woocommerce'
+							'productreels'
 						) }
 						value={ styles.popup.dismissFor || 'session' }
 						onChange={ ( value ) =>
@@ -720,35 +720,35 @@ const LayoutSection = ( { styles, set, setDevice } ) => {
 								value: 'page',
 								label: __(
 									'On the next page',
-									'productreels-shoppable-video-reels-for-woocommerce'
+									'productreels'
 								),
 							},
 							{
 								value: 'session',
 								label: __(
 									'On their next visit',
-									'productreels-shoppable-video-reels-for-woocommerce'
+									'productreels'
 								),
 							},
 							{
 								value: 'day',
 								label: __(
 									'After 1 day',
-									'productreels-shoppable-video-reels-for-woocommerce'
+									'productreels'
 								),
 							},
 							{
 								value: 'week',
 								label: __(
 									'After 7 days',
-									'productreels-shoppable-video-reels-for-woocommerce'
+									'productreels'
 								),
 							},
 							{
 								value: 'month',
 								label: __(
 									'After 30 days',
-									'productreels-shoppable-video-reels-for-woocommerce'
+									'productreels'
 								),
 							},
 						] }
@@ -779,7 +779,7 @@ const ThumbnailSection = ( { styles, set } ) => {
 		<ColorPicker
 			label={ __(
 				'Title Color',
-				'productreels-shoppable-video-reels-for-woocommerce'
+				'productreels'
 			) }
 			value={ styles.titleColor }
 			onChange={ ( value ) => set( 'titleColor', value ) }
@@ -790,7 +790,7 @@ const ThumbnailSection = ( { styles, set } ) => {
 		<CollapsibleSection
 			title={ __(
 				'Thumbnail',
-				'productreels-shoppable-video-reels-for-woocommerce'
+				'productreels'
 			) }
 			icon={ IconImage }
 		>
@@ -799,11 +799,11 @@ const ThumbnailSection = ( { styles, set } ) => {
 					<Switch
 						label={ __(
 							'Reel Title',
-							'productreels-shoppable-video-reels-for-woocommerce'
+							'productreels'
 						) }
 						help={ __(
 							'Show the reel title under the circle.',
-							'productreels-shoppable-video-reels-for-woocommerce'
+							'productreels'
 						) }
 						checked={ circleTitle }
 						onChange={ ( value ) =>
@@ -818,7 +818,7 @@ const ThumbnailSection = ( { styles, set } ) => {
 				<VisualOptionCards
 					label={ __(
 						'Appearance',
-						'productreels-shoppable-video-reels-for-woocommerce'
+						'productreels'
 					) }
 					value={ styles.appearance }
 					onChange={ ( value ) => set( 'appearance', value ) }
@@ -827,7 +827,7 @@ const ThumbnailSection = ( { styles, set } ) => {
 							value: 'overlay',
 							label: __(
 								'Overlay',
-								'productreels-shoppable-video-reels-for-woocommerce'
+								'productreels'
 							),
 							preview: <AppearanceArt kind="overlay" />,
 						},
@@ -835,7 +835,7 @@ const ThumbnailSection = ( { styles, set } ) => {
 							value: 'title',
 							label: __(
 								'Only Title',
-								'productreels-shoppable-video-reels-for-woocommerce'
+								'productreels'
 							),
 							preview: <AppearanceArt kind="title" />,
 						},
@@ -843,7 +843,7 @@ const ThumbnailSection = ( { styles, set } ) => {
 							value: 'none',
 							label: __(
 								'None',
-								'productreels-shoppable-video-reels-for-woocommerce'
+								'productreels'
 							),
 							preview: <AppearanceArt kind="none" />,
 						},
@@ -858,11 +858,11 @@ const ThumbnailSection = ( { styles, set } ) => {
 					<Switch
 						label={ __(
 							'Reel Title',
-							'productreels-shoppable-video-reels-for-woocommerce'
+							'productreels'
 						) }
 						help={ __(
 							'Show the reel title on the thumbnail. A reel tagged with a product shows the product card instead.',
-							'productreels-shoppable-video-reels-for-woocommerce'
+							'productreels'
 						) }
 						checked={ styles.showFallbackTitle }
 						onChange={ ( value ) =>
@@ -872,7 +872,7 @@ const ThumbnailSection = ( { styles, set } ) => {
 					<ColorPicker
 						label={ __(
 							'Title Color',
-							'productreels-shoppable-video-reels-for-woocommerce'
+							'productreels'
 						) }
 						value={ styles.captionColor }
 						onChange={ ( value ) => set( 'captionColor', value ) }
@@ -880,11 +880,11 @@ const ThumbnailSection = ( { styles, set } ) => {
 					<ColorPicker
 						label={ __(
 							'Overlay Color',
-							'productreels-shoppable-video-reels-for-woocommerce'
+							'productreels'
 						) }
 						help={ __(
 							'Fades to transparent towards the top. Supports transparency.',
-							'productreels-shoppable-video-reels-for-woocommerce'
+							'productreels'
 						) }
 						value={ styles.overlayColor }
 						onChange={ ( value ) => set( 'overlayColor', value ) }
@@ -895,11 +895,11 @@ const ThumbnailSection = ( { styles, set } ) => {
 			<Select
 				label={ __(
 					'Preview',
-					'productreels-shoppable-video-reels-for-woocommerce'
+					'productreels'
 				) }
 				help={ __(
 					'Play the video silently on the thumbnail itself.',
-					'productreels-shoppable-video-reels-for-woocommerce'
+					'productreels'
 				) }
 				value={ preview }
 				onChange={ setPreview }
@@ -908,21 +908,21 @@ const ThumbnailSection = ( { styles, set } ) => {
 						value: 'click',
 						label: __(
 							'Off — open on click',
-							'productreels-shoppable-video-reels-for-woocommerce'
+							'productreels'
 						),
 					},
 					{
 						value: 'hover',
 						label: __(
 							'Play on hover',
-							'productreels-shoppable-video-reels-for-woocommerce'
+							'productreels'
 						),
 					},
 					{
 						value: 'autoplay',
 						label: __(
 							'Autoplay when visible',
-							'productreels-shoppable-video-reels-for-woocommerce'
+							'productreels'
 						),
 					},
 				] }
@@ -931,7 +931,7 @@ const ThumbnailSection = ( { styles, set } ) => {
 			<Select
 				label={ __(
 					'Hover effect',
-					'productreels-shoppable-video-reels-for-woocommerce'
+					'productreels'
 				) }
 				value={ styles.hoverEffect }
 				onChange={ ( value ) => set( 'hoverEffect', value ) }
@@ -940,28 +940,28 @@ const ThumbnailSection = ( { styles, set } ) => {
 						value: 'none',
 						label: __(
 							'None',
-							'productreels-shoppable-video-reels-for-woocommerce'
+							'productreels'
 						),
 					},
 					{
 						value: 'zoom-in',
 						label: __(
 							'Zoom in',
-							'productreels-shoppable-video-reels-for-woocommerce'
+							'productreels'
 						),
 					},
 					{
 						value: 'zoom-out',
 						label: __(
 							'Zoom out',
-							'productreels-shoppable-video-reels-for-woocommerce'
+							'productreels'
 						),
 					},
 					{
 						value: 'lift',
 						label: __(
 							'Lift',
-							'productreels-shoppable-video-reels-for-woocommerce'
+							'productreels'
 						),
 					},
 				] }
@@ -970,13 +970,13 @@ const ThumbnailSection = ( { styles, set } ) => {
 			<Group>
 				{ __(
 					'Play button',
-					'productreels-shoppable-video-reels-for-woocommerce'
+					'productreels'
 				) }
 			</Group>
 			<Switch
 				label={ __(
 					'Show Play Button',
-					'productreels-shoppable-video-reels-for-woocommerce'
+					'productreels'
 				) }
 				checked={ styles.showPlayButton }
 				onChange={ ( value ) => set( 'showPlayButton', value ) }
@@ -987,7 +987,7 @@ const ThumbnailSection = ( { styles, set } ) => {
 					<Slider
 						label={ __(
 							'Play Icon Size',
-							'productreels-shoppable-video-reels-for-woocommerce'
+							'productreels'
 						) }
 						min={ 16 }
 						max={ 120 }
@@ -998,7 +998,7 @@ const ThumbnailSection = ( { styles, set } ) => {
 					<ColorPicker
 						label={ __(
 							'Play Icon Color',
-							'productreels-shoppable-video-reels-for-woocommerce'
+							'productreels'
 						) }
 						value={ styles.playIconColor }
 						onChange={ ( value ) => set( 'playIconColor', value ) }
@@ -1009,13 +1009,13 @@ const ThumbnailSection = ( { styles, set } ) => {
 			<Group>
 				{ __(
 					'View count',
-					'productreels-shoppable-video-reels-for-woocommerce'
+					'productreels'
 				) }
 			</Group>
 			<Switch
 				label={ __(
 					'Show Views',
-					'productreels-shoppable-video-reels-for-woocommerce'
+					'productreels'
 				) }
 				checked={ styles.showViews }
 				onChange={ ( value ) => set( 'showViews', value ) }
@@ -1026,7 +1026,7 @@ const ThumbnailSection = ( { styles, set } ) => {
 					<ColorPicker
 						label={ __(
 							'Background',
-							'productreels-shoppable-video-reels-for-woocommerce'
+							'productreels'
 						) }
 						value={ styles.viewsBgColor }
 						onChange={ ( value ) => set( 'viewsBgColor', value ) }
@@ -1034,7 +1034,7 @@ const ThumbnailSection = ( { styles, set } ) => {
 					<ColorPicker
 						label={ __(
 							'Text & Icon Color',
-							'productreels-shoppable-video-reels-for-woocommerce'
+							'productreels'
 						) }
 						value={ styles.viewsTextIconColor }
 						onChange={ ( value ) =>
@@ -1054,14 +1054,14 @@ const StylesSection = ( { styles, set, setDevice } ) => {
 		<CollapsibleSection
 			title={ __(
 				'Styles',
-				'productreels-shoppable-video-reels-for-woocommerce'
+				'productreels'
 			) }
 			icon={ IconPalette }
 		>
 			<Slider
 				label={ __(
 					'Border Width',
-					'productreels-shoppable-video-reels-for-woocommerce'
+					'productreels'
 				) }
 				min={ 0 }
 				max={ 20 }
@@ -1073,7 +1073,7 @@ const StylesSection = ( { styles, set, setDevice } ) => {
 			<ColorPicker
 				label={ __(
 					'Border Color',
-					'productreels-shoppable-video-reels-for-woocommerce'
+					'productreels'
 				) }
 				value={ styles.border.color }
 				onChange={ ( value ) => set( 'border.color', value ) }
@@ -1082,7 +1082,7 @@ const StylesSection = ( { styles, set, setDevice } ) => {
 			<ResponsiveSlider
 				label={ __(
 					'Border Radius',
-					'productreels-shoppable-video-reels-for-woocommerce'
+					'productreels'
 				) }
 				min={ 0 }
 				max={ 100 }
@@ -1108,7 +1108,7 @@ const StylesSection = ( { styles, set, setDevice } ) => {
 			<Slider
 				label={ __(
 					'Shadow',
-					'productreels-shoppable-video-reels-for-woocommerce'
+					'productreels'
 				) }
 				min={ 0 }
 				max={ 100 }
@@ -1120,11 +1120,11 @@ const StylesSection = ( { styles, set, setDevice } ) => {
 			<ColorPicker
 				label={ __(
 					'Background Color',
-					'productreels-shoppable-video-reels-for-woocommerce'
+					'productreels'
 				) }
 				help={ __(
 					'Supports transparency.',
-					'productreels-shoppable-video-reels-for-woocommerce'
+					'productreels'
 				) }
 				value={ styles.cardBgColor }
 				onChange={ ( value ) => set( 'cardBgColor', value ) }
@@ -1135,13 +1135,13 @@ const StylesSection = ( { styles, set, setDevice } ) => {
 					<Group>
 						{ __(
 							'Carousel buttons',
-							'productreels-shoppable-video-reels-for-woocommerce'
+							'productreels'
 						) }
 					</Group>
 					<Slider
 						label={ __(
 							'Border Radius',
-							'productreels-shoppable-video-reels-for-woocommerce'
+							'productreels'
 						) }
 						min={ 0 }
 						max={ 100 }
@@ -1154,7 +1154,7 @@ const StylesSection = ( { styles, set, setDevice } ) => {
 					<ButtonColors
 						label={ __(
 							'Button Colors',
-							'productreels-shoppable-video-reels-for-woocommerce'
+							'productreels'
 						) }
 						styles={ styles }
 						set={ set }
@@ -1175,18 +1175,18 @@ const AdvancedSection = ( { styles, set } ) => (
 	<CollapsibleSection
 		title={ __(
 			'Advanced',
-			'productreels-shoppable-video-reels-for-woocommerce'
+			'productreels'
 		) }
 		icon={ IconSliders }
 	>
 		<Switch
 			label={ __(
 				'Lazy load videos',
-				'productreels-shoppable-video-reels-for-woocommerce'
+				'productreels'
 			) }
 			help={ __(
 				'Defers video loading to reduce initial page weight.',
-				'productreels-shoppable-video-reels-for-woocommerce'
+				'productreels'
 			) }
 			checked={ styles.lazyLoad }
 			onChange={ ( value ) => set( 'lazyLoad', value ) }
@@ -1195,11 +1195,11 @@ const AdvancedSection = ( { styles, set } ) => (
 		<TextField
 			label={ __(
 				'Custom class',
-				'productreels-shoppable-video-reels-for-woocommerce'
+				'productreels'
 			) }
 			help={ __(
 				'Added to the widget wrapper, for your own CSS. Separate several with spaces.',
-				'productreels-shoppable-video-reels-for-woocommerce'
+				'productreels'
 			) }
 			value={ styles.customClass || '' }
 			placeholder="my-reels"
@@ -1214,7 +1214,7 @@ const PlayerAppearanceSection = ( { styles, set } ) => (
 	<CollapsibleSection
 		title={ __(
 			'Appearance',
-			'productreels-shoppable-video-reels-for-woocommerce'
+			'productreels'
 		) }
 		icon={ IconImage }
 		defaultOpen
@@ -1222,7 +1222,7 @@ const PlayerAppearanceSection = ( { styles, set } ) => (
 		<VisualOptionCards
 			label={ __(
 				'Appearance',
-				'productreels-shoppable-video-reels-for-woocommerce'
+				'productreels'
 			) }
 			value={ styles.playerAppearance }
 			onChange={ ( value ) => set( 'playerAppearance', value ) }
@@ -1231,7 +1231,7 @@ const PlayerAppearanceSection = ( { styles, set } ) => (
 					value: 'overlay',
 					label: __(
 						'Overlay',
-						'productreels-shoppable-video-reels-for-woocommerce'
+						'productreels'
 					),
 					preview: <AppearanceArt kind="overlay" />,
 				},
@@ -1239,7 +1239,7 @@ const PlayerAppearanceSection = ( { styles, set } ) => (
 					value: 'title',
 					label: __(
 						'Only Title',
-						'productreels-shoppable-video-reels-for-woocommerce'
+						'productreels'
 					),
 					preview: <AppearanceArt kind="title" />,
 				},
@@ -1247,7 +1247,7 @@ const PlayerAppearanceSection = ( { styles, set } ) => (
 					value: 'none',
 					label: __(
 						'None',
-						'productreels-shoppable-video-reels-for-woocommerce'
+						'productreels'
 					),
 					preview: <AppearanceArt kind="none" />,
 				},
@@ -1258,11 +1258,11 @@ const PlayerAppearanceSection = ( { styles, set } ) => (
 			<Switch
 				label={ __(
 					'Reel Title',
-					'productreels-shoppable-video-reels-for-woocommerce'
+					'productreels'
 				) }
 				help={ __(
 					'Show the reel title when it has no button to show instead.',
-					'productreels-shoppable-video-reels-for-woocommerce'
+					'productreels'
 				) }
 				checked={ styles.showPlayerFallbackTitle }
 				onChange={ ( value ) =>
@@ -1277,18 +1277,18 @@ const PlaybackSection = ( { styles, set } ) => (
 	<CollapsibleSection
 		title={ __(
 			'Playback',
-			'productreels-shoppable-video-reels-for-woocommerce'
+			'productreels'
 		) }
 		icon={ IconFilm }
 	>
 		<IconToggleGroup
 			label={ __(
 				'Slide direction',
-				'productreels-shoppable-video-reels-for-woocommerce'
+				'productreels'
 			) }
 			help={ __(
 				'How visitors move between reels: sideways, or up and down like a feed.',
-				'productreels-shoppable-video-reels-for-woocommerce'
+				'productreels'
 			) }
 			value={ styles.slideDirection }
 			onChange={ ( value ) => set( 'slideDirection', value ) }
@@ -1297,14 +1297,14 @@ const PlaybackSection = ( { styles, set } ) => (
 					value: 'horizontal',
 					label: __(
 						'Horizontal',
-						'productreels-shoppable-video-reels-for-woocommerce'
+						'productreels'
 					),
 				},
 				{
 					value: 'vertical',
 					label: __(
 						'Vertical',
-						'productreels-shoppable-video-reels-for-woocommerce'
+						'productreels'
 					),
 				},
 			] }
@@ -1313,11 +1313,11 @@ const PlaybackSection = ( { styles, set } ) => (
 		<Switch
 			label={ __(
 				'Play with sound',
-				'productreels-shoppable-video-reels-for-woocommerce'
+				'productreels'
 			) }
 			help={ __(
 				'Start with sound on. Visitors can still mute or unmute anytime while watching.',
-				'productreels-shoppable-video-reels-for-woocommerce'
+				'productreels'
 			) }
 			checked={ styles.playWithSound }
 			onChange={ ( value ) => set( 'playWithSound', value ) }
@@ -1326,11 +1326,11 @@ const PlaybackSection = ( { styles, set } ) => (
 		<Switch
 			label={ __(
 				'Loop',
-				'productreels-shoppable-video-reels-for-woocommerce'
+				'productreels'
 			) }
 			help={ __(
 				'Replay the reel when it ends instead of moving to the next one.',
-				'productreels-shoppable-video-reels-for-woocommerce'
+				'productreels'
 			) }
 			checked={ styles.loop }
 			onChange={ ( value ) => set( 'loop', value ) }
@@ -1339,7 +1339,7 @@ const PlaybackSection = ( { styles, set } ) => (
 		<Switch
 			label={ __(
 				'Show seekbar',
-				'productreels-shoppable-video-reels-for-woocommerce'
+				'productreels'
 			) }
 			checked={ styles.showSeekbar }
 			onChange={ ( value ) => set( 'showSeekbar', value ) }
@@ -1348,7 +1348,7 @@ const PlaybackSection = ( { styles, set } ) => (
 		<Switch
 			label={ __(
 				'Show volume control',
-				'productreels-shoppable-video-reels-for-woocommerce'
+				'productreels'
 			) }
 			checked={ styles.showVolumeControl }
 			onChange={ ( value ) => set( 'showVolumeControl', value ) }
@@ -1360,14 +1360,14 @@ const NavButtonsSection = ( { styles, set } ) => (
 	<CollapsibleSection
 		title={ __(
 			'Navigation Buttons',
-			'productreels-shoppable-video-reels-for-woocommerce'
+			'productreels'
 		) }
 		icon={ IconChevronRight }
 	>
 		<ButtonColors
 			label={ __(
 				'Button Colors',
-				'productreels-shoppable-video-reels-for-woocommerce'
+				'productreels'
 			) }
 			styles={ styles }
 			set={ set }
@@ -1381,7 +1381,7 @@ const NavButtonsSection = ( { styles, set } ) => (
 		<Slider
 			label={ __(
 				'Border Radius',
-				'productreels-shoppable-video-reels-for-woocommerce'
+				'productreels'
 			) }
 			min={ 0 }
 			max={ 100 }
@@ -1396,18 +1396,18 @@ const ProductCardSection = ( { styles, set } ) => (
 	<CollapsibleSection
 		title={ __(
 			'Product Card',
-			'productreels-shoppable-video-reels-for-woocommerce'
+			'productreels'
 		) }
 		icon={ IconCart }
 	>
 		<VisualOptionCards
 			label={ __(
 				'Style',
-				'productreels-shoppable-video-reels-for-woocommerce'
+				'productreels'
 			) }
 			help={ __(
 				'Used on the thumbnail and in the player.',
-				'productreels-shoppable-video-reels-for-woocommerce'
+				'productreels'
 			) }
 			value={ styles.productCardStyle }
 			onChange={ ( value ) => set( 'productCardStyle', value ) }
@@ -1416,11 +1416,11 @@ const ProductCardSection = ( { styles, set } ) => (
 					value: 'modern',
 					label: __(
 						'Modern',
-						'productreels-shoppable-video-reels-for-woocommerce'
+						'productreels'
 					),
 					help: __(
 						'Image, name and price on one compact row.',
-						'productreels-shoppable-video-reels-for-woocommerce'
+						'productreels'
 					),
 					preview: <AppearanceArt kind="overlay" />,
 				},
@@ -1428,11 +1428,11 @@ const ProductCardSection = ( { styles, set } ) => (
 					value: 'classic',
 					label: __(
 						'Classic',
-						'productreels-shoppable-video-reels-for-woocommerce'
+						'productreels'
 					),
 					help: __(
 						'Larger card with the image above the details.',
-						'productreels-shoppable-video-reels-for-woocommerce'
+						'productreels'
 					),
 					preview: <AppearanceArt kind="title" />,
 				},
@@ -1442,7 +1442,7 @@ const ProductCardSection = ( { styles, set } ) => (
 		<Switch
 			label={ __(
 				'Show Ratings',
-				'productreels-shoppable-video-reels-for-woocommerce'
+				'productreels'
 			) }
 			checked={ styles.showRatings }
 			onChange={ ( value ) => set( 'showRatings', value ) }
@@ -1453,11 +1453,11 @@ const ProductCardSection = ( { styles, set } ) => (
 		<Switch
 			label={ __(
 				'Show Add to Cart',
-				'productreels-shoppable-video-reels-for-woocommerce'
+				'productreels'
 			) }
 			help={ __(
 				'Adds the product and keeps the shopper on the page.',
-				'productreels-shoppable-video-reels-for-woocommerce'
+				'productreels'
 			) }
 			checked={ styles.showAddToCart }
 			onChange={ ( value ) =>
@@ -1473,7 +1473,7 @@ const ProductCardSection = ( { styles, set } ) => (
 			<TextField
 				label={ __(
 					'Button Text',
-					'productreels-shoppable-video-reels-for-woocommerce'
+					'productreels'
 				) }
 				value={ styles.addToCartText }
 				onChange={ ( value ) => set( 'addToCartText', value ) }
@@ -1483,11 +1483,11 @@ const ProductCardSection = ( { styles, set } ) => (
 		<Switch
 			label={ __(
 				'Direct Checkout',
-				'productreels-shoppable-video-reels-for-woocommerce'
+				'productreels'
 			) }
 			help={ __(
 				'Adds the product and sends the shopper straight to checkout. Turning this on turns Add to Cart off.',
-				'productreels-shoppable-video-reels-for-woocommerce'
+				'productreels'
 			) }
 			checked={ styles.directCheckout }
 			onChange={ ( value ) =>
@@ -1503,7 +1503,7 @@ const ProductCardSection = ( { styles, set } ) => (
 			<TextField
 				label={ __(
 					'Button Text',
-					'productreels-shoppable-video-reels-for-woocommerce'
+					'productreels'
 				) }
 				value={ styles.directCheckoutText }
 				onChange={ ( value ) => set( 'directCheckoutText', value ) }
@@ -1521,22 +1521,22 @@ export const StylePanel = ( { styles, set, setDevice } ) => {
 			value: 'thumbnail',
 			label: __(
 				'Thumbnail',
-				'productreels-shoppable-video-reels-for-woocommerce'
+				'productreels'
 			),
 			hint: __(
 				'What visitors see on the page.',
-				'productreels-shoppable-video-reels-for-woocommerce'
+				'productreels'
 			),
 		},
 		{
 			value: 'player',
 			label: __(
 				'Player',
-				'productreels-shoppable-video-reels-for-woocommerce'
+				'productreels'
 			),
 			hint: __(
 				'What opens when a reel is clicked.',
-				'productreels-shoppable-video-reels-for-woocommerce'
+				'productreels'
 			),
 		},
 	];
@@ -1549,7 +1549,7 @@ export const StylePanel = ( { styles, set, setDevice } ) => {
 				<Tabs
 					label={ __(
 						'Customize',
-						'productreels-shoppable-video-reels-for-woocommerce'
+						'productreels'
 					) }
 					value={ tab }
 					onChange={ setTab }

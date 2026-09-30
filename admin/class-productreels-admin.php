@@ -87,8 +87,8 @@ class Productreels_Admin {
 	 */
 	public function register_menu() {
 		add_menu_page(
-			__( 'ProductReels', 'productreels-shoppable-video-reels-for-woocommerce' ),
-			__( 'ProductReels', 'productreels-shoppable-video-reels-for-woocommerce' ),
+			__( 'ProductReels', 'productreels' ),
+			__( 'ProductReels', 'productreels' ),
 			Productreels_Rest_Controller::CAPABILITY,
 			self::PAGE,
 			array( $this, 'render_app' ),
@@ -99,17 +99,17 @@ class Productreels_Admin {
 		// Replaces the duplicate of the parent WordPress adds automatically.
 		add_submenu_page(
 			self::PAGE,
-			__( 'All Widgets', 'productreels-shoppable-video-reels-for-woocommerce' ),
-			__( 'All Widgets', 'productreels-shoppable-video-reels-for-woocommerce' ),
+			__( 'All Widgets', 'productreels' ),
+			__( 'All Widgets', 'productreels' ),
 			Productreels_Rest_Controller::CAPABILITY,
 			self::PAGE,
 			array( $this, 'render_app' )
 		);
 
 		$labels = array(
-			'productreels-reels'      => __( 'All Reels', 'productreels-shoppable-video-reels-for-woocommerce' ),
-			'productreels-new-widget' => __( 'Create Widget', 'productreels-shoppable-video-reels-for-woocommerce' ),
-			'productreels-settings'   => __( 'Settings', 'productreels-shoppable-video-reels-for-woocommerce' ),
+			'productreels-reels'      => __( 'All Reels', 'productreels' ),
+			'productreels-new-widget' => __( 'Create Widget', 'productreels' ),
+			'productreels-settings'   => __( 'Settings', 'productreels' ),
 		);
 
 		foreach ( $labels as $slug => $label ) {
@@ -191,7 +191,7 @@ class Productreels_Admin {
 			true
 		);
 
-		wp_set_script_translations( 'productreels-admin', 'productreels-shoppable-video-reels-for-woocommerce', PRODUCTREELS_PATH . 'languages' );
+		wp_set_script_translations( 'productreels-admin', 'productreels', PRODUCTREELS_PATH . 'languages' );
 
 		wp_add_inline_script(
 			'productreels-admin',
@@ -275,7 +275,7 @@ class Productreels_Admin {
 	public function render_missing_build_notice() {
 		printf(
 			'<div class="notice notice-error"><p>%s</p></div>',
-			esc_html__( 'The ProductReels admin bundle is missing. Run "npm install && npm run build" in the plugin folder.', 'productreels-shoppable-video-reels-for-woocommerce' )
+			esc_html__( 'The ProductReels admin bundle is missing. Run "npm install && npm run build" in the plugin folder.', 'productreels' )
 		);
 	}
 

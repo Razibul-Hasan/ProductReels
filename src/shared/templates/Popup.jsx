@@ -168,7 +168,7 @@ export const Popup = ( {
 					className="wr-popup__close"
 					aria-label={ __(
 						'Close',
-						'productreels-shoppable-video-reels-for-woocommerce'
+						'productreels'
 					) }
 					onClick={ dismiss }
 				>

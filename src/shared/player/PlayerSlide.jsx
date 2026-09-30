@@ -121,11 +121,11 @@ export const PlayerSlide = forwardRef(
 							playing
 								? __(
 										'Pause',
-										'productreels-shoppable-video-reels-for-woocommerce'
+										'productreels'
 									)
 								: __(
 										'Play',
-										'productreels-shoppable-video-reels-for-woocommerce'
+										'productreels'
 									)
 						}
 						onPointerDown={ onPointerDown }

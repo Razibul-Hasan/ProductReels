@@ -110,7 +110,7 @@ class Productreels_Rest_Settings extends Productreels_Rest_Controller {
 		}
 
 		if ( empty( $changes ) ) {
-			return $this->invalid( 'productreels_settings_update_failed', __( 'Please enter valid numbers.', 'productreels-shoppable-video-reels-for-woocommerce' ) );
+			return $this->invalid( 'productreels_settings_update_failed', __( 'Please enter valid numbers.', 'productreels' ) );
 		}
 
 		return rest_ensure_response( Productreels_Settings::update( $changes ) );

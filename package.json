@@ -11,7 +11,13 @@
 		"index.php",
 		"readme.txt",
 		"LICENSE.txt",
-		"CHANGELOG.md",
+		"README.md",
+		"THIRD-PARTY-NOTICES.txt",
+		"webpack.config.js",
+		"src/",
+		"admin/src/",
+		"public/src/",
+		"block/src/",
 		"admin/index.php",
 		"admin/class-productreels-admin.php",
 		"admin/partials/",
@@ -19,18 +25,21 @@
 		"admin/dist/*.js",
 		"admin/dist/*.css",
 		"admin/dist/*.asset.php",
+		"admin/dist/*.LICENSE.txt",
 		"block/index.php",
 		"block/block.json",
 		"block/dist/*.js",
 		"block/dist/*.css",
 		"block/dist/*.asset.php",
+		"block/dist/*.LICENSE.txt",
 		"includes/",
 		"languages/",
 		"public/index.php",
 		"public/class-productreels-public.php",
 		"public/dist/*.js",
 		"public/dist/*.css",
-		"public/dist/*.asset.php"
+		"public/dist/*.asset.php",
+		"public/dist/*.LICENSE.txt"
 	],
 	"scripts": {
 		"build": "wp-scripts build",
@@ -38,9 +47,9 @@
 		"lint:js": "wp-scripts lint-js admin/src public/src src block/src",
 		"lint:js:fix": "wp-scripts lint-js admin/src public/src src block/src --fix",
 		"lint:php": "phpcs",
-		"make-pot": "wp i18n make-pot . languages/productreels-shoppable-video-reels-for-woocommerce.pot --exclude=node_modules,admin/dist,public/dist,block/dist,build,build-prompts,*.map --domain=productreels-shoppable-video-reels-for-woocommerce --slug=productreels-shoppable-video-reels-for-woocommerce",
-		"plugin-zip": "wp-scripts plugin-zip --root-folder=productreels-shoppable-video-reels-for-woocommerce",
-		"zip": "wp-scripts build && wp-scripts plugin-zip --root-folder=productreels-shoppable-video-reels-for-woocommerce"
+		"make-pot": "wp i18n make-pot . languages/productreels.pot --exclude=node_modules,admin/dist,public/dist,block/dist,build,build-prompts,*.map --domain=productreels --slug=productreels",
+		"plugin-zip": "wp-scripts plugin-zip --root-folder=productreels",
+		"zip": "wp-scripts build && wp-scripts plugin-zip --root-folder=productreels"
 	},
 	"devDependencies": {
 		"@wordpress/scripts": "^35.0.0"

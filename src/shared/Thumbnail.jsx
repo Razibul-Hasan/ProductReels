@@ -204,12 +204,12 @@ export const Thumbnail = ( {
 				/* translators: %s: reel title. */
 				__(
 					'Play reel: %s',
-					'productreels-shoppable-video-reels-for-woocommerce'
+					'productreels'
 				),
 				reel.title ||
 					__(
 						'Untitled',
-						'productreels-shoppable-video-reels-for-woocommerce'
+						'productreels'
 					)
 			) }
 			aria-hidden={ decorative ? 'true' : undefined }

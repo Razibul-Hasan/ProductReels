@@ -86,8 +86,8 @@ class Productreels_Shortcodes {
 			return self::missing_notice(
 				$widget_id > 0
 					/* translators: %d: widget id. */
-					? sprintf( __( 'ProductReels: widget #%d was not found.', 'productreels-shoppable-video-reels-for-woocommerce' ), $widget_id )
-					: __( 'ProductReels: the shortcode needs a widget id, e.g. [productreels id="1"].', 'productreels-shoppable-video-reels-for-woocommerce' )
+					? sprintf( __( 'ProductReels: widget #%d was not found.', 'productreels' ), $widget_id )
+					: __( 'ProductReels: the shortcode needs a widget id, e.g. [productreels id="1"].', 'productreels' )
 			);
 		}
 
@@ -116,8 +116,8 @@ class Productreels_Shortcodes {
 			return self::missing_notice(
 				$reel_id > 0
 					/* translators: %d: reel id. */
-					? sprintf( __( 'ProductReels: reel #%d was not found.', 'productreels-shoppable-video-reels-for-woocommerce' ), $reel_id )
-					: __( 'ProductReels: the shortcode needs a reel id, e.g. [productreels_reel id="1"].', 'productreels-shoppable-video-reels-for-woocommerce' )
+					? sprintf( __( 'ProductReels: reel #%d was not found.', 'productreels' ), $reel_id )
+					: __( 'ProductReels: the shortcode needs a reel id, e.g. [productreels_reel id="1"].', 'productreels' )
 			);
 		}
 

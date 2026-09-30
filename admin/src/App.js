@@ -76,7 +76,7 @@ const AppBar = ( { route, navigate } ) => {
 			match: [ 'widgets', 'widget-stats' ],
 			label: __(
 				'All Widgets',
-				'productreels-shoppable-video-reels-for-woocommerce'
+				'productreels'
 			),
 		},
 		{
@@ -84,7 +84,7 @@ const AppBar = ( { route, navigate } ) => {
 			match: [ 'reels' ],
 			label: __(
 				'All Reels',
-				'productreels-shoppable-video-reels-for-woocommerce'
+				'productreels'
 			),
 		},
 		{
@@ -92,7 +92,7 @@ const AppBar = ( { route, navigate } ) => {
 			match: [ 'settings' ],
 			label: __(
 				'Settings',
-				'productreels-shoppable-video-reels-for-woocommerce'
+				'productreels'
 			),
 		},
 	];
@@ -115,7 +115,7 @@ const AppBar = ( { route, navigate } ) => {
 				className="wr-appbar__tabs"
 				aria-label={ __(
 					'ProductReels sections',
-					'productreels-shoppable-video-reels-for-woocommerce'
+					'productreels'
 				) }
 			>
 				{ tabs.map( ( tab ) => {
@@ -146,7 +146,7 @@ const AppBar = ( { route, navigate } ) => {
 				>
 					{ __(
 						'Documentation',
-						'productreels-shoppable-video-reels-for-woocommerce'
+						'productreels'
 					) }
 					<IconExternal size={ 12 } />
 				</a>
@@ -203,27 +203,27 @@ const App = () => {
 		{
 			widgets: __(
 				'All Widgets',
-				'productreels-shoppable-video-reels-for-woocommerce'
+				'productreels'
 			),
 			'widget-new': __(
 				'Create Widget',
-				'productreels-shoppable-video-reels-for-woocommerce'
+				'productreels'
 			),
 			'widget-edit': __(
 				'Edit Widget',
-				'productreels-shoppable-video-reels-for-woocommerce'
+				'productreels'
 			),
 			'widget-stats': __(
 				'Statistics',
-				'productreels-shoppable-video-reels-for-woocommerce'
+				'productreels'
 			),
 			reels: __(
 				'All Reels',
-				'productreels-shoppable-video-reels-for-woocommerce'
+				'productreels'
 			),
 			settings: __(
 				'Settings',
-				'productreels-shoppable-video-reels-for-woocommerce'
+				'productreels'
 			),
 		}[ route.name ]
 	);
@@ -259,11 +259,11 @@ const App = () => {
 					<ConfirmDialog
 						title={ __(
 							'You have unsaved changes. Leave this page without saving?',
-							'productreels-shoppable-video-reels-for-woocommerce'
+							'productreels'
 						) }
 						confirmLabel={ __(
 							'Continue',
-							'productreels-shoppable-video-reels-for-woocommerce'
+							'productreels'
 						) }
 						tone="primary"
 						onConfirm={ leaveAnyway }
@@ -271,7 +271,7 @@ const App = () => {
 					>
 						{ __(
 							'Anything you have changed since the last save will be lost.',
-							'productreels-shoppable-video-reels-for-woocommerce'
+							'productreels'
 						) }
 					</ConfirmDialog>
 				) }

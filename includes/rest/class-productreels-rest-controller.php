@@ -69,7 +69,7 @@ abstract class Productreels_Rest_Controller extends WP_REST_Controller {
 
 		return new WP_Error(
 			'productreels_forbidden',
-			__( 'You are not allowed to manage ProductReels.', 'productreels-shoppable-video-reels-for-woocommerce' ),
+			__( 'You are not allowed to manage ProductReels.', 'productreels' ),
 			array( 'status' => rest_authorization_required_code() )
 		);
 	}
@@ -87,7 +87,7 @@ abstract class Productreels_Rest_Controller extends WP_REST_Controller {
 
 		return new WP_Error(
 			'productreels_forbidden',
-			__( 'You are not allowed to manage ProductReels.', 'productreels-shoppable-video-reels-for-woocommerce' ),
+			__( 'You are not allowed to manage ProductReels.', 'productreels' ),
 			array( 'status' => rest_authorization_required_code() )
 		);
 	}
@@ -117,7 +117,7 @@ abstract class Productreels_Rest_Controller extends WP_REST_Controller {
 
 		return new WP_Error(
 			'productreels_forbidden',
-			__( 'Public access to this widget is turned off.', 'productreels-shoppable-video-reels-for-woocommerce' ),
+			__( 'Public access to this widget is turned off.', 'productreels' ),
 			array( 'status' => rest_authorization_required_code() )
 		);
 	}
@@ -188,7 +188,7 @@ abstract class Productreels_Rest_Controller extends WP_REST_Controller {
 
 		return new WP_Error(
 			$code,
-			__( 'Something went wrong. Please try again.', 'productreels-shoppable-video-reels-for-woocommerce' ),
+			__( 'Something went wrong. Please try again.', 'productreels' ),
 			array( 'status' => 500 )
 		);
 	}

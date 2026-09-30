@@ -98,21 +98,21 @@ export const Settings = () => {
 		if ( ! isInt( draft.view_limit, 1, 100 ) ) {
 			next.view_limit = __(
 				'Please enter valid numbers.',
-				'productreels-shoppable-video-reels-for-woocommerce'
+				'productreels'
 			);
 		}
 
 		if ( ! isInt( draft.view_interval, 1, 1440 ) ) {
 			next.view_interval = __(
 				'Please enter valid numbers.',
-				'productreels-shoppable-video-reels-for-woocommerce'
+				'productreels'
 			);
 		}
 
 		if ( ! isInt( draft.cache_ttl, 1, 7 * 24 * 60 ) ) {
 			next.cache_ttl = __(
 				'Please enter valid numbers.',
-				'productreels-shoppable-video-reels-for-woocommerce'
+				'productreels'
 			);
 		}
 
@@ -126,7 +126,7 @@ export const Settings = () => {
 			toasts.error(
 				__(
 					'Please enter valid numbers.',
-					'productreels-shoppable-video-reels-for-woocommerce'
+					'productreels'
 				)
 			);
 
@@ -152,7 +152,7 @@ export const Settings = () => {
 			toasts.success(
 				__(
 					'Settings updated successfully.',
-					'productreels-shoppable-video-reels-for-woocommerce'
+					'productreels'
 				)
 			);
 		} catch ( error ) {
@@ -169,13 +169,13 @@ export const Settings = () => {
 					<h1 className="wr-page-head__title">
 						{ __(
 							'Settings',
-							'productreels-shoppable-video-reels-for-woocommerce'
+							'productreels'
 						) }
 					</h1>
 					<p className="wr-page-head__sub">
 						{ __(
 							'Tracking, public access, caching and what happens on uninstall.',
-							'productreels-shoppable-video-reels-for-woocommerce'
+							'productreels'
 						) }
 					</p>
 				</div>
@@ -188,7 +188,7 @@ export const Settings = () => {
 					>
 						{ __(
 							'Save',
-							'productreels-shoppable-video-reels-for-woocommerce'
+							'productreels'
 						) }
 					</Button>
 				</div>
@@ -208,22 +208,22 @@ export const Settings = () => {
 						<Card
 							title={ __(
 								'View tracking',
-								'productreels-shoppable-video-reels-for-woocommerce'
+								'productreels'
 							) }
 							text={ __(
 								'The two numbers work together as a rate limit: a visitor can add at most this many views to one reel within this many minutes. Visitor IPs are hashed before they are used and never stored.',
-								'productreels-shoppable-video-reels-for-woocommerce'
+								'productreels'
 							) }
 						>
 							<div className="wr-settings-row">
 								<TextField
 									label={ __(
 										'View limit',
-										'productreels-shoppable-video-reels-for-woocommerce'
+										'productreels'
 									) }
 									help={ __(
 										'Views per visitor, per reel.',
-										'productreels-shoppable-video-reels-for-woocommerce'
+										'productreels'
 									) }
 									error={ errors.view_limit }
 									type="number"
@@ -238,11 +238,11 @@ export const Settings = () => {
 								<TextField
 									label={ __(
 										'Time interval',
-										'productreels-shoppable-video-reels-for-woocommerce'
+										'productreels'
 									) }
 									help={ __(
 										'In minutes.',
-										'productreels-shoppable-video-reels-for-woocommerce'
+										'productreels'
 									) }
 									error={ errors.view_interval }
 									type="number"
@@ -261,7 +261,7 @@ export const Settings = () => {
 									/* translators: 1: view limit, 2: interval in minutes. */
 									__(
 										'Currently: at most %1$s views per reel every %2$s minutes, per visitor.',
-										'productreels-shoppable-video-reels-for-woocommerce'
+										'productreels'
 									),
 									draft.view_limit || '—',
 									draft.view_interval || '—'
@@ -272,21 +272,21 @@ export const Settings = () => {
 						<Card
 							title={ __(
 								'Public API',
-								'productreels-shoppable-video-reels-for-woocommerce'
+								'productreels'
 							) }
 							text={ __(
 								'Your own pages always work. This decides whether anyone else can read a widget directly from the REST API.',
-								'productreels-shoppable-video-reels-for-woocommerce'
+								'productreels'
 							) }
 						>
 							<Switch
 								label={ __(
 									'Allow public fetch',
-									'productreels-shoppable-video-reels-for-woocommerce'
+									'productreels'
 								) }
 								help={ __(
 									'When on, GET /productreels/v1/render/{id} answers any request. It exposes reel titles, video URLs, posters, view counts and links — never anything about your visitors or orders.',
-									'productreels-shoppable-video-reels-for-woocommerce'
+									'productreels'
 								) }
 								checked={ draft.allow_public_fetch }
 								onChange={ ( value ) =>
@@ -298,21 +298,21 @@ export const Settings = () => {
 						<Card
 							title={ __(
 								'Performance',
-								'productreels-shoppable-video-reels-for-woocommerce'
+								'productreels'
 							) }
 							text={ __(
 								'Widget payloads are assembled once and reused until something changes.',
-								'productreels-shoppable-video-reels-for-woocommerce'
+								'productreels'
 							) }
 						>
 							<Switch
 								label={ __(
 									'Cache render responses',
-									'productreels-shoppable-video-reels-for-woocommerce'
+									'productreels'
 								) }
 								help={ __(
 									'Any edit to a widget, reel or file clears the cache immediately.',
-									'productreels-shoppable-video-reels-for-woocommerce'
+									'productreels'
 								) }
 								checked={ draft.cache_render }
 								onChange={ ( value ) =>
@@ -324,11 +324,11 @@ export const Settings = () => {
 									<TextField
 										label={ __(
 											'Cache TTL',
-											'productreels-shoppable-video-reels-for-woocommerce'
+											'productreels'
 										) }
 										help={ __(
 											'In minutes. Between 1 minute and 7 days.',
-											'productreels-shoppable-video-reels-for-woocommerce'
+											'productreels'
 										) }
 										error={ errors.cache_ttl }
 										type="number"
@@ -347,21 +347,21 @@ export const Settings = () => {
 						<Card
 							title={ __(
 								'Data',
-								'productreels-shoppable-video-reels-for-woocommerce'
+								'productreels'
 							) }
 							text={ __(
 								'What happens to your reels, widgets and statistics when the plugin is deleted.',
-								'productreels-shoppable-video-reels-for-woocommerce'
+								'productreels'
 							) }
 						>
 							<Switch
 								label={ __(
 									'Delete all plugin data on uninstall',
-									'productreels-shoppable-video-reels-for-woocommerce'
+									'productreels'
 								) }
 								help={ __(
 									'Off by default. Deactivating never removes anything.',
-									'productreels-shoppable-video-reels-for-woocommerce'
+									'productreels'
 								) }
 								checked={ draft.delete_data_on_uninstall }
 								onChange={ ( value ) =>
@@ -372,7 +372,7 @@ export const Settings = () => {
 								<Notice tone="warning">
 									{ __(
 										'Deleting the plugin will permanently drop every ProductReels table — all widgets, reels, file records, view counts and click counts. Media files in your library are kept.',
-										'productreels-shoppable-video-reels-for-woocommerce'
+										'productreels'
 									) }
 								</Notice>
 							) }

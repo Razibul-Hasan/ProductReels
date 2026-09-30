@@ -67,7 +67,7 @@ export const PosterCapture = ( { src, onCaptured, onClose } ) => {
 			setError(
 				__(
 					'This frame could not be captured. Videos hosted on another domain are blocked from being read this way — pick a poster from the media library instead.',
-					'productreels-shoppable-video-reels-for-woocommerce'
+					'productreels'
 				)
 			);
 		} finally {
@@ -79,7 +79,7 @@ export const PosterCapture = ( { src, onCaptured, onClose } ) => {
 		<Modal
 			title={ __(
 				'Capture frame',
-				'productreels-shoppable-video-reels-for-woocommerce'
+				'productreels'
 			) }
 			onClose={ onClose }
 			footer={
@@ -87,7 +87,7 @@ export const PosterCapture = ( { src, onCaptured, onClose } ) => {
 					<Button variant="ghost" onClick={ onClose }>
 						{ __(
 							'Cancel',
-							'productreels-shoppable-video-reels-for-woocommerce'
+							'productreels'
 						) }
 					</Button>
 					<Button
@@ -99,7 +99,7 @@ export const PosterCapture = ( { src, onCaptured, onClose } ) => {
 					>
 						{ __(
 							'Use this frame',
-							'productreels-shoppable-video-reels-for-woocommerce'
+							'productreels'
 						) }
 					</Button>
 				</>
@@ -128,7 +128,7 @@ export const PosterCapture = ( { src, onCaptured, onClose } ) => {
 						<span className="wr-field__label">
 							{ __(
 								'Position',
-								'productreels-shoppable-video-reels-for-woocommerce'
+								'productreels'
 							) }
 						</span>
 						<span className="wr-field__help">
@@ -144,7 +144,7 @@ export const PosterCapture = ( { src, onCaptured, onClose } ) => {
 						value={ time }
 						aria-label={ __(
 							'Position',
-							'productreels-shoppable-video-reels-for-woocommerce'
+							'productreels'
 						) }
 						onChange={ ( event ) => {
 							const next = Number( event.target.value );

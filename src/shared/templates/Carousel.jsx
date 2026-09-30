@@ -157,7 +157,7 @@ export const Carousel = ( { reels, styles, onOpen } ) => {
 				className="wr-nav wr-nav--prev"
 				aria-label={ __(
 					'Previous',
-					'productreels-shoppable-video-reels-for-woocommerce'
+					'productreels'
 				) }
 				disabled={ edges.start }
 				onClick={ () => page( -1 ) }
@@ -186,7 +186,7 @@ export const Carousel = ( { reels, styles, onOpen } ) => {
 				role="group"
 				aria-label={ __(
 					'Reels',
-					'productreels-shoppable-video-reels-for-woocommerce'
+					'productreels'
 				) }
 				onKeyDown={ onKeyDown }
 				onPointerDown={ onPointerDown }
@@ -211,7 +211,7 @@ export const Carousel = ( { reels, styles, onOpen } ) => {
 				className="wr-nav wr-nav--next"
 				aria-label={ __(
 					'Next',
-					'productreels-shoppable-video-reels-for-woocommerce'
+					'productreels'
 				) }
 				disabled={ edges.end }
 				onClick={ () => page( 1 ) }

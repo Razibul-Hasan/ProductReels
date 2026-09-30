@@ -110,7 +110,7 @@ export const Seekbar = ( { current, duration, onSeek } ) => {
 			tabIndex={ 0 }
 			aria-label={ __(
 				'Seek',
-				'productreels-shoppable-video-reels-for-woocommerce'
+				'productreels'
 			) }
 			aria-valuemin={ 0 }
 			aria-valuemax={ Math.round( duration ) }
@@ -119,7 +119,7 @@ export const Seekbar = ( { current, duration, onSeek } ) => {
 				/* translators: 1: elapsed time, 2: total duration. */
 				__(
 					'%1$s of %2$s',
-					'productreels-shoppable-video-reels-for-woocommerce'
+					'productreels'
 				),
 				formatClock( shown ),
 				formatClock( duration )

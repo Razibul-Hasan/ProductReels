@@ -263,7 +263,7 @@ export const Stacked = ( { reels, styles, onOpen } ) => {
 						className="wr-nav"
 						aria-label={ __(
 							'Previous',
-							'productreels-shoppable-video-reels-for-woocommerce'
+							'productreels'
 						) }
 						onClick={ () => advance( -1 ) }
 					>
@@ -287,7 +287,7 @@ export const Stacked = ( { reels, styles, onOpen } ) => {
 						className="wr-nav"
 						aria-label={ __(
 							'Next',
-							'productreels-shoppable-video-reels-for-woocommerce'
+							'productreels'
 						) }
 						onClick={ () => advance( 1 ) }
 					>

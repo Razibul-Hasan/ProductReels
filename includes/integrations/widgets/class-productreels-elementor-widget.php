@@ -46,7 +46,7 @@ class Productreels_Elementor_Widget extends \Elementor\Widget_Base {
 	 * @return string The title.
 	 */
 	public function get_title() {
-		return __( 'ProductReels', 'productreels-shoppable-video-reels-for-woocommerce' );
+		return __( 'ProductReels', 'productreels' );
 	}
 
 	/**
@@ -109,7 +109,7 @@ class Productreels_Elementor_Widget extends \Elementor\Widget_Base {
 		$this->start_controls_section(
 			'productreels_section',
 			array(
-				'label' => __( 'ProductReels', 'productreels-shoppable-video-reels-for-woocommerce' ),
+				'label' => __( 'ProductReels', 'productreels' ),
 				'tab'   => \Elementor\Controls_Manager::TAB_CONTENT,
 			)
 		);
@@ -119,20 +119,20 @@ class Productreels_Elementor_Widget extends \Elementor\Widget_Base {
 		$this->add_control(
 			'widget_id',
 			array(
-				'label'       => __( 'Widget', 'productreels-shoppable-video-reels-for-woocommerce' ),
+				'label'       => __( 'Widget', 'productreels' ),
 				'type'        => \Elementor\Controls_Manager::SELECT2,
 				'options'     => $options,
 				'default'     => '',
 				'label_block' => true,
 				'description' => empty( $options )
-					? __( "You haven't created any widget yet! Create one under ProductReels in the WordPress admin.", 'productreels-shoppable-video-reels-for-woocommerce' )
-					: __( 'Choose a widget. Styling is done in the ProductReels editor.', 'productreels-shoppable-video-reels-for-woocommerce' ),
+					? __( "You haven't created any widget yet! Create one under ProductReels in the WordPress admin.", 'productreels' )
+					: __( 'Choose a widget. Styling is done in the ProductReels editor.', 'productreels' ),
 			)
 		);
 
 		$notice = array(
 			'label'           => '',
-			'raw'             => __( 'The reels render on the live page and inside this preview once a widget is chosen. Open the widget in ProductReels to change its layout, colours or player behaviour.', 'productreels-shoppable-video-reels-for-woocommerce' ),
+			'raw'             => __( 'The reels render on the live page and inside this preview once a widget is chosen. Open the widget in ProductReels to change its layout, colours or player behaviour.', 'productreels' ),
 			'content_classes' => 'elementor-descriptor',
 		);
 
@@ -141,7 +141,7 @@ class Productreels_Elementor_Widget extends \Elementor\Widget_Base {
 				'type'        => \Elementor\Controls_Manager::NOTICE,
 				'notice_type' => 'info',
 				'dismissible' => false,
-				'heading'     => __( 'Preview', 'productreels-shoppable-video-reels-for-woocommerce' ),
+				'heading'     => __( 'Preview', 'productreels' ),
 				'content'     => $notice['raw'],
 			);
 		} else {
@@ -167,7 +167,7 @@ class Productreels_Elementor_Widget extends \Elementor\Widget_Base {
 			if ( \Elementor\Plugin::$instance->editor->is_edit_mode() ) {
 				printf(
 					'<p style="padding:16px;border:1px dashed #d1d5db;border-radius:6px;font-size:13px;color:#6b7280;text-align:center;">%s</p>',
-					esc_html__( 'Choose a ProductReels widget in the panel to show it here.', 'productreels-shoppable-video-reels-for-woocommerce' )
+					esc_html__( 'Choose a ProductReels widget in the panel to show it here.', 'productreels' )
 				);
 			}
 
@@ -198,7 +198,7 @@ class Productreels_Elementor_Widget extends \Elementor\Widget_Base {
 		foreach ( $page['items'] as $item ) {
 			$options[ (string) $item['id'] ] = sprintf(
 				/* translators: 1: widget name, 2: widget id. */
-				__( '%1$s (#%2$d)', 'productreels-shoppable-video-reels-for-woocommerce' ),
+				__( '%1$s (#%2$d)', 'productreels' ),
 				$item['name'],
 				$item['id']
 			);

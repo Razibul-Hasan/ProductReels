@@ -70,7 +70,7 @@ export const SearchInput = ( { value, onChange, placeholder, label } ) => (
 				className="wr-search__clear"
 				aria-label={ __(
 					'Clear',
-					'productreels-shoppable-video-reels-for-woocommerce'
+					'productreels'
 				) }
 				onClick={ () => onChange( '' ) }
 			>

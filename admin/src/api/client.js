@@ -57,7 +57,7 @@ const toError = ( error ) => {
 			? error.message
 			: __(
 					'Something went wrong. Please try again.',
-					'productreels-shoppable-video-reels-for-woocommerce'
+					'productreels'
 				);
 
 	const wrapped = new Error( message );

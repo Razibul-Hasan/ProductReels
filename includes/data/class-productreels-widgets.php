@@ -389,7 +389,7 @@ class Productreels_Widgets extends Productreels_Repository {
 		}
 
 		/* translators: %s: the name of the widget being duplicated. */
-		$name = Productreels_Validator::text( sprintf( __( '%s (Copy)', 'productreels-shoppable-video-reels-for-woocommerce' ), $source['name'] ), 191 );
+		$name = Productreels_Validator::text( sprintf( __( '%s (Copy)', 'productreels' ), $source['name'] ), 191 );
 
 		return $this->create(
 			array(
@@ -841,6 +841,6 @@ class Productreels_Widgets extends Productreels_Repository {
 	 */
 	private function next_untitled_name() {
 		/* translators: %d: sequential number for an automatically named widget. */
-		return sprintf( __( 'Untitled widget %d', 'productreels-shoppable-video-reels-for-woocommerce' ), $this->next_number() );
+		return sprintf( __( 'Untitled widget %d', 'productreels' ), $this->next_number() );
 	}
 }

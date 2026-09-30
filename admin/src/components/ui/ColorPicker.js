@@ -128,7 +128,7 @@ export const ColorPicker = ( {
 							value={ rgb }
 							aria-label={ __(
 								'Pick a colour',
-								'productreels-shoppable-video-reels-for-woocommerce'
+								'productreels'
 							) }
 							onChange={ ( event ) =>
 								commit( joinColor( event.target.value, alpha ) )
@@ -142,7 +142,7 @@ export const ColorPicker = ( {
 							spellCheck="false"
 							aria-label={ __(
 								'Hex value',
-								'productreels-shoppable-video-reels-for-woocommerce'
+								'productreels'
 							) }
 							onChange={ ( event ) =>
 								setDraft( event.target.value )
@@ -165,7 +165,7 @@ export const ColorPicker = ( {
 							<span className="wr-field__help">
 								{ __(
 									'Opacity',
-									'productreels-shoppable-video-reels-for-woocommerce'
+									'productreels'
 								) }
 							</span>
 							<input
@@ -176,7 +176,7 @@ export const ColorPicker = ( {
 								value={ alpha }
 								aria-label={ __(
 									'Opacity',
-									'productreels-shoppable-video-reels-for-woocommerce'
+									'productreels'
 								) }
 								onChange={ ( event ) =>
 									commit(

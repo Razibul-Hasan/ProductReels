@@ -13,7 +13,7 @@ export const ViewsBadge = ( { count, background, color, shape } ) => (
 		style={ { background, color } }
 		title={ __(
 			'Views',
-			'productreels-shoppable-video-reels-for-woocommerce'
+			'productreels'
 		) }
 	>
 		<svg

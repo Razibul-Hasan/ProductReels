@@ -55,20 +55,20 @@ const formatDate = ( value ) => {
 };
 
 const TEMPLATE_LABELS = {
-	grid: __( 'Grid', 'productreels-shoppable-video-reels-for-woocommerce' ),
+	grid: __( 'Grid', 'productreels' ),
 	carousel: __(
 		'Carousel',
-		'productreels-shoppable-video-reels-for-woocommerce'
+		'productreels'
 	),
 	marquee: __(
 		'Marquee',
-		'productreels-shoppable-video-reels-for-woocommerce'
+		'productreels'
 	),
 	stacked: __(
 		'Stacked',
-		'productreels-shoppable-video-reels-for-woocommerce'
+		'productreels'
 	),
-	popup: __( 'Popup', 'productreels-shoppable-video-reels-for-woocommerce' ),
+	popup: __( 'Popup', 'productreels' ),
 };
 
 const ctrOf = ( widget ) =>
@@ -136,7 +136,7 @@ const ShortcodeChip = ( { id, onCopied } ) => {
 				/* translators: %s: the shortcode. */
 				__(
 					'Copy %s',
-					'productreels-shoppable-video-reels-for-woocommerce'
+					'productreels'
 				),
 				shortcode
 			) }
@@ -224,7 +224,7 @@ const Overview = ( { items, loading } ) => {
 		{
 			label: __(
 				'Widgets',
-				'productreels-shoppable-video-reels-for-woocommerce'
+				'productreels'
 			),
 			value: formatNumber( totals.widgets ),
 			hint: sprintf(
@@ -233,7 +233,7 @@ const Overview = ( { items, loading } ) => {
 					'%d reel placed',
 					'%d reels placed',
 					totals.reels,
-					'productreels-shoppable-video-reels-for-woocommerce'
+					'productreels'
 				),
 				totals.reels
 			),
@@ -241,34 +241,34 @@ const Overview = ( { items, loading } ) => {
 		{
 			label: __(
 				'Total Views',
-				'productreels-shoppable-video-reels-for-woocommerce'
+				'productreels'
 			),
 			value: formatNumber( totals.views ),
 			hint: __(
 				'Across every widget',
-				'productreels-shoppable-video-reels-for-woocommerce'
+				'productreels'
 			),
 		},
 		{
 			label: __(
 				'Total Clicks',
-				'productreels-shoppable-video-reels-for-woocommerce'
+				'productreels'
 			),
 			value: formatNumber( totals.clicks ),
 			hint: __(
 				'Buttons and product cards',
-				'productreels-shoppable-video-reels-for-woocommerce'
+				'productreels'
 			),
 		},
 		{
 			label: __(
 				'CTR',
-				'productreels-shoppable-video-reels-for-woocommerce'
+				'productreels'
 			),
 			value: formatPercent( totals.ctr ),
 			hint: __(
 				'Clicks per view',
-				'productreels-shoppable-video-reels-for-woocommerce'
+				'productreels'
 			),
 		},
 	];
@@ -345,11 +345,11 @@ const GettingStarted = ( { hasReels, onAddReel, onCreate } ) => {
 		{
 			title: __(
 				'Add Reel',
-				'productreels-shoppable-video-reels-for-woocommerce'
+				'productreels'
 			),
 			text: __(
 				'Upload a short vertical video, or paste a Vimeo, YouTube Shorts or hosted link. Tag products or add a button.',
-				'productreels-shoppable-video-reels-for-woocommerce'
+				'productreels'
 			),
 			done: hasReels,
 			action: (
@@ -360,7 +360,7 @@ const GettingStarted = ( { hasReels, onAddReel, onCreate } ) => {
 				>
 					{ __(
 						'Add Reel',
-						'productreels-shoppable-video-reels-for-woocommerce'
+						'productreels'
 					) }
 				</Button>
 			),
@@ -368,11 +368,11 @@ const GettingStarted = ( { hasReels, onAddReel, onCreate } ) => {
 		{
 			title: __(
 				'Create Widget',
-				'productreels-shoppable-video-reels-for-woocommerce'
+				'productreels'
 			),
 			text: __(
 				'Group reels into a widget, pick a layout and style it in the live editor.',
-				'productreels-shoppable-video-reels-for-woocommerce'
+				'productreels'
 			),
 			done: false,
 			action: (
@@ -383,7 +383,7 @@ const GettingStarted = ( { hasReels, onAddReel, onCreate } ) => {
 				>
 					{ __(
 						'Create Widget',
-						'productreels-shoppable-video-reels-for-woocommerce'
+						'productreels'
 					) }
 				</Button>
 			),
@@ -391,11 +391,11 @@ const GettingStarted = ( { hasReels, onAddReel, onCreate } ) => {
 		{
 			title: __(
 				'Place it',
-				'productreels-shoppable-video-reels-for-woocommerce'
+				'productreels'
 			),
 			text: __(
 				'Drop the shortcode into any page, or use the ProductReels block or Elementor widget.',
-				'productreels-shoppable-video-reels-for-woocommerce'
+				'productreels'
 			),
 			done: false,
 			action: (
@@ -412,13 +412,13 @@ const GettingStarted = ( { hasReels, onAddReel, onCreate } ) => {
 				<h2 className="wr-start__title">
 					{ __(
 						"You haven't created any widget yet!",
-						'productreels-shoppable-video-reels-for-woocommerce'
+						'productreels'
 					) }
 				</h2>
 				<p className="wr-start__text">
 					{ __(
 						'A widget is a styled, reusable set of reels. Three steps and it is live.',
-						'productreels-shoppable-video-reels-for-woocommerce'
+						'productreels'
 					) }
 				</p>
 			</div>
@@ -557,7 +557,7 @@ export const WidgetsList = ( { navigate } ) => {
 			toasts.success(
 				__(
 					'Widget created successfully!',
-					'productreels-shoppable-video-reels-for-woocommerce'
+					'productreels'
 				)
 			);
 			await load();
@@ -576,7 +576,7 @@ export const WidgetsList = ( { navigate } ) => {
 			toasts.success(
 				__(
 					'Widget deleted successfully!',
-					'productreels-shoppable-video-reels-for-woocommerce'
+					'productreels'
 				)
 			);
 			setConfirming( null );
@@ -598,7 +598,7 @@ export const WidgetsList = ( { navigate } ) => {
 					<h1 className="wr-page-head__title">
 						{ __(
 							'All Widgets',
-							'productreels-shoppable-video-reels-for-woocommerce'
+							'productreels'
 						) }
 						{ ! loading && total > 0 && (
 							<span className="wr-count-chip">
@@ -609,7 +609,7 @@ export const WidgetsList = ( { navigate } ) => {
 					<p className="wr-page-head__sub">
 						{ __(
 							'Reusable, styled collections of reels you can drop anywhere.',
-							'productreels-shoppable-video-reels-for-woocommerce'
+							'productreels'
 						) }
 					</p>
 				</div>
@@ -619,7 +619,7 @@ export const WidgetsList = ( { navigate } ) => {
 						onChange={ setSearch }
 						placeholder={ __(
 							'Search widgets…',
-							'productreels-shoppable-video-reels-for-woocommerce'
+							'productreels'
 						) }
 					/>
 					<Button
@@ -628,7 +628,7 @@ export const WidgetsList = ( { navigate } ) => {
 					>
 						{ __(
 							'Add Reel',
-							'productreels-shoppable-video-reels-for-woocommerce'
+							'productreels'
 						) }
 					</Button>
 					<Button
@@ -638,7 +638,7 @@ export const WidgetsList = ( { navigate } ) => {
 					>
 						{ __(
 							'Create Widget',
-							'productreels-shoppable-video-reels-for-woocommerce'
+							'productreels'
 						) }
 					</Button>
 				</div>
@@ -651,7 +651,7 @@ export const WidgetsList = ( { navigate } ) => {
 						<Button onClick={ load }>
 							{ __(
 								'Try again',
-								'productreels-shoppable-video-reels-for-woocommerce'
+								'productreels'
 							) }
 						</Button>
 					</div>
@@ -668,17 +668,17 @@ export const WidgetsList = ( { navigate } ) => {
 						<EmptyState
 							title={ __(
 								'No widgets match that search.',
-								'productreels-shoppable-video-reels-for-woocommerce'
+								'productreels'
 							) }
 							text={ __(
 								'Try a different name, or clear the search to see everything.',
-								'productreels-shoppable-video-reels-for-woocommerce'
+								'productreels'
 							) }
 							action={
 								<Button onClick={ () => setSearch( '' ) }>
 									{ __(
 										'Clear',
-										'productreels-shoppable-video-reels-for-woocommerce'
+										'productreels'
 									) }
 								</Button>
 							}
@@ -703,7 +703,7 @@ export const WidgetsList = ( { navigate } ) => {
 										column="name"
 										label={ __(
 											'Widget Name',
-											'productreels-shoppable-video-reels-for-woocommerce'
+											'productreels'
 										) }
 										sort={ sort }
 										onSort={ toggleSort }
@@ -712,7 +712,7 @@ export const WidgetsList = ( { navigate } ) => {
 										column="reel_count"
 										label={ __(
 											'Reels',
-											'productreels-shoppable-video-reels-for-woocommerce'
+											'productreels'
 										) }
 										sort={ sort }
 										onSort={ toggleSort }
@@ -721,14 +721,14 @@ export const WidgetsList = ( { navigate } ) => {
 									<th scope="col">
 										{ __(
 											'Shortcode',
-											'productreels-shoppable-video-reels-for-woocommerce'
+											'productreels'
 										) }
 									</th>
 									<SortHeader
 										column="view_total"
 										label={ __(
 											'Views',
-											'productreels-shoppable-video-reels-for-woocommerce'
+											'productreels'
 										) }
 										sort={ sort }
 										onSort={ toggleSort }
@@ -738,7 +738,7 @@ export const WidgetsList = ( { navigate } ) => {
 										column="click_total"
 										label={ __(
 											'Clicks',
-											'productreels-shoppable-video-reels-for-woocommerce'
+											'productreels'
 										) }
 										sort={ sort }
 										onSort={ toggleSort }
@@ -748,7 +748,7 @@ export const WidgetsList = ( { navigate } ) => {
 										column="ctr"
 										label={ __(
 											'CTR',
-											'productreels-shoppable-video-reels-for-woocommerce'
+											'productreels'
 										) }
 										sort={ sort }
 										onSort={ toggleSort }
@@ -758,7 +758,7 @@ export const WidgetsList = ( { navigate } ) => {
 										column="created_at"
 										label={ __(
 											'Created',
-											'productreels-shoppable-video-reels-for-woocommerce'
+											'productreels'
 										) }
 										sort={ sort }
 										onSort={ toggleSort }
@@ -767,7 +767,7 @@ export const WidgetsList = ( { navigate } ) => {
 										<span className="wr-screen-reader-text">
 											{ __(
 												'Actions',
-												'productreels-shoppable-video-reels-for-woocommerce'
+												'productreels'
 											) }
 										</span>
 									</th>
@@ -835,7 +835,7 @@ export const WidgetsList = ( { navigate } ) => {
 														toasts.success(
 															__(
 																'Copied!',
-																'productreels-shoppable-video-reels-for-woocommerce'
+																'productreels'
 															)
 														)
 													}
@@ -869,7 +869,7 @@ export const WidgetsList = ( { navigate } ) => {
 														icon={ IconEdit }
 														label={ __(
 															'Edit',
-															'productreels-shoppable-video-reels-for-woocommerce'
+															'productreels'
 														) }
 														onClick={ () =>
 															navigate(
@@ -881,7 +881,7 @@ export const WidgetsList = ( { navigate } ) => {
 														icon={ IconChart }
 														label={ __(
 															'Statistics',
-															'productreels-shoppable-video-reels-for-woocommerce'
+															'productreels'
 														) }
 														onClick={ () =>
 															navigate(
@@ -893,7 +893,7 @@ export const WidgetsList = ( { navigate } ) => {
 														icon={ IconDuplicate }
 														label={ __(
 															'Duplicate',
-															'productreels-shoppable-video-reels-for-woocommerce'
+															'productreels'
 														) }
 														disabled={
 															busyId === widget.id
@@ -906,7 +906,7 @@ export const WidgetsList = ( { navigate } ) => {
 														icon={ IconShortcode }
 														label={ __(
 															'Copy shortcode',
-															'productreels-shoppable-video-reels-for-woocommerce'
+															'productreels'
 														) }
 														onClick={ async () => {
 															await copyText(
@@ -915,7 +915,7 @@ export const WidgetsList = ( { navigate } ) => {
 															toasts.success(
 																__(
 																	'Copied!',
-																	'productreels-shoppable-video-reels-for-woocommerce'
+																	'productreels'
 																)
 															);
 														} }
@@ -924,7 +924,7 @@ export const WidgetsList = ( { navigate } ) => {
 														icon={ IconTrash }
 														label={ __(
 															'Delete',
-															'productreels-shoppable-video-reels-for-woocommerce'
+															'productreels'
 														) }
 														tone="danger"
 														onClick={ () =>
@@ -959,7 +959,7 @@ export const WidgetsList = ( { navigate } ) => {
 				<ConfirmDialog
 					title={ __(
 						'Are you sure you want to delete this widget?',
-						'productreels-shoppable-video-reels-for-woocommerce'
+						'productreels'
 					) }
 					busy={ deleting }
 					onConfirm={ remove }
@@ -969,7 +969,7 @@ export const WidgetsList = ( { navigate } ) => {
 						/* translators: %1$s: widget name, %2$s: a count of reels, already pluralised. */
 						__(
 							'%1$s will be removed, along with its click statistics. Its %2$s stay in your library and keep working in any other widget.',
-							'productreels-shoppable-video-reels-for-woocommerce'
+							'productreels'
 						),
 						confirming.name,
 						sprintf(
@@ -978,7 +978,7 @@ export const WidgetsList = ( { navigate } ) => {
 								'%d reel',
 								'%d reels',
 								confirming.reel_count,
-								'productreels-shoppable-video-reels-for-woocommerce'
+								'productreels'
 							),
 							confirming.reel_count
 						)

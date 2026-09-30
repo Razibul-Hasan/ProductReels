@@ -7,7 +7,7 @@
 	"category": "widgets",
 	"description": "Place a ProductReels widget — a styled collection of shoppable video reels.",
 	"keywords": [ "reels", "video", "shoppable", "woocommerce", "stories" ],
-	"textdomain": "productreels-shoppable-video-reels-for-woocommerce",
+	"textdomain": "productreels",
 	"attributes": {
 		"widgetId": {
 			"type": "string",
