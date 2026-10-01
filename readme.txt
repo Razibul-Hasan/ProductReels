@@ -1,7 +1,6 @@
 === ProductReels ===
-Contributors: razibulhasan
-Donate link: https://bestwebexpert.com/
-Tags: woocommerce, video, reels, shoppable video, stories
+Contributors: bestwpexpert,razibulhasan
+Tags: woocommerce, video, reels, shoppable video, stories, ugc video reels
 Requires at least: 6.6
 Tested up to: 7.1
 Requires PHP: 7.4

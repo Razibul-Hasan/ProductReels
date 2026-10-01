@@ -8,13 +8,13 @@
  * registers the activation and deactivation functions, and defines a function
  * that starts the plugin.
  *
- * @link              https://bestwebexpert.com/productreels
+ * @link             https://wordpress.org/plugins/productreels
  * @since             1.0.0
  * @package           Productreels
  *
  * @wordpress-plugin
  * Plugin Name:       ProductReels
- * Plugin URI:        https://bestwebexpert.com/productreels
+ * Plugin URI:        https://wordpress.org/plugins/productreels
  * Description:       Turn product videos and customer UGC into shoppable Instagram-style reels. Grid, carousel, marquee, stacked and popup layouts, WooCommerce product tagging, CTA buttons, and built-in view/click analytics.
  * Version:           1.0.0
  * Requires at least: 6.6
@@ -52,30 +52,6 @@ define('PRODUCTREELS_DB_VERSION', '1.0.0');
 define('PRODUCTREELS_FILE', __FILE__);
 define('PRODUCTREELS_PATH', plugin_dir_path(PRODUCTREELS_FILE));
 define('PRODUCTREELS_URL', plugin_dir_url(PRODUCTREELS_FILE));
-
-/**
- * Add helpful links to this plugin's metadata on the Plugins screen.
- *
- * @since 1.0.0
- * @param string[] $links Existing plugin metadata links.
- * @param string   $file  Plugin basename.
- * @return string[]
- */
-function productreels_plugin_row_meta($links, $file)
-{
-	if (plugin_basename(PRODUCTREELS_FILE) !== $file) {
-		return $links;
-	}
-
-	$links['docs'] = sprintf(
-		'<a href="%s" target="_blank" rel="noopener noreferrer">%s</a>',
-		esc_url('https://bestwebexpert.com/productreels'),
-		esc_html__('Docs', 'productreels')
-	);
-
-	return $links;
-}
-add_filter('plugin_row_meta', 'productreels_plugin_row_meta', 10, 2);
 
 /**
  * Tell WooCommerce this plugin is compatible with High-Performance Order Storage.
