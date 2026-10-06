@@ -3,7 +3,7 @@
 	"version": "1.0.0",
 	"description": "ProductReels — shoppable video reels for WooCommerce.",
 	"private": true,
-	"author": "Razibul Hasan",
+	"author": "bestwpexpert",
 	"license": "GPL-2.0-or-later",
 	"files": [
 		"productreels.php",
@@ -22,6 +22,7 @@
 		"admin/class-productreels-admin.php",
 		"admin/partials/",
 		"admin/css/",
+		"admin/images/",
 		"admin/dist/*.js",
 		"admin/dist/*.css",
 		"admin/dist/*.asset.php",

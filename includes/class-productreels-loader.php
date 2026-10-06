@@ -18,7 +18,7 @@
  *
  * @package    Productreels
  * @subpackage Productreels/includes
- * @author     Razibul Hasan <razibulhasan.ra@gmail.com>
+ * @author     bestwpexpert <https://bestwebexpert.com/>
  */
 class Productreels_Loader {
 

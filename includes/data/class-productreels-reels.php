@@ -25,7 +25,7 @@ if ( ! defined( 'WPINC' ) ) {
  * @since      1.0.0
  * @package    Productreels
  * @subpackage Productreels/includes/data
- * @author     Razibul Hasan <razibulhasan.ra@gmail.com>
+ * @author     bestwpexpert <https://bestwebexpert.com/>
  */
 class Productreels_Reels extends Productreels_Repository {
 

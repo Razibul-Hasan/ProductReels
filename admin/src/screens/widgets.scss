@@ -42,10 +42,14 @@
 		justify-content: center;
 		width: 28px;
 		height: 28px;
-		color: var(--wr-primary-fg);
-		background: linear-gradient(135deg, var(--wr-primary), var(--wr-primary-hover));
 		border-radius: 8px;
 		box-shadow: 0 2px 6px rgb(37 99 235 / 0.3);
+
+		img {
+			display: block;
+			width: 100%;
+			height: 100%;
+		}
 	}
 
 	.wr-appbar__name {

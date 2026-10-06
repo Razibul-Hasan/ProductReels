@@ -8,13 +8,13 @@
  * registers the activation and deactivation functions, and defines a function
  * that starts the plugin.
  *
- * @link             https://wordpress.org/plugins/productreels
+ * @link             https://bestwebexpert.com/productreels/
  * @since             1.0.0
  * @package           Productreels
  *
  * @wordpress-plugin
- * Plugin Name:       ProductReels
- * Plugin URI:        https://wordpress.org/plugins/productreels
+ * Plugin Name:       ProductReels – Shoppable Video Reels for WooCommerce
+ * Plugin URI:        https://bestwebexpert.com/productreels/
  * Description:       Turn product videos and customer UGC into shoppable Instagram-style reels. Grid, carousel, marquee, stacked and popup layouts, WooCommerce product tagging, CTA buttons, and built-in view/click analytics.
  * Version:           1.0.0
  * Requires at least: 6.6

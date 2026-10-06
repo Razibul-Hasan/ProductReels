@@ -25,7 +25,7 @@ if ( ! defined( 'WPINC' ) ) {
  * @since      1.0.0
  * @package    Productreels
  * @subpackage Productreels/admin
- * @author     Razibul Hasan <razibulhasan.ra@gmail.com>
+ * @author     bestwpexpert <https://bestwebexpert.com/>
  */
 class Productreels_Admin {
 
@@ -92,8 +92,7 @@ class Productreels_Admin {
 			Productreels_Rest_Controller::CAPABILITY,
 			self::PAGE,
 			array( $this, 'render_app' ),
-			'dashicons-format-video',
-			25
+			'dashicons-format-video'
 		);
 
 		// Replaces the duplicate of the parent WordPress adds automatically.
@@ -311,6 +310,7 @@ class Productreels_Admin {
 				'defaults' => Productreels_Settings::default_styles(),
 				'settings' => Productreels_Settings::all(),
 				'version'  => PRODUCTREELS_VERSION,
+				'logoUrl'  => PRODUCTREELS_URL . 'admin/images/logo.png',
 			),
 			Productreels_WooCommerce::bootstrap()
 		);
