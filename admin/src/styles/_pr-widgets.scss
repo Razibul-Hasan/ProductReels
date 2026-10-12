@@ -1,0 +1,353 @@
+/**
+ * Widgets (home): the page column's rhythm, the metric placeholders, top
+ * reels, the widgets table's extras and the first-run guide's illustrations.
+ *
+ * Loaded inside #productreels-admin-app by _pr-scoped.scss. Tokens only.
+ */
+
+.pr-home {
+	display: flex;
+	flex-direction: column;
+	gap: var(--pr-space-6);
+}
+
+/* ------------------------------------------------------------- Metrics */
+
+.pr-metric__ph {
+	display: block;
+	width: 96px;
+	height: 36px;
+	margin-block: 2px;
+	border-radius: var(--pr-radius-xs);
+	background: var(--pr-surface-sunken);
+	animation: pr-pulse 1.4s ease-in-out infinite;
+}
+
+/* ------------------------------------------------------------ Top reels */
+
+.pr-topreels {
+	display: flex;
+	flex-direction: column;
+	gap: var(--pr-space-4);
+}
+
+.pr-topreels__head {
+	display: flex;
+	align-items: baseline;
+	justify-content: space-between;
+	gap: var(--pr-space-4);
+}
+
+.pr-topreels__all {
+	color: var(--pr-brand);
+	text-decoration: underline;
+	text-underline-offset: 2px;
+	border-radius: var(--pr-radius-xs);
+}
+
+.pr-topreels__all:focus-visible {
+	outline: none;
+	box-shadow: var(--pr-focus-ring);
+}
+
+.pr-topreels__list {
+	display: grid;
+	grid-template-columns: repeat(6, minmax(0, 150px));
+	justify-content: space-between;
+	gap: var(--pr-space-4);
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.pr-topreel {
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	gap: var(--pr-space-2);
+	min-width: 0;
+	margin: 0;
+}
+
+.pr-topreel .prs-tile {
+	width: 100%;
+}
+
+.pr-topreel .prs-tile__media {
+	background: var(--pr-surface-sunken);
+}
+
+.pr-topreel .prs-tile:hover .prs-tile__media > img {
+	transform: scale(1.04);
+}
+
+.pr-topreel__rank {
+	position: absolute;
+	top: 10px;
+	inset-inline-start: 10px;
+	width: 24px;
+	height: 24px;
+	display: grid;
+	place-items: center;
+	border-radius: var(--pr-radius-pill);
+	background: var(--pr-surface);
+	color: var(--pr-ink);
+	pointer-events: none;
+}
+
+.pr-topreel__title {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.pr-topreel__meta {
+	display: flex;
+	flex-wrap: wrap;
+	gap: var(--pr-space-1) var(--pr-space-3);
+	color: var(--pr-ink-muted);
+}
+
+.pr-topreel__views {
+	display: inline-flex;
+	align-items: center;
+	gap: var(--pr-space-1);
+}
+
+/* --------------------------------------------------------- Widget table */
+
+.pr-widgettable {
+	overflow-x: auto;
+}
+
+.pr-widgettable .pr-sort {
+	color: var(--pr-ink-muted);
+	border-radius: var(--pr-radius-xs);
+}
+
+.pr-widgettable .pr-sort[data-active="true"],
+.pr-widgettable .pr-sort:hover {
+	color: var(--pr-ink);
+}
+
+.pr-widgettable .pr-sort:focus-visible {
+	outline: none;
+	box-shadow: var(--pr-focus-ring);
+}
+
+.pr-widgettable .pr-wname__title:focus-visible {
+	outline: none;
+	border-radius: var(--pr-radius-xs);
+	box-shadow: var(--pr-focus-ring);
+}
+
+.pr-widgettable .pr-stack {
+	min-width: 62px;
+}
+
+.pr-widgettable tr[data-highlight="true"] td {
+	animation: pr-row-highlight 2.4s ease-out;
+}
+
+@keyframes pr-row-highlight {
+
+	0%,
+	40% {
+		background: var(--pr-brand-soft);
+	}
+
+	100% {
+		background: transparent;
+	}
+}
+
+/* --------------------------------------------------------------- Guide */
+
+.pr-guide__steps {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.pr-step {
+	margin: 0;
+}
+
+.pr-stepart {
+	position: absolute;
+	inset: 0;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.pr-stepart__frame {
+	position: relative;
+	width: 52px;
+	height: 92px;
+	flex: none;
+	border-radius: 10px;
+	overflow: hidden;
+	background: var(--pr-surface-sunken);
+	box-shadow: var(--pr-shadow-reel);
+}
+
+.pr-stepart__frame--lg {
+	width: 64px;
+	height: 114px;
+	border-radius: 12px;
+}
+
+.pr-stepart img {
+	position: absolute;
+	inset: 0;
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	display: block;
+}
+
+.pr-stepart--reel {
+	gap: 14px;
+}
+
+.pr-stepart__card {
+	position: absolute;
+	inset-inline: 4px;
+	bottom: 4px;
+	display: flex;
+	align-items: center;
+	gap: 4px;
+	padding: 3px;
+	border-radius: 6px;
+	background: var(--pr-surface);
+}
+
+.pr-stepart__thumb {
+	position: relative;
+	width: 14px;
+	height: 14px;
+	flex: none;
+	border-radius: 3px;
+	overflow: hidden;
+	background: var(--pr-surface-sunken);
+}
+
+.pr-stepart__bar {
+	flex: 1;
+	height: 4px;
+	border-radius: var(--pr-radius-pill);
+	background: var(--pr-line);
+}
+
+.pr-stepart__badges {
+	display: flex;
+	flex-direction: column;
+	gap: var(--pr-space-2);
+}
+
+.pr-stepart--row {
+	gap: var(--pr-space-2);
+}
+
+.pr-stepart--row .pr-stepart__frame:nth-child(4) {
+	opacity: 0.45;
+}
+
+.pr-stepart__arrow {
+	position: absolute;
+	inset-inline-end: 14px;
+	top: calc(50% - 16px);
+	width: 32px;
+	height: 32px;
+	display: grid;
+	place-items: center;
+	border-radius: var(--pr-radius-pill);
+	background: var(--pr-surface);
+	color: var(--pr-ink);
+	box-shadow: var(--pr-shadow-sm);
+}
+
+[dir="rtl"] .pr-stepart__arrow svg {
+	transform: scaleX(-1);
+}
+
+.pr-stepart--page {
+	inset: 16px 20px 0;
+	flex-direction: column;
+	align-items: flex-start;
+	justify-content: flex-start;
+	gap: var(--pr-space-2);
+	padding: var(--pr-space-3);
+	border-radius: 10px 10px 0 0;
+	background: var(--pr-surface);
+	box-shadow: 0 0 0 1px var(--pr-line);
+}
+
+.pr-stepart__line {
+	width: 45%;
+	height: 6px;
+	border-radius: 6px;
+	background: var(--pr-line);
+}
+
+.pr-stepart__circles {
+	display: flex;
+	gap: 6px;
+}
+
+.pr-stepart__circle {
+	position: relative;
+	width: 30px;
+	height: 30px;
+	border-radius: var(--pr-radius-pill);
+	overflow: hidden;
+	background: var(--pr-surface-sunken);
+	box-shadow: 0 0 0 1.5px var(--pr-surface), 0 0 0 2.5px var(--pr-ink);
+}
+
+.pr-stepart__code {
+	margin-top: 6px;
+	cursor: default;
+}
+
+/* ---------------------------------------------------------- Responsive */
+
+@media (max-width: 1200px) {
+
+	.pr-topreels__list {
+		grid-template-columns: repeat(auto-fill, minmax(128px, 1fr));
+	}
+}
+
+@media (max-width: 960px) {
+
+	.pr-guide__steps {
+		grid-template-columns: minmax(0, 1fr);
+	}
+
+	.pr-step {
+		border-inline-start: 0;
+		border-top: 1px solid var(--pr-line);
+	}
+
+	.pr-step:first-child {
+		border-top: 0;
+	}
+
+	.pr-guide__head {
+		padding: var(--pr-space-6);
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+	.pr-metric__ph,
+	.pr-widgettable tr[data-highlight="true"] td {
+		animation: none;
+	}
+
+	.pr-widgettable tr[data-highlight="true"] td {
+		background: var(--pr-brand-soft);
+	}
+}

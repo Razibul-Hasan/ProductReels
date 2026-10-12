@@ -37,3 +37,7 @@ export const settings = {
 	get: () => get( '/settings' ),
 	update: ( data ) => put( '/settings', data ),
 };
+
+export const overview = {
+	get: () => get( '/overview' ),
+};

@@ -28,4 +28,5 @@ export { RangeField } from './RangeField';
 export { SettingRow, SettingsCard } from './Settings';
 export { BarCell, EmptyState, MetricBand, ReelStack, Skeleton } from './Data';
 export { ConfirmDialog, Dialog } from './Dialog';
+export { StepGuide } from './StepGuide';
 export { portalRoot } from './portal';

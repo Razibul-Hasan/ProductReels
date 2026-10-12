@@ -144,6 +144,7 @@ class Productreels {
 		require_once plugin_dir_path( __DIR__ ) . 'includes/rest/class-productreels-rest-products.php';
 		require_once plugin_dir_path( __DIR__ ) . 'includes/rest/class-productreels-rest-tracking.php';
 		require_once plugin_dir_path( __DIR__ ) . 'includes/rest/class-productreels-rest-settings.php';
+		require_once plugin_dir_path( __DIR__ ) . 'includes/rest/class-productreels-rest-overview.php';
 		require_once plugin_dir_path( __DIR__ ) . 'includes/rest/class-productreels-rest.php';
 
 		/**

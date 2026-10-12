@@ -387,6 +387,60 @@ class Productreels_Reels extends Productreels_Repository {
 	}
 
 	/**
+	 * How many reels the library holds.
+	 *
+	 * @since  1.1.0
+	 * @return int The count.
+	 */
+	public function count_all() {
+		$table = $this->table();
+
+		return (int) $this->db()->get_var( "SELECT COUNT(*) FROM `{$table}`" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+	}
+
+	/**
+	 * The most-viewed reels that have any views, for the Widgets screen.
+	 *
+	 * Each carries a poster (its own cover, or its first file's poster) so the
+	 * client never needs the files.
+	 *
+	 * @since  1.1.0
+	 * @param  int $limit How many.
+	 * @return array[] { id, title, thumbnail, view_count }, most viewed first.
+	 */
+	public function most_viewed( $limit = 6 ) {
+		$table = $this->table();
+
+		$rows = $this->db()->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			$this->db()->prepare( // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+				"SELECT id, title, thumbnail, view_count FROM `{$table}` WHERE view_count > 0 ORDER BY view_count DESC, id DESC LIMIT %d",
+				max( 1, absint( $limit ) )
+			),
+			ARRAY_A
+		);
+
+		$reels = $this->attach_first_file( $this->cast_rows( $rows ) );
+		$out   = array();
+
+		foreach ( $reels as $reel ) {
+			$poster = $reel['thumbnail'];
+
+			if ( '' === $poster && ! empty( $reel['file']['poster_url'] ) ) {
+				$poster = $reel['file']['poster_url'];
+			}
+
+			$out[] = array(
+				'id'         => $reel['id'],
+				'title'      => $reel['title'],
+				'thumbnail'  => $poster,
+				'view_count' => $reel['view_count'],
+			);
+		}
+
+		return $out;
+	}
+
+	/**
 	 * Attach each reel's first file, in one query for the whole page.
 	 *
 	 * @since  1.0.0

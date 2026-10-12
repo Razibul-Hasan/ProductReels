@@ -32,11 +32,11 @@ Rebuild the Widgets screen: totals, top reels and the widgets table once a store
 
 ## Done when
 
-- [ ] Matches `ScreenWidgets.png` and `ScreenFirstRun.png` at 1440px.
-- [ ] Totals equal the 1.0.0 dashboard's numbers on the same data.
-- [ ] Every row action works and is keyboard reachable; Delete asks first.
-- [ ] Loading, error and no-results states all render (simulate the error).
-- [ ] New or changed REST routes have `permission_callback`, sanitised args, and are listed in PROGRESS.md.
+- [x] Matches `ScreenWidgets.png` and `ScreenFirstRun.png` at 1440px.
+- [x] Totals equal the 1.0.0 dashboard's numbers on the same data.
+- [x] Every row action works and is keyboard reachable; Delete asks first.
+- [x] Loading, error and no-results states all render (simulate the error).
+- [x] New or changed REST routes have `permission_callback`, sanitised args, and are listed in PROGRESS.md.
 
 ## Hand-off
 

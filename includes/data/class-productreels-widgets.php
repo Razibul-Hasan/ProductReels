@@ -195,6 +195,11 @@ class Productreels_Widgets extends Productreels_Repository {
 					array( 'grid', 'carousel', 'marquee', 'stacked', 'popup' ),
 					'carousel'
 				),
+				'shape'       => Productreels_Validator::enum(
+					isset( $styles['shape'] ) ? $styles['shape'] : '',
+					array( 'rectangle', 'circle' ),
+					'rectangle'
+				),
 				'reel_count'  => $totals['reel_count'],
 				'view_total'  => $totals['view_total'],
 				'click_total' => isset( $clicks[ $id ] ) ? $clicks[ $id ] : 0,
@@ -463,6 +468,49 @@ class Productreels_Widgets extends Productreels_Repository {
 		);
 
 		return array_map( 'intval', (array) $ids );
+	}
+
+	/**
+	 * Store-wide totals for the Widgets screen, counted the way 1.0.0 did.
+	 *
+	 * 1.0.0 summed every widget's `view_total` (its reels' lifetime views, so
+	 * a reel in two widgets counts twice) and `click_total` on the client. The
+	 * same sums run here as two indexed aggregates instead of a page loop, and
+	 * the joins on the widgets table keep them to widgets that still exist.
+	 *
+	 * @since  1.1.0
+	 * @return array{widgets:int,views:int,clicks:int,reels_in_use:int} The totals.
+	 */
+	public function overview_totals() {
+		$table  = $this->table();
+		$pivot  = $this->pivot();
+		$reels  = Productreels_Schema::table( 'reels' );
+		$clicks = Productreels_Schema::table( 'clicks' );
+
+		// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Table names only; nothing user-supplied.
+		$placed = $this->db()->get_row(
+			"SELECT COALESCE( SUM( r.view_count ), 0 ) AS views, COUNT( DISTINCT p.reel_id ) AS reels_in_use
+			FROM `{$pivot}` p
+			INNER JOIN `{$table}` w ON w.id = p.widget_id
+			INNER JOIN `{$reels}` r ON r.id = p.reel_id",
+			ARRAY_A
+		);
+
+		$click_total = $this->db()->get_var(
+			"SELECT COALESCE( SUM( c.click_count ), 0 )
+			FROM `{$clicks}` c
+			INNER JOIN `{$table}` w ON w.id = c.widget_id"
+		);
+
+		$widgets = $this->db()->get_var( "SELECT COUNT(*) FROM `{$table}`" );
+		// phpcs:enable
+
+		return array(
+			'widgets'      => (int) $widgets,
+			'views'        => isset( $placed['views'] ) ? (int) $placed['views'] : 0,
+			'clicks'       => (int) $click_total,
+			'reels_in_use' => isset( $placed['reels_in_use'] ) ? (int) $placed['reels_in_use'] : 0,
+		);
 	}
 
 	/**

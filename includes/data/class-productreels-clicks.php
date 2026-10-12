@@ -185,6 +185,48 @@ class Productreels_Clicks extends Productreels_Repository {
 	}
 
 	/**
+	 * Total clicks per reel across every widget that still exists.
+	 *
+	 * Powers the Widgets screen's top reels, whose click rate is a reel's
+	 * clicks over its lifetime views.
+	 *
+	 * @since  1.1.0
+	 * @param  int[] $reel_ids Reel ids.
+	 * @return array<int,int> Reel id => total clicks.
+	 */
+	public function totals_for_reels( $reel_ids ) {
+		$reel_ids = array_values( array_unique( array_filter( array_map( 'absint', (array) $reel_ids ) ) ) );
+
+		if ( empty( $reel_ids ) ) {
+			return array();
+		}
+
+		$table        = $this->table();
+		$widgets      = Productreels_Schema::table( 'widgets' );
+		$placeholders = $this->placeholders( count( $reel_ids ) );
+
+		$rows = $this->db()->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			$this->db()->prepare( // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+				"SELECT c.reel_id, COALESCE( SUM( c.click_count ), 0 ) AS total
+				FROM `{$table}` c
+				INNER JOIN `{$widgets}` w ON w.id = c.widget_id
+				WHERE c.reel_id IN ({$placeholders})
+				GROUP BY c.reel_id",
+				$reel_ids
+			),
+			ARRAY_A
+		);
+
+		$totals = array();
+
+		foreach ( (array) $rows as $row ) {
+			$totals[ (int) $row['reel_id'] ] = (int) $row['total'];
+		}
+
+		return $totals;
+	}
+
+	/**
 	 * Delete every counter belonging to a widget.
 	 *
 	 * @since  1.0.0

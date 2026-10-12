@@ -60,6 +60,7 @@ class Productreels_Rest {
 			new Productreels_Rest_Products(),
 			new Productreels_Rest_Tracking(),
 			new Productreels_Rest_Settings(),
+			new Productreels_Rest_Overview(),
 		);
 	}
 }
