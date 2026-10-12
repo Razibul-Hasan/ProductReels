@@ -1,0 +1,455 @@
+/**
+ * Additions to the design's pr-admin rules, for what only the real app needs:
+ * the portal layer (dialogs, menus, popovers, tooltips, toasts, floating
+ * bars), the colour popover, the editable range value, skeletons, and fixes
+ * for WordPress core form styles. Tokens only; no raw colours or font sizes.
+ *
+ * Loaded inside #productreels-admin-app by _pr-scoped.scss.
+ */
+
+/* --------------------------------------------- WordPress and focus fixes */
+
+/* forms.css draws its own tick and an inset shadow on every checkbox. */
+.pr-check {
+	box-shadow: none;
+}
+
+.pr-check:checked::before {
+	content: none;
+}
+
+/* forms.css gives headings and paragraphs margins. */
+:where(h1, h2, h3, h4, h5, h6, p):where([class^="pr-"], [class*=" pr-"]) {
+	margin: 0;
+}
+
+/* Every pr-* control without a focus style of its own still gets the ring. */
+:where([class^="pr-"]:focus-visible, [class*=" pr-"]:focus-visible) {
+	outline: none;
+	box-shadow: var(--pr-focus-ring);
+}
+
+/* The slider rings its thumb instead (pr-admin). */
+.pr-slider:focus-visible {
+	box-shadow: none;
+}
+
+/* In pr-admin a selected state's own box-shadow comes after the focus ring
+   and cancels it. Roving focus always lands on the checked segment, so
+   without these Segmented would never show a ring. */
+.pr-seg__item[aria-checked="true"]:focus-visible,
+.pr-template[aria-checked="true"]:focus-visible,
+.pr-reelcard .pr-check:focus-visible {
+	box-shadow: var(--pr-focus-ring);
+}
+
+.pr-seg--studio .pr-seg__item[aria-checked="true"]:focus-visible {
+	box-shadow: var(--pr-focus-ring-studio);
+}
+
+.pr-iconbtn:disabled,
+.pr-switch:disabled,
+.pr-input:disabled,
+.pr-check:disabled,
+.pr-menu__item:disabled {
+	opacity: 0.45;
+	cursor: not-allowed;
+}
+
+.pr-spin {
+	animation: pr-spin 0.8s linear infinite;
+}
+
+/* ---------------------------------------------------------------- Dialog */
+
+/* The reference draws the overlay inside a mockup frame; here it covers the
+   viewport, above the WordPress admin bar. */
+.pr-overlay {
+	position: fixed;
+	z-index: 100000;
+	animation: pr-fade 0.2s ease-out;
+}
+
+.pr-dialog {
+	max-height: calc(100vh - 2 * var(--pr-space-8));
+	animation: pr-rise 0.2s ease-out;
+}
+
+.pr-dialog:focus {
+	outline: none;
+}
+
+/* A long body scrolls inside the dialog instead of overflowing it. */
+.pr-dialog__body {
+	flex: 1 1 auto;
+	min-height: 0;
+}
+
+/* 1.0.0 dialogs (ui/Modal.js) keep their widths and block layout until their
+   screens are ported. Part 14 removes these. */
+.pr-dialog--sm {
+	width: min(440px, 100%);
+}
+
+.pr-dialog--lg {
+	width: min(860px, 100%);
+}
+
+.pr-dialog--xl {
+	width: min(1120px, 100%);
+}
+
+.pr-dialog__body--legacy {
+	display: block;
+}
+
+.pr-confirm__icon--brand {
+	background: var(--pr-brand-soft);
+	color: var(--pr-brand);
+}
+
+@media (max-width: 600px) {
+
+	.pr-overlay {
+		padding: var(--pr-space-4);
+	}
+
+	.pr-dialog {
+		max-height: calc(100vh - 2 * var(--pr-space-4));
+	}
+}
+
+/* ------------------------------------------- Toasts and the floating bar */
+
+/* Both centre on the app, not on a viewport that includes the WP menu
+   (portal.js keeps --pr-app-start and --pr-app-end current). */
+.pr-toasts,
+.pr-floatdock {
+	position: fixed;
+	inset-block-end: var(--pr-space-6);
+	inset-inline-start: var(--pr-app-start, 0);
+	inset-inline-end: var(--pr-app-end, 0);
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: var(--pr-space-2);
+	padding-inline: var(--pr-space-4);
+	pointer-events: none;
+}
+
+.pr-toasts {
+	z-index: 100001;
+	transition: inset-block-end 0.2s ease-out;
+}
+
+/* Toasts sit above a floating bar while one shows. */
+.pr-has-floatbar .pr-toasts {
+	inset-block-end: calc(var(--pr-space-6) + var(--pr-control) + var(--pr-space-6));
+}
+
+.pr-floatdock {
+	z-index: 9000;
+}
+
+.pr-toasts > .pr-toast,
+.pr-floatdock > .pr-floatbar {
+	pointer-events: auto;
+	max-width: 100%;
+	animation: pr-rise 0.2s ease-out;
+}
+
+/* Room for the bar at the end of the page, so it never covers the last row. */
+.pr-floatbar-spacer {
+	flex: none;
+	height: calc(var(--pr-control) + 2 * var(--pr-space-6));
+}
+
+/* ------------------------------------------------ Menu and tooltip layer */
+
+.pr-menu--floating {
+	position: fixed;
+	z-index: 100002;
+}
+
+.pr-menu--floating:focus {
+	outline: none;
+}
+
+.pr-tip {
+	position: fixed;
+	z-index: 100003;
+	padding: var(--pr-space-1) var(--pr-space-2);
+	border-radius: var(--pr-radius-xs);
+	background: var(--pr-ink);
+	color: var(--pr-on-ink);
+	white-space: nowrap;
+	pointer-events: none;
+}
+
+/* ---------------------------------------------------------- Colour field */
+
+.pr-color {
+	width: 100%;
+	cursor: pointer;
+	font: inherit;
+	text-align: start;
+	transition: border-color 0.15s;
+}
+
+.pr-color:hover {
+	border-color: var(--pr-ink-muted);
+}
+
+.pr-color[aria-expanded="true"] {
+	border-color: var(--pr-brand);
+}
+
+.pr-color:focus-visible {
+	border-color: var(--pr-brand);
+	box-shadow: var(--pr-focus-ring);
+}
+
+.pr-color:disabled {
+	opacity: 0.45;
+	cursor: not-allowed;
+}
+
+.pr-colorpop {
+	position: fixed;
+	z-index: 100002;
+	width: 248px;
+	padding: var(--pr-space-3);
+	display: flex;
+	flex-direction: column;
+	gap: var(--pr-space-3);
+	background: var(--pr-surface);
+	border: 1px solid var(--pr-line);
+	border-radius: var(--pr-radius-md);
+	box-shadow: var(--pr-shadow-md);
+}
+
+.pr-colorpop__native {
+	display: block;
+	width: 100%;
+	height: var(--pr-control);
+	padding: 3px;
+	border: 1px solid var(--pr-line-strong);
+	border-radius: var(--pr-radius-sm);
+	background: var(--pr-surface);
+	cursor: pointer;
+}
+
+.pr-colorpop__native::-webkit-color-swatch-wrapper {
+	padding: 0;
+}
+
+.pr-colorpop__native::-webkit-color-swatch {
+	border: 0;
+	border-radius: var(--pr-radius-xs);
+}
+
+.pr-colorpop__native::-moz-color-swatch {
+	border: 0;
+	border-radius: var(--pr-radius-xs);
+}
+
+.pr-colorpop__row {
+	display: flex;
+	align-items: center;
+	gap: var(--pr-space-2);
+}
+
+.pr-colorpop__hex {
+	flex: 1;
+}
+
+.pr-colorpop__hex .pr-input {
+	padding-inline-start: 28px;
+	text-transform: uppercase;
+}
+
+.pr-colorpop__alpha {
+	min-width: 44px;
+	text-align: end;
+	color: var(--pr-ink-muted);
+	font-variant-numeric: tabular-nums;
+}
+
+.pr-colorpop__recents {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 6px;
+}
+
+/* Same checkerboard as the field's swatch, so transparency shows. */
+.pr-colorpop__recent {
+	position: relative;
+	width: 24px;
+	height: 24px;
+	padding: 0;
+	border: 0;
+	border-radius: var(--pr-radius-xs);
+	overflow: hidden;
+	cursor: pointer;
+	background-image:
+		linear-gradient(45deg, var(--pr-surface-sunken) 25%, transparent 25%, transparent 75%, var(--pr-surface-sunken) 75%),
+		linear-gradient(45deg, var(--pr-surface-sunken) 25%, var(--pr-surface) 25%, var(--pr-surface) 75%, var(--pr-surface-sunken) 75%);
+	background-size: 10px 10px;
+	background-position: 0 0, 5px 5px;
+}
+
+.pr-colorpop__recent > span {
+	position: absolute;
+	inset: 0;
+	box-shadow: inset 0 0 0 1px var(--pr-line);
+	border-radius: inherit;
+}
+
+/* ------------------------------------------------- Range: editable value */
+
+.pr-range__value:focus-within {
+	box-shadow: var(--pr-focus-ring);
+}
+
+.pr-range__input {
+	width: auto;
+	min-width: 1ch;
+	height: auto;
+	min-height: 0;
+	margin: 0;
+	padding: 0;
+	border: 0;
+	border-radius: 0;
+	background: transparent;
+	box-shadow: none;
+	color: inherit;
+	font: inherit;
+	text-align: end;
+	font-variant-numeric: tabular-nums;
+}
+
+.pr-range__input:focus,
+.pr-range__input:focus-visible {
+	outline: none;
+	box-shadow: none;
+}
+
+/* ------------------------------------------------------- Reel stack image */
+
+.pr-stack__item > img {
+	display: block;
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+}
+
+/* -------------------------------------------------------------- Skeleton */
+
+.pr-skeleton__media,
+.pr-skeleton__thumb,
+.pr-skeleton__line {
+	display: block;
+	background: var(--pr-surface-sunken);
+	animation: pr-pulse 1.4s ease-in-out infinite;
+}
+
+.pr-skeleton--rows {
+	display: flex;
+	flex-direction: column;
+	background: var(--pr-surface);
+	border: 1px solid var(--pr-line);
+	border-radius: var(--pr-radius-md);
+	overflow: hidden;
+}
+
+.pr-skeleton__row {
+	display: flex;
+	align-items: center;
+	gap: var(--pr-space-3);
+	padding: var(--pr-space-3) var(--pr-space-5);
+	border-top: 1px solid var(--pr-line);
+}
+
+.pr-skeleton__row:nth-child(2) {
+	border-top: 0;
+}
+
+.pr-skeleton__thumb {
+	width: 30px;
+	height: 53px;
+	flex: none;
+	border-radius: var(--pr-radius-xs);
+}
+
+.pr-skeleton__lines {
+	flex: 1;
+	display: flex;
+	flex-direction: column;
+	gap: var(--pr-space-2);
+}
+
+.pr-skeleton__line {
+	width: 60%;
+	height: 10px;
+	border-radius: var(--pr-radius-pill);
+}
+
+.pr-skeleton__line--short {
+	width: 35%;
+}
+
+.pr-skeleton--cards {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(156px, 1fr));
+	gap: var(--pr-space-6) var(--pr-space-4);
+}
+
+.pr-skeleton__card {
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+}
+
+.pr-skeleton__media {
+	aspect-ratio: 9 / 16;
+	border-radius: var(--pr-radius-reel);
+}
+
+.pr-skeleton__card .pr-skeleton__line {
+	width: 80%;
+}
+
+.pr-skeleton__card .pr-skeleton__line--short {
+	width: 50%;
+}
+
+/* ------------------------------------------------------------ Animations */
+
+@keyframes pr-spin {
+
+	to {
+		transform: rotate(360deg);
+	}
+}
+
+@keyframes pr-fade {
+
+	from {
+		opacity: 0;
+	}
+}
+
+@keyframes pr-rise {
+
+	from {
+		opacity: 0;
+		transform: translateY(8px);
+	}
+}
+
+@keyframes pr-pulse {
+
+	50% {
+		opacity: 0.55;
+	}
+}

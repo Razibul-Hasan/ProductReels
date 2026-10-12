@@ -1,0 +1,22 @@
+/**
+ * The 1.1.0 design layer, at app strength.
+ *
+ * WordPress's forms.css (e.g. `input[type=checkbox]`, `.wrap h1`) and the
+ * 1.0.0 base resets (`#productreels-admin-app button { font: inherit }`)
+ * out-rank a bare `.pr-*` class, so the design's own CSS is loaded here inside
+ * #productreels-admin-app: the type classes (from pr-tokens), every pr-*
+ * component rule (pr-admin, unchanged) and their additions (pr-components).
+ * The token declarations themselves still load unscoped from pr-tokens, since
+ * they must match the app root and the storefront.
+ *
+ * Every dialog, menu, popover and toast portals into the `.pr-portal` root
+ * inside the app (components/pr/portal.js), so all of them get these rules.
+ */
+
+@use 'sass:meta';
+
+#productreels-admin-app {
+	@include meta.load-css('../../../src/shared/styles/pr-tokens');
+	@include meta.load-css('pr-admin');
+	@include meta.load-css('pr-components');
+}

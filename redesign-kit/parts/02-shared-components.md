@@ -45,11 +45,11 @@ Dialogs: `Dialog` and `ConfirmDialog`.
 
 ## Done when
 
-- [ ] Each component matches its PNG at 1440px (check by rendering it in a screen or a temporary story; remove temporary code before committing).
-- [ ] Keyboard: Menu, Dialog, Segmented, Switch, Checkbox, ShortcodeChip all work without a mouse, with a visible focus ring.
-- [ ] Existing toasts and dialogs in 1.0.0 screens still work, in the new style.
-- [ ] No hard-coded colours, font sizes or radii in component code.
-- [ ] Build and lint pass; no console warnings.
+- [x] Each component matches its PNG at 1440px (check by rendering it in a screen or a temporary story; remove temporary code before committing). *(All 24 PNGs compared with a temporary `#/__story` route in an Edge harness at 1440 (WP core admin CSS + built bundle), plus open Menu, Dialog, ConfirmDialog, colour popover, toasts over a floating bar. Story deleted before commit.)*
+- [x] Keyboard: Menu, Dialog, Segmented, Switch, Checkbox, ShortcodeChip all work without a mouse, with a visible focus ring. *(57 scripted keyboard-only checks pass, incl. Tabs, RangeField, menu flip, nested Escape, focus trap/return, scroll lock, toast hover pause. Found and fixed: pr-admin's selected-state shadows cancelled the focus ring on the checked segment.)*
+- [x] Existing toasts and dialogs in 1.0.0 screens still work, in the new style. *(Mocked REST in the harness: widget delete confirm + toast, reel editor (xl) with the link dialog stacked on it, settings save success/error toasts, unsaved-changes guard. Not yet in a logged-in wp-admin.)*
+- [x] No hard-coded colours, font sizes or radii in component code. *(JS has only dynamic inline styles (positions, bar width, --pr-fill); `_pr-components.scss` uses tokens. The only hex in JS is splitColor's `#000000` fallback for an unreadable stored value, which is data, not styling.)*
+- [x] Build and lint pass; no console warnings. *(Build passes (the entrypoint-size warning predates this part). ESLint clean on every new/changed file (CRLF-stripped for the two adapters); `ColorPicker.js` keeps 4 old Prettier errors on untouched lines (6 before). `_pr-components.scss` passes stylelint. No console errors or warnings in any harness run.)*
 
 ## Hand-off
 

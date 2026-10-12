@@ -8,67 +8,24 @@
  *
  * Recent swatches live in this session only. They are a convenience while
  * styling one widget, not a preference worth persisting.
+ *
+ * 1.1.0: the colour helpers and the recents list live in pr/ColorField.js and
+ * are shared with ColorField, the new trigger for this same picker. Part 14
+ * removes this file once no screen uses it.
  */
 
 import { useRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { useDismiss } from '../../hooks/use-dismiss';
+import {
+	joinColor,
+	recentColors,
+	rememberColor as remember,
+	splitColor,
+} from '../pr/ColorField';
 import { Field } from './Fields';
 
-const recents = [];
-
-const remember = ( value ) => {
-	const index = recents.indexOf( value );
-
-	if ( index !== -1 ) {
-		recents.splice( index, 1 );
-	}
-
-	recents.unshift( value );
-	recents.splice( 8 );
-};
-
-/**
- * Split #rrggbbaa into its solid part and its alpha, tolerating short forms.
- *
- * @param {string} value A hex colour.
- * @return {{hex: string, alpha: number}} The solid colour and its alpha.
- */
-const splitColor = ( value ) => {
-	const hex = typeof value === 'string' ? value.trim() : '';
-
-	if ( /^#[0-9a-f]{8}$/i.test( hex ) ) {
-		return {
-			rgb: hex.slice( 0, 7 ),
-			alpha: Math.round( ( parseInt( hex.slice( 7 ), 16 ) / 255 ) * 100 ),
-		};
-	}
-
-	if ( /^#[0-9a-f]{6}$/i.test( hex ) ) {
-		return { rgb: hex, alpha: 100 };
-	}
-
-	if ( /^#[0-9a-f]{3}$/i.test( hex ) ) {
-		const [ , r, g, b ] = hex;
-
-		return { rgb: `#${ r }${ r }${ g }${ g }${ b }${ b }`, alpha: 100 };
-	}
-
-	return { rgb: '#000000', alpha: 100 };
-};
-
-const joinColor = ( rgb, alpha ) => {
-	if ( alpha >= 100 ) {
-		return rgb;
-	}
-
-	return (
-		rgb +
-		Math.round( ( alpha / 100 ) * 255 )
-			.toString( 16 )
-			.padStart( 2, '0' )
-	);
-};
+const recents = recentColors();
 
 export const ColorPicker = ( {
 	label,

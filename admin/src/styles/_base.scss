@@ -57,8 +57,10 @@ body.productreels-screen {
 		box-sizing: border-box;
 	}
 
-	/* One focus treatment, applied everywhere, never removed. */
-	:focus-visible {
+	/* One focus treatment, applied everywhere, never removed. The 1.1.0
+	   components (any pr-* class) draw --pr-focus-ring instead: this rule's
+	   radius would square off their pills mid-focus. */
+	:focus-visible:where(:not([class^='pr-'], [class*=' pr-'])) {
 		outline: 2px solid var(--wr-ring);
 		outline-offset: 2px;
 		border-radius: var(--wr-radius-sm);
@@ -98,12 +100,13 @@ body.productreels-screen {
 		color: inherit;
 	}
 
-	/* wp-admin sets these globally and they fight the app's own controls. */
-	input[type='text'],
-	input[type='url'],
-	input[type='number'],
-	input[type='search'],
-	textarea {
+	/* wp-admin sets these globally and they fight the app's own controls.
+	   1.1.0 inputs (pr-*) set their own radius and focus ring. */
+	input[type='text']:where(:not([class^='pr-'], [class*=' pr-'])),
+	input[type='url']:where(:not([class^='pr-'], [class*=' pr-'])),
+	input[type='number']:where(:not([class^='pr-'], [class*=' pr-'])),
+	input[type='search']:where(:not([class^='pr-'], [class*=' pr-'])),
+	textarea:where(:not([class^='pr-'], [class*=' pr-'])) {
 		box-shadow: none;
 		border-radius: var(--wr-radius-sm);
 		min-height: 0;
