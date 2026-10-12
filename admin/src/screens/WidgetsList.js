@@ -27,7 +27,11 @@ import {
 } from '../components/icons';
 import { Button, IconButton } from '../components/ui/Button';
 import { EmptyState, Skeleton } from '../components/ui/Feedback';
-import { SearchInput } from '../components/ui/Fields';
+import {
+	Button as PrButton,
+	PageHeader,
+	SearchField,
+} from '../components/pr';
 import { ConfirmDialog } from '../components/ui/Modal';
 import { useToasts } from '../components/ui/Toasts';
 import { useDebounced } from '../hooks/use-debounced';
@@ -593,56 +597,47 @@ export const WidgetsList = ( { navigate } ) => {
 
 	return (
 		<>
-			<div className="wr-page-head">
-				<div className="wr-page-head__titles">
-					<h1 className="wr-page-head__title">
-						{ __(
-							'All Widgets',
-							'productreels'
-						) }
-						{ ! loading && total > 0 && (
-							<span className="wr-count-chip">
-								{ formatNumber( total ) }
-							</span>
-						) }
-					</h1>
-					<p className="wr-page-head__sub">
-						{ __(
-							'Reusable, styled collections of reels you can drop anywhere.',
-							'productreels'
-						) }
-					</p>
-				</div>
-				<div className="wr-page-head__actions">
-					<SearchInput
-						value={ search }
-						onChange={ setSearch }
-						placeholder={ __(
-							'Search widgets…',
-							'productreels'
-						) }
-					/>
-					<Button
-						icon={ IconPlus }
-						onClick={ () => setAddingReel( true ) }
-					>
-						{ __(
-							'Add Reel',
-							'productreels'
-						) }
-					</Button>
-					<Button
-						variant="primary"
-						icon={ IconLayout }
-						onClick={ () => navigate( '#/widgets/new' ) }
-					>
-						{ __(
-							'Create Widget',
-							'productreels'
-						) }
-					</Button>
-				</div>
-			</div>
+			<PageHeader
+				title={ __( 'Widgets', 'productreels' ) }
+				count={ ! loading && total > 0 ? total : null }
+				description={ __(
+					'Styled sets of reels you can place on any page.',
+					'productreels'
+				) }
+				actions={
+					<>
+						<SearchField
+							value={ search }
+							onChange={ ( event ) =>
+								setSearch( event.target.value )
+							}
+							onKeyDown={ ( event ) => {
+								if ( event.key === 'Escape' && search !== '' ) {
+									setSearch( '' );
+								}
+							} }
+							placeholder={ __(
+								'Search widgets',
+								'productreels'
+							) }
+							width={ 240 }
+						/>
+						<PrButton
+							icon="plus"
+							onClick={ () => setAddingReel( true ) }
+						>
+							{ __( 'Add reel', 'productreels' ) }
+						</PrButton>
+						<PrButton
+							variant="primary"
+							icon="plus"
+							onClick={ () => navigate( '#/widgets/new' ) }
+						>
+							{ __( 'Create widget', 'productreels' ) }
+						</PrButton>
+					</>
+				}
+			/>
 
 			<div className="wr-app__body">
 				{ error !== '' && (

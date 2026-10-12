@@ -11,6 +11,8 @@ export { Badge, Count, LAYOUTS, LayoutBadge } from './Badge';
 export { ShortcodeChip, copyText } from './ShortcodeChip';
 export { FloatingBar, Notice } from './Notice';
 export { Toast, ToastProvider, useToasts } from './Toast';
+export { AppHeader, SECTIONS } from './AppHeader';
+export { PageHeader } from './PageHeader';
 export { FilterChips, Segmented, Tabs } from './Navigation';
 export { Menu } from './Menu';
 export {

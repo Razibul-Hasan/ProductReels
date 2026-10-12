@@ -19,4 +19,5 @@
 	@include meta.load-css('../../../src/shared/styles/pr-tokens');
 	@include meta.load-css('pr-admin');
 	@include meta.load-css('pr-components');
+	@include meta.load-css('pr-shell');
 }

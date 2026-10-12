@@ -7,18 +7,22 @@
  */
 
 import { useCallback, useEffect, useMemo, useState } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { posterOf } from '@shared/format';
 import { widgets as widgetsApi } from '../api';
 import {
 	IconChevronDown,
-	IconChevronLeft,
 	IconEdit,
 	IconExternal,
 	IconVideo,
 } from '../components/icons';
-import { Button, IconButton } from '../components/ui/Button';
+import { Button } from '../components/ui/Button';
 import { EmptyState, Skeleton } from '../components/ui/Feedback';
+import {
+	Button as PrButton,
+	PageHeader,
+	ShortcodeChip,
+} from '../components/pr';
 
 const locale = () => document.documentElement.lang || undefined;
 
@@ -180,48 +184,36 @@ export const Statistics = ( { widgetId, navigate } ) => {
 
 	return (
 		<>
-			<div className="wr-page-head">
-				<div className="wr-page-head__titles wr-page-head__titles--with-back">
-					<IconButton
-						icon={ IconChevronLeft }
-						label={ __(
-							'Back',
-							'productreels'
-						) }
-						onClick={ () => navigate( '#/widgets' ) }
-					/>
-					<div>
-						<h1 className="wr-page-head__title">
-							{ __(
-								'Statistics',
-								'productreels'
-							) }
-							{ widget && (
-								<span className="wr-page-head__crumb">
-									{ widget.name }
-								</span>
-							) }
-						</h1>
-						<p className="wr-page-head__sub">
-							{ __(
-								'Lifetime views and clicks for this widget.',
-								'productreels'
-							) }
-						</p>
-					</div>
-				</div>
-				<div className="wr-page-head__actions">
-					<Button
-						icon={ IconEdit }
-						onClick={ () => navigate( `#/widgets/${ widgetId }` ) }
-					>
-						{ __(
-							'Edit',
-							'productreels'
-						) }
-					</Button>
-				</div>
-			</div>
+			<PageHeader
+				title={ __( 'Statistics', 'productreels' ) }
+				back={ __( 'Back to widgets', 'productreels' ) }
+				onBack={ () => navigate( '#/widgets' ) }
+				description={
+					widget
+						? sprintf(
+								/* translators: %s: widget name. */
+								__( '%s, all time.', 'productreels' ),
+								widget.name ||
+									__( 'Untitled widget', 'productreels' )
+							)
+						: null
+				}
+				actions={
+					<>
+						<ShortcodeChip
+							code={ `[productreels id="${ widgetId }"]` }
+						/>
+						<PrButton
+							icon="pencil"
+							onClick={ () =>
+								navigate( `#/widgets/${ widgetId }` )
+							}
+						>
+							{ __( 'Edit widget', 'productreels' ) }
+						</PrButton>
+					</>
+				}
+			/>
 
 			<div className="wr-app__body">
 				{ error !== '' && (

@@ -261,7 +261,10 @@ export const WidgetEditor = ( { widgetId, navigate } ) => {
 	const saved = useRef( { name: '', styles: boot.defaults, attached: [] } );
 	const narrow = useMediaQuery( '(max-width: 1180px)' );
 
-	useUnsavedChanges( dirty );
+	useUnsavedChanges(
+		dirty,
+		name.trim() || __( 'Untitled widget', 'productreels' )
+	);
 
 	const sensors = useSensors(
 		useSensor( PointerSensor, { activationConstraint: { distance: 4 } } ),

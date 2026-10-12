@@ -32,11 +32,11 @@ Give every screen the new frame: the ProductReels app bar, page headers, three s
 
 ## Done when
 
-- [ ] The app bar matches `AppHeader.png`; the current section is highlighted on every screen.
-- [ ] Every 1.0.0 admin URL (list them from AUDIT.md) still opens the right place.
-- [ ] The WP submenu shows Widgets, Reels, Settings, and the right one is highlighted as current.
-- [ ] Leaving a dirty editor asks first, both for in-app links and for closing the tab.
-- [ ] Works at 1440, 1280, 960 and 782px wide.
+- [x] The app bar matches `AppHeader.png`; the current section is highlighted on every screen.
+- [x] Every 1.0.0 admin URL (list them from AUDIT.md) still opens the right place.
+- [x] The WP submenu shows Widgets, Reels, Settings, and the right one is highlighted as current.
+- [x] Leaving a dirty editor asks first, both for in-app links and for closing the tab.
+- [x] Works at 1440, 1280, 960 and 782px wide.
 
 ## Hand-off
 

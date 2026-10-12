@@ -11,7 +11,7 @@ import { useEffect, useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { boot, settings as settingsApi } from '../api';
 import { IconInfo } from '../components/icons';
-import { Button } from '../components/ui/Button';
+import { Button, PageHeader } from '../components/pr';
 import { Notice, Skeleton } from '../components/ui/Feedback';
 import { Switch, TextField } from '../components/ui/Fields';
 import { useToasts } from '../components/ui/Toasts';
@@ -62,7 +62,7 @@ export const Settings = () => {
 
 	const dirty = draft !== null && JSON.stringify( draft ) !== saved;
 
-	useUnsavedChanges( dirty );
+	useUnsavedChanges( dirty, __( 'Settings', 'productreels' ) );
 
 	useEffect( () => {
 		let cancelled = false;
@@ -164,35 +164,24 @@ export const Settings = () => {
 
 	return (
 		<>
-			<div className="wr-page-head">
-				<div className="wr-page-head__titles">
-					<h1 className="wr-page-head__title">
-						{ __(
-							'Settings',
-							'productreels'
-						) }
-					</h1>
-					<p className="wr-page-head__sub">
-						{ __(
-							'Tracking, public access, caching and what happens on uninstall.',
-							'productreels'
-						) }
-					</p>
-				</div>
-				<div className="wr-page-head__actions">
+			<PageHeader
+				title={ __( 'Settings', 'productreels' ) }
+				description={ __(
+					'How views are counted, who can read your widgets, caching, and what happens on uninstall.',
+					'productreels'
+				) }
+				actions={
 					<Button
 						variant="primary"
+						icon="check"
 						busy={ saving }
-						disabled={ saving || ! dirty }
+						disabled={ ! dirty }
 						onClick={ save }
 					>
-						{ __(
-							'Save',
-							'productreels'
-						) }
+						{ __( 'Save settings', 'productreels' ) }
 					</Button>
-				</div>
-			</div>
+				}
+			/>
 
 			<div className="wr-app__body wr-settings">
 				{ ! draft && (

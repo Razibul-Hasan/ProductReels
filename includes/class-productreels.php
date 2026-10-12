@@ -215,7 +215,7 @@ class Productreels {
 		$this->loader->add_filter( 'admin_footer_text', $plugin_admin, 'admin_footer_text', 99 );
 		$this->loader->add_filter( 'update_footer', $plugin_admin, 'admin_footer_text', 99 );
 		$this->loader->add_filter( 'admin_body_class', $plugin_admin, 'admin_body_class' );
-		$this->loader->add_filter( 'admin_title', $plugin_admin, 'admin_title' );
+		$this->loader->add_filter( 'admin_title', $plugin_admin, 'admin_title', 10, 2 );
 	}
 
 	/**

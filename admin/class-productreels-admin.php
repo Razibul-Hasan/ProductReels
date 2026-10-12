@@ -20,7 +20,7 @@ if ( ! defined( 'WPINC' ) ) {
  * The whole admin is one React app on one WordPress screen. The extra menu
  * items are real WordPress submenus whose only job is to redirect to a hash
  * route on that screen, which is what lets a single-page app appear in the
- * sidebar as four separate destinations.
+ * sidebar as three separate destinations: Widgets, Reels and Settings.
  *
  * @since      1.0.0
  * @package    Productreels
@@ -40,6 +40,10 @@ class Productreels_Admin {
 	/**
 	 * Submenu slug => the hash route it sends the browser to.
 	 *
+	 * `productreels-new-widget` was the 1.0.0 "Create Widget" item. Since
+	 * 1.1.0 it is a hidden page, kept so old links and bookmarks still land
+	 * on the create screen.
+	 *
 	 * @since 1.0.0
 	 * @var   array<string,string>
 	 */
@@ -57,6 +61,17 @@ class Productreels_Admin {
 	 * @var      string    $plugin_name    The ID of this plugin.
 	 */
 	private $plugin_name;
+
+	/**
+	 * The admin title WordPress printed, split around the screen name.
+	 *
+	 * Filled by admin_title(), which runs before the scripts are enqueued, so
+	 * the app can rename the tab per route in the site's own format.
+	 *
+	 * @since 1.1.0
+	 * @var   array<string,string>|null
+	 */
+	private $title_parts = null;
 
 	/**
 	 * The current version of the plugin.
@@ -80,9 +95,11 @@ class Productreels_Admin {
 	}
 
 	/**
-	 * Register the ProductReels menu and its four submenu items.
+	 * Register the ProductReels menu: Widgets, Reels and Settings.
 	 *
 	 * @since  1.0.0
+	 * @since  1.1.0 Labels are Widgets, Reels and Settings; Create Widget is
+	 *               a hidden page that still redirects.
 	 * @return void
 	 */
 	public function register_menu() {
@@ -98,22 +115,26 @@ class Productreels_Admin {
 		// Replaces the duplicate of the parent WordPress adds automatically.
 		add_submenu_page(
 			self::PAGE,
-			__( 'All Widgets', 'productreels' ),
-			__( 'All Widgets', 'productreels' ),
+			__( 'Widgets', 'productreels' ),
+			__( 'Widgets', 'productreels' ),
 			Productreels_Rest_Controller::CAPABILITY,
 			self::PAGE,
 			array( $this, 'render_app' )
 		);
 
-		$labels = array(
-			'productreels-reels'      => __( 'All Reels', 'productreels' ),
-			'productreels-new-widget' => __( 'Create Widget', 'productreels' ),
-			'productreels-settings'   => __( 'Settings', 'productreels' ),
+		// Parent '' registers a page without a menu item: the 1.0.0 create
+		// link keeps working with the same capability check.
+		$pages = array(
+			'productreels-reels'      => array( self::PAGE, __( 'Reels', 'productreels' ) ),
+			'productreels-settings'   => array( self::PAGE, __( 'Settings', 'productreels' ) ),
+			'productreels-new-widget' => array( '', __( 'Create widget', 'productreels' ) ),
 		);
 
-		foreach ( $labels as $slug => $label ) {
+		foreach ( $pages as $slug => $page ) {
+			list( $parent, $label ) = $page;
+
 			$hook = add_submenu_page(
-				self::PAGE,
+				$parent,
 				$label,
 				$label,
 				Productreels_Rest_Controller::CAPABILITY,
@@ -256,22 +277,42 @@ class Productreels_Admin {
 	}
 
 	/**
-	 * Name the browser tab "ProductReels - All Widgets ‹ Site — WordPress".
+	 * Name the browser tab "Widgets ‹ ProductReels ‹ Site — WordPress".
 	 *
 	 * WordPress titles the tab after the submenu item alone, so nothing says
-	 * which plugin the screen belongs to once a few tabs are open. The app
-	 * then keeps the screen part in step with its hash route.
+	 * which plugin the screen belongs to once a few tabs are open. The plugin
+	 * name goes after the screen name, the way WordPress nests its own
+	 * screens. The title is also kept split around the screen name, so the app
+	 * can rename the tab per hash route without guessing the site's format.
 	 *
 	 * @since  1.0.0
+	 * @since  1.1.0 "Screen ‹ ProductReels ‹ …" instead of "ProductReels - Screen ‹ …".
 	 * @param  string $admin_title The full title WordPress would print.
-	 * @return string The title, prefixed on a ProductReels screen.
+	 * @param  string $title       The screen name alone.
+	 * @return string The title, with the plugin name on a ProductReels screen.
 	 */
-	public function admin_title( $admin_title ) {
+	public function admin_title( $admin_title, $title = '' ) {
 		if ( ! $this->is_productreels_screen() ) {
 			return $admin_title;
 		}
 
-		return 'ProductReels - ' . $admin_title;
+		$title = (string) $title;
+		$at    = '' === $title ? false : strpos( $admin_title, $title );
+
+		// Another plugin rewrote the title: leave it as it is.
+		if ( false === $at ) {
+			return $admin_title;
+		}
+
+		$before = substr( $admin_title, 0, $at );
+		$after  = ' &lsaquo; ' . __( 'ProductReels', 'productreels' ) . substr( $admin_title, $at + strlen( $title ) );
+
+		$this->title_parts = array(
+			'before' => html_entity_decode( $before, ENT_QUOTES, 'UTF-8' ),
+			'after'  => html_entity_decode( $after, ENT_QUOTES, 'UTF-8' ),
+		);
+
+		return $before . $title . $after;
 	}
 
 	/**
@@ -320,6 +361,7 @@ class Productreels_Admin {
 				'settings' => Productreels_Settings::all(),
 				'version'  => PRODUCTREELS_VERSION,
 				'logoUrl'  => PRODUCTREELS_URL . 'admin/images/logo.png',
+				'title'    => $this->title_parts,
 			),
 			Productreels_WooCommerce::bootstrap()
 		);

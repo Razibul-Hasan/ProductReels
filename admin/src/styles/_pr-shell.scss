@@ -1,0 +1,99 @@
+/**
+ * The 1.1.0 app shell: app bar, page column and page header, on top of the
+ * design's own rules in pr-admin. Loaded inside #productreels-admin-app by
+ * pr-scoped, like the components.
+ *
+ * Breakpoints follow wp-admin: at 960px the admin menu folds, at 782px it
+ * goes and the admin bar grows.
+ */
+
+/* ------------------------------------------------------------- App bar */
+
+.pr-appbar__brand {
+	display: flex;
+	flex: none;
+	align-items: center;
+	gap: var(--pr-space-2);
+	color: inherit;
+	text-decoration: none;
+	border-radius: var(--pr-radius-xs);
+}
+
+.pr-appbar__mark {
+	display: block;
+	width: 28px;
+	height: 28px;
+	margin-inline-end: var(--pr-space-1);
+}
+
+.pr-nav {
+	min-width: 0;
+}
+
+.pr-navpill,
+.pr-docs {
+	flex: none;
+	white-space: nowrap;
+}
+
+/* wp-admin's common.css rings every focused link (`a:focus`), mouse clicks
+   included. The shell's links ring on keyboard focus only, like the rest. */
+.pr-appbar a:focus:not(:focus-visible) {
+	box-shadow: none;
+}
+
+/* ---------------------------------------------------------------- Page */
+
+/* In the shell's flex column the auto margins would shrink the column to
+   its content; it is full width up to --pr-content-max instead. */
+.wr-app > .pr-page {
+	width: 100%;
+}
+
+/* A 1.0.0 screen body inside the new page column: the column owns the
+   gutters now. */
+.pr-page > .wr-app__body {
+	padding: 0;
+}
+
+/* Below the fold point the pills scroll sideways rather than wrap. */
+@media (max-width: 960px) {
+	.pr-appbar {
+		gap: var(--pr-space-5);
+	}
+
+	.pr-nav {
+		flex: 1 1 auto;
+		overflow-x: auto;
+		scrollbar-width: none;
+		/* Room for the focus ring inside the scroller. */
+		padding: 3px;
+		margin: -3px;
+	}
+
+	.pr-nav::-webkit-scrollbar {
+		display: none;
+	}
+}
+
+@media (max-width: 782px) {
+	.pr-appbar {
+		gap: var(--pr-space-4);
+		padding-inline: var(--pr-space-5);
+	}
+
+	.pr-page {
+		padding: var(--pr-space-5);
+	}
+
+	/* Actions wrap under the title, and search takes the spare width. */
+	.pr-pagehead {
+		flex-direction: column;
+		align-items: stretch;
+		gap: var(--pr-space-4);
+	}
+
+	.pr-pagehead__actions > .pr-inputwrap {
+		flex: 1 1 200px;
+	}
+}

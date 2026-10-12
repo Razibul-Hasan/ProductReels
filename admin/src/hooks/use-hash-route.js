@@ -123,13 +123,13 @@ export const useHashRoute = ( dirtyRef ) => {
 /**
  * Keep the WordPress submenu highlight in step with the hash.
  *
- * The four menu items all resolve to one WordPress screen, so WordPress marks
+ * The three menu items all resolve to one WordPress screen, so WordPress marks
  * the first of them current and leaves it there. This moves the highlight the
- * way it would move if these really were four separate pages.
+ * way it would move if these really were three separate pages.
  *
- * @param {Object} route The current route.
+ * @param {string} section The current section: widgets, reels or settings.
  */
-export const useSubmenuHighlight = ( route ) => {
+export const useSubmenuHighlight = ( section ) => {
 	useEffect( () => {
 		const menu = document.querySelector( '#toplevel_page_productreels' );
 
@@ -139,9 +139,8 @@ export const useSubmenuHighlight = ( route ) => {
 
 		const wanted = {
 			reels: 'productreels-reels',
-			'widget-new': 'productreels-new-widget',
 			settings: 'productreels-settings',
-		}[ route.name ];
+		}[ section ];
 
 		menu.querySelectorAll( '.wp-submenu li' ).forEach( ( item ) => {
 			const link = item.querySelector( 'a' );
@@ -157,8 +156,14 @@ export const useSubmenuHighlight = ( route ) => {
 
 			item.classList.toggle( 'current', isCurrent );
 			link.classList.toggle( 'current', isCurrent );
+
+			if ( isCurrent ) {
+				link.setAttribute( 'aria-current', 'page' );
+			} else {
+				link.removeAttribute( 'aria-current' );
+			}
 		} );
-	}, [ route.name ] );
+	}, [ section ] );
 };
 
 /**
@@ -166,23 +171,36 @@ export const useSubmenuHighlight = ( route ) => {
  *
  * WordPress names the tab once, after the one submenu item it knows about,
  * and the name never moves again. Every route here is a page in its own
- * right — it deserves its own name in the tab, the history menu and any
- * bookmark. The site name and " — WordPress" tail are whatever WordPress
- * printed, so the format follows the site's language.
+ * right, so it gets its own name in the tab, the history menu and any
+ * bookmark: "Reels ‹ ProductReels ‹ Site — WordPress".
  *
- * @param {string} label The screen name, e.g. "All Widgets".
+ * PHP sends the title WordPress printed, split around the screen name
+ * (`title.before`, `title.after`), so the site name and the locale's own
+ * separators stay exactly as WordPress wrote them.
+ *
+ * @param {string} label The screen name, e.g. "Reels".
+ * @param {Object} parts `{ before, after }` from the bootstrap, if any.
  */
-export const useDocumentTitle = ( label ) => {
+export const useDocumentTitle = ( label, parts ) => {
 	useEffect( () => {
 		if ( ! label ) {
 			return;
 		}
 
+		if ( parts && typeof parts.after === 'string' ) {
+			document.title = `${ parts.before || '' }${ label }${
+				parts.after
+			}`;
+
+			return;
+		}
+
+		// No parts (another plugin rewrote the title): swap the first segment.
 		const current = document.title;
 		const tail = current.indexOf( ' ‹ ' );
 
-		document.title = `ProductReels - ${ label }${
+		document.title = `${ label }${
 			tail === -1 ? '' : current.slice( tail )
 		}`;
-	}, [ label ] );
+	}, [ label, parts ] );
 };

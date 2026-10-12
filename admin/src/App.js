@@ -1,23 +1,21 @@
 /**
  * The app shell.
  *
- * Owns the route, the unsaved-changes gate and the toast stack. Screens below
- * this point are pure: they receive a navigate function and never touch the
- * address bar themselves.
+ * Owns the route, the frame each route sits in, the unsaved-changes gate and
+ * the toast stack. Screens below this point are pure: they receive a navigate
+ * function and never touch the address bar themselves.
  */
 
-import { useMemo, useRef, useState } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+import { useCallback, useMemo, useRef, useState } from '@wordpress/element';
+import { __, sprintf } from '@wordpress/i18n';
 import { boot } from './api';
-import { IconExternal } from './components/icons';
 import {
 	useDocumentTitle,
 	useHashRoute,
 	useSubmenuHighlight,
 } from './hooks/use-hash-route';
-import { UnsavedContext } from './hooks/use-unsaved-guard';
-import { ConfirmDialog } from './components/ui/Modal';
-import { ToastProvider } from './components/ui/Toasts';
+import { UnsavedContext, useLeaveWarning } from './hooks/use-unsaved-guard';
+import { AppHeader, ConfirmDialog, ToastProvider } from './components/pr';
 import { ReelsLibrary } from './screens/ReelsLibrary';
 import { Settings } from './screens/Settings';
 import { Statistics } from './screens/Statistics';
@@ -26,103 +24,43 @@ import { WidgetsList } from './screens/WidgetsList';
 
 const DOCS_URL = 'https://bestwebexpert.com/productreels';
 
-const BrandMark = () => (
-	<img src={ boot.logoUrl } width="28" height="28" alt="" />
-);
-
 /**
- * The bar above every list screen: who this is, where you are, where the
- * other sections are. The editor draws its own header and hides this one.
- *
- * @param {Object}   props          Props.
- * @param {Object}   props.route    The current route.
- * @param {Function} props.navigate Hash navigation.
- * @return {Object} The bar.
+ * Every route, in one place: the section it belongs to (app bar pill and WP
+ * submenu item), its name in the browser tab, and its frame. `app` routes get
+ * the app bar and the page column; `editor` routes fill the content area and
+ * draw their own header.
  */
-const AppBar = ( { route, navigate } ) => {
-	const tabs = [
-		{
-			hash: '#/widgets',
-			match: [ 'widgets', 'widget-stats' ],
-			label: __(
-				'All Widgets',
-				'productreels'
-			),
-		},
-		{
-			hash: '#/reels',
-			match: [ 'reels' ],
-			label: __(
-				'All Reels',
-				'productreels'
-			),
-		},
-		{
-			hash: '#/settings',
-			match: [ 'settings' ],
-			label: __(
-				'Settings',
-				'productreels'
-			),
-		},
-	];
-
-	return (
-		<header className="wr-appbar">
-			<button
-				type="button"
-				className="wr-appbar__brand"
-				onClick={ () => navigate( '#/widgets' ) }
-			>
-				<span className="wr-appbar__mark">
-					<BrandMark />
-				</span>
-				<span className="wr-appbar__name">ProductReels</span>
-				<span className="wr-appbar__version">v{ boot.version }</span>
-			</button>
-
-			<nav
-				className="wr-appbar__tabs"
-				aria-label={ __(
-					'ProductReels sections',
-					'productreels'
-				) }
-			>
-				{ tabs.map( ( tab ) => {
-					const current = tab.match.includes( route.name );
-
-					return (
-						<button
-							key={ tab.hash }
-							type="button"
-							className={ `wr-appbar__tab${
-								current ? ' is-current' : ''
-							}` }
-							aria-current={ current ? 'page' : undefined }
-							onClick={ () => navigate( tab.hash ) }
-						>
-							{ tab.label }
-						</button>
-					);
-				} ) }
-			</nav>
-
-			<div className="wr-appbar__links">
-				<a
-					className="wr-appbar__link"
-					href={ DOCS_URL }
-					target="_blank"
-					rel="noopener noreferrer"
-				>
-					{ __(
-						'Documentation',
-						'productreels'
-					) }
-					<IconExternal size={ 12 } />
-				</a>
-			</div>
-		</header>
-	);
+const ROUTES = {
+	widgets: {
+		section: 'widgets',
+		title: __( 'Widgets', 'productreels' ),
+		frame: 'app',
+	},
+	'widget-new': {
+		section: 'widgets',
+		title: __( 'New widget', 'productreels' ),
+		frame: 'editor',
+	},
+	'widget-edit': {
+		section: 'widgets',
+		title: __( 'Edit widget', 'productreels' ),
+		frame: 'editor',
+	},
+	'widget-stats': {
+		section: 'widgets',
+		title: __( 'Statistics', 'productreels' ),
+		frame: 'app',
+	},
+	reels: {
+		section: 'reels',
+		title: __( 'Reels', 'productreels' ),
+		frame: 'app',
+	},
+	settings: {
+		section: 'settings',
+		title: __( 'Settings', 'productreels' ),
+		frame: 'app',
+	},
 };
 
 const Screen = ( { route, navigate } ) => {
@@ -164,85 +102,78 @@ const Screen = ( { route, navigate } ) => {
 
 const App = () => {
 	const dirty = useRef( false );
-	const [ , setDirtyState ] = useState( false );
+	const [ unsaved, setUnsaved ] = useState( { dirty: false, label: '' } );
 	const { route, navigate, pending, leaveAnyway, stayHere } =
 		useHashRoute( dirty );
+	const meta = ROUTES[ route.name ] || ROUTES.widgets;
 
-	useSubmenuHighlight( route );
-	useDocumentTitle(
-		{
-			widgets: __(
-				'All Widgets',
-				'productreels'
-			),
-			'widget-new': __(
-				'Create Widget',
-				'productreels'
-			),
-			'widget-edit': __(
-				'Edit Widget',
-				'productreels'
-			),
-			'widget-stats': __(
-				'Statistics',
-				'productreels'
-			),
-			reels: __(
-				'All Reels',
-				'productreels'
-			),
-			settings: __(
-				'Settings',
-				'productreels'
-			),
-		}[ route.name ]
-	);
+	useSubmenuHighlight( meta.section );
+	useDocumentTitle( meta.title, boot.title );
+	useLeaveWarning( unsaved.dirty );
 
-	const unsaved = useMemo(
-		() => ( {
-			setDirty: ( value ) => {
-				dirty.current = value;
-				setDirtyState( value );
-			},
-		} ),
-		[]
-	);
+	const setDirty = useCallback( ( value, label = '' ) => {
+		dirty.current = !! value;
+		setUnsaved( ( current ) =>
+			current.dirty === !! value && current.label === label
+				? current
+				: { dirty: !! value, label }
+		);
+	}, [] );
 
-	// The widget editor has its own header and locks its panes to the
-	// viewport, so it drops the app bar and gets a fixed-height shell.
-	const isEditor =
-		'widget-new' === route.name || 'widget-edit' === route.name;
+	const context = useMemo( () => ( { setDirty } ), [ setDirty ] );
+
+	const leave = useCallback( () => {
+		setUnsaved( { dirty: false, label: '' } );
+		leaveAnyway();
+	}, [ leaveAnyway ] );
+
+	const isEditor = meta.frame === 'editor';
 
 	return (
 		<ToastProvider>
-			<UnsavedContext.Provider value={ unsaved }>
+			<UnsavedContext.Provider value={ context }>
 				<div
 					className={ isEditor ? 'wr-app wr-app--editor' : 'wr-app' }
 				>
-					{ ! isEditor && (
-						<AppBar route={ route } navigate={ navigate } />
+					{ isEditor ? (
+						<Screen route={ route } navigate={ navigate } />
+					) : (
+						<>
+							<AppHeader
+								current={ meta.section }
+								version={ boot.version }
+								logoUrl={ boot.logoUrl }
+								docsUrl={ DOCS_URL }
+							/>
+							<div className="pr-page">
+								<Screen route={ route } navigate={ navigate } />
+							</div>
+						</>
 					) }
-					<Screen route={ route } navigate={ navigate } />
 				</div>
 
 				{ pending && (
 					<ConfirmDialog
-						title={ __(
-							'You have unsaved changes. Leave this page without saving?',
-							'productreels'
-						) }
-						confirmLabel={ __(
-							'Continue',
-							'productreels'
-						) }
-						tone="primary"
-						onConfirm={ leaveAnyway }
+						title={ __( 'Leave without saving?', 'productreels' ) }
+						confirm={ __( 'Leave', 'productreels' ) }
+						cancelLabel={ __( 'Keep editing', 'productreels' ) }
+						icon="alert"
+						onConfirm={ leave }
 						onClose={ stayHere }
 					>
-						{ __(
-							'Anything you have changed since the last save will be lost.',
-							'productreels'
-						) }
+						{ unsaved.label
+							? sprintf(
+									/* translators: %s: what has unsaved changes, e.g. a widget's name. */
+									__(
+										'Your changes to %s will be lost.',
+										'productreels'
+									),
+									unsaved.label
+								)
+							: __(
+									'Your changes will be lost.',
+									'productreels'
+								) }
 					</ConfirmDialog>
 				) }
 			</UnsavedContext.Provider>

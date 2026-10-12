@@ -21,7 +21,12 @@ import {
 } from '../components/icons';
 import { Button, IconButton } from '../components/ui/Button';
 import { EmptyState, Skeleton } from '../components/ui/Feedback';
-import { Checkbox, SearchInput } from '../components/ui/Fields';
+import { Checkbox } from '../components/ui/Fields';
+import {
+	Button as PrButton,
+	PageHeader,
+	SearchField,
+} from '../components/pr';
 import { ConfirmDialog } from '../components/ui/Modal';
 import { useToasts } from '../components/ui/Toasts';
 import { useDebounced } from '../hooks/use-debounced';
@@ -371,63 +376,55 @@ export const ReelsLibrary = () => {
 
 	return (
 		<>
-			<div className="wr-page-head">
-				<div className="wr-page-head__titles">
-					<h1 className="wr-page-head__title">
-						{ __(
-							'All Reels',
-							'productreels'
+			<PageHeader
+				title={ __( 'Reels', 'productreels' ) }
+				count={ ! loading && total > 0 ? total : null }
+				description={ __(
+					'Each reel is one vertical video and the products it sells. Use it in as many widgets as you like.',
+					'productreels'
+				) }
+				actions={
+					<>
+						<SearchField
+							value={ search }
+							onChange={ ( event ) =>
+								setSearch( event.target.value )
+							}
+							onKeyDown={ ( event ) => {
+								if ( event.key === 'Escape' && search !== '' ) {
+									setSearch( '' );
+								}
+							} }
+							placeholder={ __( 'Search reels', 'productreels' ) }
+							width={ 240 }
+						/>
+						{ selected.length > 0 && (
+							<PrButton
+								icon="trash"
+								onClick={ () =>
+									setConfirming( { bulk: true } )
+								}
+							>
+								{ sprintf(
+									/* translators: %d: number of selected reels. */
+									__(
+										'Delete Selected (%d)',
+										'productreels'
+									),
+									selected.length
+								) }
+							</PrButton>
 						) }
-						{ ! loading && total > 0 && (
-							<span className="wr-count-chip">
-								{ formatNumber( total ) }
-							</span>
-						) }
-					</h1>
-					<p className="wr-page-head__sub">
-						{ __(
-							'Each reel lives on its own and can appear in as many widgets as you like.',
-							'productreels'
-						) }
-					</p>
-				</div>
-				<div className="wr-page-head__actions">
-					{ selected.length > 0 && (
-						<Button
-							variant="danger"
-							icon={ IconTrash }
-							onClick={ () => setConfirming( { bulk: true } ) }
+						<PrButton
+							variant="primary"
+							icon="plus"
+							onClick={ () => setEditing( { id: 0 } ) }
 						>
-							{ sprintf(
-								/* translators: %d: number of selected reels. */
-								__(
-									'Delete Selected (%d)',
-									'productreels'
-								),
-								selected.length
-							) }
-						</Button>
-					) }
-					<SearchInput
-						value={ search }
-						onChange={ setSearch }
-						placeholder={ __(
-							'Search reels…',
-							'productreels'
-						) }
-					/>
-					<Button
-						variant="primary"
-						icon={ IconPlus }
-						onClick={ () => setEditing( { id: 0 } ) }
-					>
-						{ __(
-							'Add Reel',
-							'productreels'
-						) }
-					</Button>
-				</div>
-			</div>
+							{ __( 'Add reel', 'productreels' ) }
+						</PrButton>
+					</>
+				}
+			/>
 
 			<div className="wr-app__body">
 				{ error !== '' && (
