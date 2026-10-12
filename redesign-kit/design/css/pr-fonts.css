@@ -1,0 +1,3 @@
+/* Admin screens only. Never enqueue on the storefront or in the block editor canvas. Archivo, SIL OFL 1.1: see ../fonts/OFL.txt. */
+@font-face { font-family: "ProductReels Archivo"; src: url("../fonts/Archivo-Variable.woff2") format("woff2"); font-weight: 100 900; font-style: normal; font-display: swap; }
+@font-face { font-family: "ProductReels Archivo Expanded"; src: url("../fonts/ArchivoExpanded-Variable.woff2") format("woff2"); font-weight: 100 900; font-style: normal; font-display: swap; }

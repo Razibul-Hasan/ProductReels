@@ -1,0 +1,47 @@
+<?php
+/**
+ * TEMPLATE for part 15. Not loaded by the plugin. Adapt the prefix, option names and
+ * function names to the plugin's existing ones (AUDIT.md sections 1 and 7), then move the
+ * code into the plugin's bootstrap or an includes/ file the main plugin file loads.
+ *
+ * Why not the activation hook: WordPress does not run activation hooks when a plugin is
+ * updated, so upgrade work must be triggered by comparing a stored version on load.
+ */
+
+defined( 'ABSPATH' ) || exit;
+
+/**
+ * Runs pending upgrades once per site, when the stored version is older than the code.
+ */
+function productreels_maybe_upgrade() {
+	$stored = get_option( 'productreels_version', '1.0.0' ); // Use the existing option if 1.0.0 already stores one.
+
+	if ( version_compare( $stored, PRODUCTREELS_VERSION, '>=' ) ) {
+		return;
+	}
+
+	if ( version_compare( $stored, '1.1.0', '<' ) ) {
+		productreels_upgrade_to_110();
+	}
+
+	update_option( 'productreels_version', PRODUCTREELS_VERSION, false );
+}
+add_action( 'plugins_loaded', 'productreels_maybe_upgrade', 20 );
+
+/**
+ * 1.1.0: additive only. Safe to run more than once.
+ */
+function productreels_upgrade_to_110() {
+	// 1. Schema additions from parts 04–05 (indexes or columns), through the plugin's
+	//    existing dbDelta() function. dbDelta only adds; it never drops.
+	// productreels_install_tables();
+
+	// 2. Defaults for options that are new in 1.1.0. add_option() never overwrites.
+	// add_option( 'productreels_example_new_option', 'default', '', false );
+
+	// 3. Clear cached widget payloads so storefronts pick up the 1.1.0 markup.
+	//    Use the same function the "edit a widget clears the cache" path uses.
+	// productreels_flush_render_cache();
+
+	// Never: delete, rename or rewrite merchants' reels, widgets, statistics or settings.
+}
