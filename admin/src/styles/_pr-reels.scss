@@ -1,0 +1,139 @@
+/**
+ * Reels library: the filter bar, grid columns, card selection states, the
+ * list view and Load more.
+ *
+ * Loaded inside #productreels-admin-app by _pr-scoped.scss. Tokens only.
+ */
+
+.pr-libbar {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: var(--pr-space-4);
+	flex-wrap: wrap;
+}
+
+/* ---------------------------------------------------------------- Grid */
+
+/* Eight across in the 1216px page column at 1440, three at 782, two at
+   600. The design CSS's 156px minimum would give seven at 1440, so the
+   minimum is 132px on wide screens and 200px from the WP mobile break. */
+.pr-reelgrid,
+.pr-skeleton--cards {
+	grid-template-columns: repeat(auto-fill, minmax(132px, 1fr));
+}
+
+@media (max-width: 782px) {
+
+	.pr-reelgrid,
+	.pr-skeleton--cards {
+		grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+	}
+}
+
+@media (max-width: 480px) {
+
+	.pr-reelgrid,
+	.pr-skeleton--cards {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+}
+
+.pr-reelcard__media > video {
+	position: absolute;
+	inset: 0;
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	display: block;
+	pointer-events: none;
+}
+
+/* The checkbox is reachable without a mouse: it shows on keyboard focus,
+   on touch screens, and on every card once anything is selected. */
+.pr-reelgrid[data-selecting="true"] .pr-reelcard__check,
+.pr-reelcard__check:focus-within {
+	opacity: 1;
+}
+
+@media (hover: none) {
+
+	.pr-reelcard__check,
+	.pr-reelcard__play {
+		opacity: 1;
+	}
+}
+
+.pr-reelcard__check .pr-check {
+	display: grid;
+}
+
+/* ---------------------------------------------------------------- List */
+
+.pr-reeltable {
+	overflow-x: auto;
+}
+
+.pr-reeltable .pr-reeltable__check {
+	width: 1%;
+	padding-inline-end: 0;
+}
+
+.pr-reeltable .pr-check {
+	display: grid;
+}
+
+.pr-reeltable tr[data-selected="true"] td {
+	background: var(--pr-brand-soft);
+}
+
+.pr-reeltable .pr-reelrow__thumb {
+	position: relative;
+	display: block;
+	background: var(--pr-surface-sunken);
+}
+
+.pr-reelrow__thumb > img,
+.pr-reelrow__thumb > video {
+	position: absolute;
+	inset: 0;
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	display: block;
+}
+
+.pr-reeltable__title {
+	max-width: 100%;
+	padding: 0;
+	border: 0;
+	border-radius: var(--pr-radius-xs);
+	background: none;
+	color: var(--pr-ink);
+	text-align: start;
+	cursor: pointer;
+}
+
+.pr-reeltable__title:hover {
+	color: var(--pr-brand);
+}
+
+.pr-reeltable__title:focus-visible {
+	outline: none;
+	box-shadow: var(--pr-focus-ring);
+}
+
+/* ----------------------------------------------------------- Load more */
+
+.pr-loadmore {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: var(--pr-space-4);
+	flex-wrap: wrap;
+	padding-block: var(--pr-space-2);
+}
+
+.pr-loadmore__text {
+	color: var(--pr-ink-muted);
+}

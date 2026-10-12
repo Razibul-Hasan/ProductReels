@@ -31,11 +31,11 @@ Rebuild the Reels screen as a visual library with filters, search, bulk delete a
 
 ## Done when
 
-- [ ] Matches `ScreenReels.png` at 1440px; three columns at 782px; two at 600px.
-- [ ] Filter counts are correct and follow search.
-- [ ] Bulk delete removes the reels from every widget (check a widget that used one).
-- [ ] Load more appends without duplicates.
-- [ ] Every action works by keyboard; the checkbox is reachable without hover.
+- [x] Matches `ScreenReels.png` at 1440px; three columns at 782px; two at 600px.
+- [x] Filter counts are correct and follow search.
+- [x] Bulk delete removes the reels from every widget (check a widget that used one).
+- [x] Load more appends without duplicates.
+- [x] Every action works by keyboard; the checkbox is reachable without hover.
 
 ## Hand-off
 

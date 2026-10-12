@@ -29,4 +29,14 @@ export { SettingRow, SettingsCard } from './Settings';
 export { BarCell, EmptyState, MetricBand, ReelStack, Skeleton } from './Data';
 export { ConfirmDialog, Dialog } from './Dialog';
 export { StepGuide } from './StepGuide';
+export {
+	REEL_SOURCES,
+	ReelCard,
+	ReelCover,
+	buttonsLabel,
+	productsLabel,
+	reelLinkCounts,
+	reelMenuItems,
+	widgetsLabel,
+} from './ReelCard';
 export { portalRoot } from './portal';

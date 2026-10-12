@@ -1,9 +1,10 @@
 /**
- * The reels library.
+ * Reels: the library.
  *
- * A card grid rather than a table, because a reel is a picture first and a
- * record second. Cards preview on hover — muted, and only the first file, so
- * browsing forty reels does not pull forty videos.
+ * A grid of covers (or a list), narrowed by filter chips whose counts come
+ * from the server and follow the search. Covers only: video plays in Preview,
+ * which opens the real storefront player. Selecting cards raises the bulk
+ * bar; deleting a reel removes it from every widget it's in.
  */
 
 import { useCallback, useEffect, useRef, useState } from '@wordpress/element';
@@ -11,201 +12,216 @@ import { __, _n, sprintf } from '@wordpress/i18n';
 import { Player } from '@shared/player/Player';
 import { boot, reels as reelsApi } from '../api';
 import {
-	IconEdit,
-	IconEye,
-	IconLink,
-	IconPlus,
-	IconTag,
-	IconTrash,
-	IconVideo,
-} from '../components/icons';
-import { Button, IconButton } from '../components/ui/Button';
-import { EmptyState, Skeleton } from '../components/ui/Feedback';
-import { Checkbox } from '../components/ui/Fields';
-import {
-	Button as PrButton,
+	Button,
+	Checkbox,
+	ConfirmDialog,
+	EmptyState,
+	FilterChips,
+	FloatingBar,
+	Menu,
+	Notice,
 	PageHeader,
+	ReelCard,
+	ReelCover,
 	SearchField,
+	Segmented,
+	Skeleton,
+	reelLinkCounts,
+	reelMenuItems,
+	useToasts,
 } from '../components/pr';
-import { ConfirmDialog } from '../components/ui/Modal';
-import { useToasts } from '../components/ui/Toasts';
+import { formatNumber } from '../format';
 import { useDebounced } from '../hooks/use-debounced';
 import { editorServices } from '../preview-services';
 import { ReelEditor } from './ReelEditor';
 
-/** How many reels one page of the library holds. */
+/** How many reels one page of the library holds (as in 1.0.0). */
 const PAGE_SIZE = 60;
 
-const formatNumber = ( value ) =>
-	new Intl.NumberFormat( document.documentElement.lang || undefined ).format(
-		value
-	);
+/** Where this browser remembers grid or list. */
+const VIEW_KEY = 'productreels_reels_view';
 
-const posterOf = ( reel ) => reel.thumbnail || reel.file?.poster_url || '';
-
-const playableOf = ( reel ) => {
-	const file = reel.file;
-
-	if ( ! file || ( file.source !== 'native' && file.source !== 'hosted' ) ) {
-		return '';
-	}
-
-	return file.url;
+const FILTERS = {
+	all: __( 'All', 'productreels' ),
+	products: __( 'Tagged products', 'productreels' ),
+	buttons: __( 'With a button', 'productreels' ),
+	unused: __( 'Not in a widget', 'productreels' ),
 };
 
-const ReelCard = ( {
-	reel,
+const EMPTY_FILTER_TITLES = {
+	products: __( 'No reels have tagged products', 'productreels' ),
+	buttons: __( 'No reels have a button', 'productreels' ),
+	unused: __( 'Every reel is in a widget', 'productreels' ),
+};
+
+const readView = () => {
+	try {
+		return window.localStorage.getItem( VIEW_KEY ) === 'list'
+			? 'list'
+			: 'grid';
+	} catch ( error ) {
+		return 'grid';
+	}
+};
+
+const saveView = ( view ) => {
+	try {
+		window.localStorage.setItem( VIEW_KEY, view );
+	} catch ( error ) {
+		// Private window or blocked storage: the choice lasts this visit.
+	}
+};
+
+const ReelTable = ( {
+	items,
 	selected,
 	onSelect,
-	onEdit,
+	onSelectAll,
+	onOpen,
 	onPreview,
 	onDelete,
 } ) => {
-	const video = useRef( null );
-	const poster = posterOf( reel );
-	const playable = playableOf( reel );
-	const linkCount = Array.isArray( reel.links ) ? reel.links.length : 0;
-	const productCount = ( reel.links || [] ).filter(
-		( link ) => link.btn_type === 'product'
-	).length;
-
-	const play = () => {
-		if (
-			video.current &&
-			! window.matchMedia( '(prefers-reduced-motion: reduce)' ).matches
-		) {
-			video.current.play().catch( () => {} );
-		}
-	};
-
-	const stop = () => {
-		if ( video.current ) {
-			video.current.pause();
-			video.current.currentTime = 0;
-		}
-	};
+	const wrap = useRef( null );
+	const shown = items.filter( ( reel ) => selected.includes( reel.id ) );
+	const all = items.length > 0 && shown.length === items.length;
 
 	return (
-		<div
-			className={ `wr-reel-card${ selected ? ' is-selected' : '' }` }
-			onPointerEnter={ play }
-			onPointerLeave={ stop }
-		>
-			<div className="wr-reel-card__frame">
-				{ playable && (
-					<video
-						ref={ video }
-						className="wr-reel-card__media"
-						src={ playable }
-						poster={ poster || undefined }
-						muted
-						loop
-						playsInline
-						preload="metadata"
-					/>
-				) }
-				{ ! playable && poster && (
-					<img
-						className="wr-reel-card__media"
-						src={ poster }
-						alt=""
-						loading="lazy"
-						decoding="async"
-					/>
-				) }
-				{ ! playable && ! poster && (
-					<span className="wr-reel-card__placeholder">
-						<IconVideo size={ 22 } />
-					</span>
-				) }
+		<div ref={ wrap } className="pr-tablewrap pr-reeltable">
+			<table className="pr-table">
+				<thead>
+					<tr className="pr-t-label">
+						<th scope="col" className="pr-reeltable__check">
+							<Checkbox
+								checked={ all }
+								onChange={ onSelectAll }
+								aria-label={ __(
+									'Select every reel shown',
+									'productreels'
+								) }
+							/>
+						</th>
+						<th scope="col">
+							<span className="pr-sr">
+								{ __( 'Cover', 'productreels' ) }
+							</span>
+						</th>
+						<th scope="col">{ __( 'Title', 'productreels' ) }</th>
+						<th scope="col" className="num">
+							{ __( 'Products', 'productreels' ) }
+						</th>
+						<th scope="col" className="num">
+							{ __( 'Buttons', 'productreels' ) }
+						</th>
+						<th scope="col" className="num">
+							{ __( 'Widgets', 'productreels' ) }
+						</th>
+						<th scope="col" className="num">
+							{ __( 'Views', 'productreels' ) }
+						</th>
+						<th scope="col">
+							<span className="pr-sr">
+								{ __( 'Actions', 'productreels' ) }
+							</span>
+						</th>
+					</tr>
+				</thead>
+				<tbody>
+					{ items.map( ( reel ) => {
+						const { products, buttons } = reelLinkCounts( reel );
 
-				<span className="wr-reel-card__check">
-					<Checkbox
-						checked={ selected }
-						onChange={ onSelect }
-						label={ sprintf(
-							/* translators: %s: reel title. */ __(
-								'Select %s',
-								'productreels'
-							),
-							reel.title
-						) }
-					/>
-				</span>
-
-				{ reel.view_count > 0 && (
-					<span className="wr-reel-card__views">
-						<IconEye size={ 12 } />
-						{ formatNumber( reel.view_count ) }
-					</span>
-				) }
-
-				<div className="wr-reel-card__hover">
-					<IconButton
-						icon={ IconEye }
-						label={ __(
-							'Preview',
-							'productreels'
-						) }
-						onClick={ onPreview }
-					/>
-					<IconButton
-						icon={ IconEdit }
-						label={ __(
-							'Edit',
-							'productreels'
-						) }
-						onClick={ onEdit }
-					/>
-					<IconButton
-						icon={ IconTrash }
-						label={ __(
-							'Delete',
-							'productreels'
-						) }
-						tone="danger"
-						onClick={ onDelete }
-					/>
-				</div>
-			</div>
-
-			<div className="wr-reel-card__foot">
-				<span className="wr-reel-card__title" title={ reel.title }>
-					{ reel.title }
-				</span>
-				{ linkCount > 0 && (
-					<span className="wr-reel-card__chip">
-						{ productCount > 0 ? (
-							<IconTag size={ 12 } />
-						) : (
-							<IconLink size={ 12 } />
-						) }
-						{ linkCount }
-					</span>
-				) }
-			</div>
+						return (
+							<tr
+								key={ reel.id }
+								data-selected={
+									selected.includes( reel.id )
+										? 'true'
+										: undefined
+								}
+							>
+								<td className="pr-reeltable__check">
+									<Checkbox
+										checked={ selected.includes( reel.id ) }
+										onChange={ ( checked ) =>
+											onSelect( reel.id, checked )
+										}
+										aria-label={ sprintf(
+											/* translators: %s: reel title. */
+											__( 'Select %s', 'productreels' ),
+											reel.title
+										) }
+									/>
+								</td>
+								<td>
+									<span className="pr-reelrow__thumb">
+										<ReelCover reel={ reel } />
+									</span>
+								</td>
+								<td>
+									<button
+										type="button"
+										className="pr-reeltable__title pr-t-body-strong"
+										onClick={ () => onOpen( reel ) }
+									>
+										{ reel.title }
+									</button>
+								</td>
+								<td className="num pr-t-body">
+									{ formatNumber( products ) }
+								</td>
+								<td className="num pr-t-body">
+									{ formatNumber( buttons ) }
+								</td>
+								<td className="num pr-t-body">
+									{ formatNumber( reel.widget_count || 0 ) }
+								</td>
+								<td className="num pr-t-body">
+									{ formatNumber( reel.view_count ) }
+								</td>
+								<td>
+									<div className="pr-rowactions">
+										<Menu
+											label={ sprintf(
+												/* translators: %s: reel title. */
+												__(
+													'More actions for %s',
+													'productreels'
+												),
+												reel.title
+											) }
+											items={ reelMenuItems( {
+												// The menu has just given focus back to its trigger.
+												onPreview: () =>
+													onPreview(
+														reel,
+														wrap.current
+															?.ownerDocument
+															.activeElement
+													),
+												onOpen: () => onOpen( reel ),
+												onDelete: () =>
+													onDelete( reel ),
+											} ) }
+										/>
+									</div>
+								</td>
+							</tr>
+						);
+					} ) }
+				</tbody>
+			</table>
 		</div>
 	);
 };
 
-const SkeletonCards = () => (
-	<>
-		{ [ 0, 1, 2, 3, 4, 5 ].map( ( card ) => (
-			<div key={ card } className="wr-reel-card">
-				<div className="wr-reel-card__frame wr-skeleton" />
-				<div className="wr-reel-card__foot">
-					<Skeleton width="70%" height={ 13 } />
-				</div>
-			</div>
-		) ) }
-	</>
-);
-
 export const ReelsLibrary = () => {
 	const toasts = useToasts();
 	const [ search, setSearch ] = useState( '' );
+	const [ filter, setFilter ] = useState( 'all' );
+	const [ view, setView ] = useState( readView );
 	const [ items, setItems ] = useState( [] );
 	const [ total, setTotal ] = useState( 0 );
+	const [ counts, setCounts ] = useState( null );
+	const [ libraryTotal, setLibraryTotal ] = useState( null );
 	const [ loading, setLoading ] = useState( true );
 	const [ error, setError ] = useState( '' );
 	const [ selected, setSelected ] = useState( [] );
@@ -216,6 +232,7 @@ export const ReelsLibrary = () => {
 	const [ page, setPage ] = useState( 1 );
 	const [ pages, setPages ] = useState( 1 );
 	const [ loadingMore, setLoadingMore ] = useState( false );
+	const latest = useRef( 0 );
 
 	const term = useDebounced( search, 300 );
 
@@ -223,21 +240,41 @@ export const ReelsLibrary = () => {
 		( number ) =>
 			reelsApi.list( {
 				search: term,
+				filter: filter === 'all' ? undefined : filter,
 				page: number,
 				per_page: PAGE_SIZE,
 				orderby: 'id',
 				order: 'DESC',
 			} ),
-		[ term ]
+		[ term, filter ]
 	);
 
-	/** Start over from the first page: a new search, or after a change. */
+	const loadCounts = useCallback( async () => {
+		const next = await reelsApi.counts( { search: term } );
+
+		setCounts( next );
+
+		if ( term === '' ) {
+			setLibraryTotal( next.all );
+		}
+	}, [ term ] );
+
+	/** Start over from the first page: a new search or filter, or after a change. */
 	const load = useCallback( async () => {
+		const request = ++latest.current;
+
 		setLoading( true );
 		setError( '' );
 
 		try {
-			const first = await fetchPage( 1 );
+			const [ first ] = await Promise.all( [
+				fetchPage( 1 ),
+				loadCounts(),
+			] );
+
+			if ( request !== latest.current ) {
+				return;
+			}
 
 			setItems( first.items );
 			setTotal( first.total );
@@ -249,11 +286,15 @@ export const ReelsLibrary = () => {
 				)
 			);
 		} catch ( requestError ) {
-			setError( requestError.message );
+			if ( request === latest.current ) {
+				setError( requestError.message );
+			}
 		} finally {
-			setLoading( false );
+			if ( request === latest.current ) {
+				setLoading( false );
+			}
 		}
-	}, [ fetchPage ] );
+	}, [ fetchPage, loadCounts ] );
 
 	useEffect( () => {
 		load();
@@ -261,12 +302,19 @@ export const ReelsLibrary = () => {
 
 	const loadMore = async () => {
 		const next = page + 1;
+		const request = latest.current;
 
 		setLoadingMore( true );
 
 		try {
 			const more = await fetchPage( next );
 
+			if ( request !== latest.current ) {
+				return;
+			}
+
+			// A reel added or deleted meanwhile shifts the pages; never
+			// show one twice.
 			setItems( ( current ) => {
 				const seen = new Set( current.map( ( reel ) => reel.id ) );
 
@@ -274,6 +322,7 @@ export const ReelsLibrary = () => {
 					more.items.filter( ( reel ) => ! seen.has( reel.id ) )
 				);
 			} );
+			setTotal( more.total );
 			setPage( next );
 			setPages( more.pages );
 		} catch ( requestError ) {
@@ -283,25 +332,30 @@ export const ReelsLibrary = () => {
 		}
 	};
 
-	const toggle = ( id ) =>
+	const select = ( id, checked ) =>
 		setSelected( ( current ) =>
-			current.includes( id )
-				? current.filter( ( entry ) => entry !== id )
-				: [ ...current, id ]
+			checked
+				? [ ...current.filter( ( entry ) => entry !== id ), id ]
+				: current.filter( ( entry ) => entry !== id )
 		);
+
+	const selectAll = ( checked ) =>
+		setSelected( checked ? items.map( ( reel ) => reel.id ) : [] );
+
+	const changeView = ( next ) => {
+		setView( next );
+		saveView( next );
+	};
 
 	const removeOne = async () => {
 		setDeleting( true );
 
 		try {
 			await reelsApi.remove( confirming.reel.id );
-			toasts.success(
-				__(
-					'Reel deleted successfully!',
-					'productreels'
-				)
-			);
 			setConfirming( null );
+			toasts.success( __( 'Reel deleted', 'productreels' ), {
+				icon: 'trash',
+			} );
 			await load();
 		} catch ( requestError ) {
 			toasts.error( requestError.message );
@@ -316,38 +370,40 @@ export const ReelsLibrary = () => {
 		try {
 			const result = await reelsApi.bulkRemove( selected );
 
+			setConfirming( null );
+			setSelected( result.failed || [] );
+
 			if ( result.deleted > 0 ) {
 				toasts.success(
 					sprintf(
-						/* translators: %d: number of reels deleted. */
+						/* translators: %s: number of reels deleted. */
 						_n(
-							'%d reel deleted successfully!',
-							'%d reels deleted successfully!',
+							'%s reel deleted',
+							'%s reels deleted',
 							result.deleted,
 							'productreels'
 						),
-						result.deleted
-					)
+						formatNumber( result.deleted )
+					),
+					{ icon: 'trash' }
 				);
 			}
 
-			if ( result.failed.length > 0 ) {
+			if ( result.failed?.length > 0 ) {
 				toasts.error(
 					sprintf(
-						/* translators: %d: number of reels that could not be deleted. */
+						/* translators: %s: number of reels that could not be deleted. */
 						_n(
-							'%d reel failed to delete.',
-							'%d reels failed to delete.',
+							'Couldn’t delete %s reel. It’s still selected.',
+							'Couldn’t delete %s reels. They’re still selected.',
 							result.failed.length,
 							'productreels'
 						),
-						result.failed.length
+						formatNumber( result.failed.length )
 					)
 				);
 			}
 
-			setConfirming( null );
-			setSelected( [] );
 			await load();
 		} catch ( requestError ) {
 			toasts.error( requestError.message );
@@ -356,13 +412,11 @@ export const ReelsLibrary = () => {
 		}
 	};
 
-	const isEmpty = ! loading && items.length === 0;
-
 	/**
 	 * Open the real player on one reel, with every file and link it has.
 	 *
 	 * @param {Object}      reel The reel as listed.
-	 * @param {HTMLElement} from The button that opened it, for focus return.
+	 * @param {HTMLElement} from The control that opened it, for focus return.
 	 */
 	const preview = async ( reel, from ) => {
 		try {
@@ -374,11 +428,176 @@ export const ReelsLibrary = () => {
 		}
 	};
 
+	const clearSearch = () => setSearch( '' );
+	const showAll = () => setFilter( 'all' );
+	const hasLibrary = libraryTotal === null || libraryTotal > 0;
+
+	let body;
+
+	if ( error ) {
+		body = (
+			<Notice
+				tone="danger"
+				title={ __( 'Couldn’t load your reels.', 'productreels' ) }
+				actions={
+					<Button size="sm" onClick={ load }>
+						{ __( 'Try again', 'productreels' ) }
+					</Button>
+				}
+			>
+				{ error }
+			</Notice>
+		);
+	} else if ( loading ) {
+		body = (
+			<Skeleton
+				variant={ view === 'list' ? 'rows' : 'cards' }
+				count={ 8 }
+				label={ __( 'Loading reels…', 'productreels' ) }
+			/>
+		);
+	} else if ( items.length === 0 && term !== '' ) {
+		body = (
+			<EmptyState
+				panel
+				icon="search"
+				title={ sprintf(
+					/* translators: %s: the search term. */
+					__( 'No reels match “%s”', 'productreels' ),
+					term
+				) }
+				description={
+					filter === 'all'
+						? __(
+								'Check the spelling, or try another title.',
+								'productreels'
+							)
+						: sprintf(
+								/* translators: %s: the filter that is on, e.g. "With a button". */
+								__(
+									'Check the spelling, or try another title. The “%s” filter is on.',
+									'productreels'
+								),
+								FILTERS[ filter ]
+							)
+				}
+				actions={
+					<>
+						<Button icon="x" onClick={ clearSearch }>
+							{ __( 'Clear search', 'productreels' ) }
+						</Button>
+						{ filter !== 'all' && (
+							<Button onClick={ showAll }>
+								{ __( 'Show all reels', 'productreels' ) }
+							</Button>
+						) }
+					</>
+				}
+			/>
+		);
+	} else if ( items.length === 0 && filter !== 'all' && hasLibrary ) {
+		body = (
+			<EmptyState
+				panel
+				icon={ filter === 'unused' ? 'success' : 'film' }
+				title={ EMPTY_FILTER_TITLES[ filter ] }
+				description={ sprintf(
+					/* translators: %s: the filter that is on, e.g. "With a button". */
+					__( 'The “%s” filter is on.', 'productreels' ),
+					FILTERS[ filter ]
+				) }
+				actions={
+					<Button onClick={ showAll }>
+						{ __( 'Show all reels', 'productreels' ) }
+					</Button>
+				}
+			/>
+		);
+	} else if ( items.length === 0 ) {
+		body = (
+			<EmptyState
+				panel
+				title={ __( 'No reels yet', 'productreels' ) }
+				description={ __(
+					'A reel is one vertical video and the products you sell from it.',
+					'productreels'
+				) }
+				actions={
+					<Button
+						variant="primary"
+						icon="plus"
+						onClick={ () => setEditing( { id: 0 } ) }
+					>
+						{ __( 'Add reel', 'productreels' ) }
+					</Button>
+				}
+			/>
+		);
+	} else {
+		body = (
+			<>
+				{ view === 'list' ? (
+					<ReelTable
+						items={ items }
+						selected={ selected }
+						onSelect={ select }
+						onSelectAll={ selectAll }
+						onOpen={ setEditing }
+						onPreview={ preview }
+						onDelete={ ( reel ) => setConfirming( { reel } ) }
+					/>
+				) : (
+					<div
+						className="pr-reelgrid"
+						data-selecting={
+							selected.length > 0 ? 'true' : undefined
+						}
+					>
+						{ items.map( ( reel ) => (
+							<ReelCard
+								key={ reel.id }
+								reel={ reel }
+								selected={ selected.includes( reel.id ) }
+								onSelect={ ( checked ) =>
+									select( reel.id, checked )
+								}
+								onOpen={ () => setEditing( reel ) }
+								onPreview={ ( from ) => preview( reel, from ) }
+								onDelete={ () => setConfirming( { reel } ) }
+							/>
+						) ) }
+					</div>
+				) }
+
+				{ total > PAGE_SIZE && (
+					<div className="pr-loadmore">
+						{ page < pages && (
+							<Button busy={ loadingMore } onClick={ loadMore }>
+								{ __( 'Load more', 'productreels' ) }
+							</Button>
+						) }
+						<span
+							className="pr-loadmore__text pr-t-small"
+							aria-live="polite"
+						>
+							{ sprintf(
+								/* translators: 1: reels shown so far, 2: reels in this list. */
+								__( 'Showing %1$s of %2$s', 'productreels' ),
+								formatNumber( items.length ),
+								formatNumber( total )
+							) }
+						</span>
+					</div>
+				) }
+			</>
+		);
+	}
+
 	return (
 		<>
 			<PageHeader
 				title={ __( 'Reels', 'productreels' ) }
-				count={ ! loading && total > 0 ? total : null }
+				count={ libraryTotal || null }
 				description={ __(
 					'Each reel is one vertical video and the products it sells. Use it in as many widgets as you like.',
 					'productreels'
@@ -398,141 +617,82 @@ export const ReelsLibrary = () => {
 							placeholder={ __( 'Search reels', 'productreels' ) }
 							width={ 240 }
 						/>
-						{ selected.length > 0 && (
-							<PrButton
-								icon="trash"
-								onClick={ () =>
-									setConfirming( { bulk: true } )
-								}
-							>
-								{ sprintf(
-									/* translators: %d: number of selected reels. */
-									__(
-										'Delete Selected (%d)',
-										'productreels'
-									),
-									selected.length
-								) }
-							</PrButton>
-						) }
-						<PrButton
+						<Button
 							variant="primary"
 							icon="plus"
 							onClick={ () => setEditing( { id: 0 } ) }
 						>
 							{ __( 'Add reel', 'productreels' ) }
-						</PrButton>
+						</Button>
 					</>
 				}
 			/>
 
-			<div className="wr-app__body">
-				{ error !== '' && (
-					<div className="wr-card wr-error-card">
-						<p>{ error }</p>
-						<Button onClick={ load }>
-							{ __(
-								'Try again',
-								'productreels'
-							) }
-						</Button>
-					</div>
-				) }
+			{ hasLibrary && ! error && (
+				<div className="pr-libbar">
+					<FilterChips
+						label={ __( 'Show reels', 'productreels' ) }
+						value={ filter }
+						onChange={ setFilter }
+						items={ Object.keys( FILTERS ).map( ( id ) => ( {
+							id,
+							label: FILTERS[ id ],
+							count: counts ? counts[ id ] : null,
+						} ) ) }
+					/>
+					<Segmented
+						iconOnly
+						label={ __( 'View', 'productreels' ) }
+						value={ view }
+						onChange={ changeView }
+						options={ [
+							{
+								value: 'grid',
+								label: __( 'Grid', 'productreels' ),
+								icon: 'grid',
+							},
+							{
+								value: 'list',
+								label: __( 'List', 'productreels' ),
+								icon: 'list',
+							},
+						] }
+					/>
+				</div>
+			) }
 
-				{ error === '' && isEmpty && (
-					<div className="wr-card">
-						<EmptyState
-							title={
-								search === ''
-									? __(
-											"You don't have any reels yet.",
-											'productreels'
-										)
-									: __(
-											'No reels match that search.',
-											'productreels'
-										)
-							}
-							text={
-								search === ''
-									? __(
-											'A reel is one vertical video, a title, and the buttons or products you want to sell from it.',
-											'productreels'
-										)
-									: __(
-											'Try a different title, or clear the search to see everything.',
-											'productreels'
-										)
-							}
-							action={
-								search === '' ? (
-									<Button
-										variant="primary"
-										icon={ IconPlus }
-										onClick={ () =>
-											setEditing( { id: 0 } )
-										}
-									>
-										{ __(
-											'Add Reel',
-											'productreels'
-										) }
-									</Button>
-								) : (
-									<Button onClick={ () => setSearch( '' ) }>
-										{ __(
-											'Clear',
-											'productreels'
-										) }
-									</Button>
-								)
-							}
-						/>
-					</div>
-				) }
+			{ body }
 
-				{ error === '' && ( loading || items.length > 0 ) && (
-					<div className="wr-reel-grid">
-						{ loading ? (
-							<SkeletonCards />
-						) : (
-							items.map( ( reel ) => (
-								<ReelCard
-									key={ reel.id }
-									reel={ reel }
-									selected={ selected.includes( reel.id ) }
-									onSelect={ () => toggle( reel.id ) }
-									onEdit={ () => setEditing( reel ) }
-									onPreview={ ( event ) =>
-										preview( reel, event.currentTarget )
-									}
-									onDelete={ () => setConfirming( { reel } ) }
-								/>
-							) )
-						) }
-					</div>
-				) }
-
-				{ error === '' && ! loading && page < pages && (
-					<div className="wr-load-more">
-						<Button
-							busy={ loadingMore }
-							disabled={ loadingMore }
-							onClick={ loadMore }
-						>
-							{ sprintf(
-								/* translators: 1: reels shown so far, 2: total reels. */
-								__(
-									'Load more (%1$s of %2$s)',
-									'productreels'
-								),
-								formatNumber( items.length ),
-								formatNumber( total )
-							) }
-						</Button>
-					</div>
-				) }
-			</div>
+			{ selected.length > 0 && (
+				<FloatingBar
+					text={ sprintf(
+						/* translators: %s: number of selected reels. */
+						_n(
+							'%s reel selected',
+							'%s reels selected',
+							selected.length,
+							'productreels'
+						),
+						formatNumber( selected.length )
+					) }
+				>
+					<Button
+						variant="on-ink"
+						size="sm"
+						onClick={ () => setSelected( [] ) }
+					>
+						{ __( 'Clear', 'productreels' ) }
+					</Button>
+					<Button
+						variant="danger"
+						size="sm"
+						icon="trash"
+						onClick={ () => setConfirming( { bulk: true } ) }
+					>
+						{ __( 'Delete selected', 'productreels' ) }
+					</Button>
+				</FloatingBar>
+			) }
 
 			{ editing && (
 				<ReelEditor
@@ -559,29 +719,51 @@ export const ReelsLibrary = () => {
 				/>
 			) }
 
-			{ confirming && (
+			{ confirming?.bulk && (
 				<ConfirmDialog
-					title={
-						confirming.bulk
-							? sprintf(
-									/* translators: %d: number of reels. */
-									__(
-										'Are you sure you want to remove %d reels?',
-										'productreels'
-									),
-									selected.length
-								)
-							: __(
-									'Are you sure you want to remove this reel?',
-									'productreels'
-								)
-					}
+					title={ sprintf(
+						/* translators: %s: number of reels. */
+						_n(
+							'Delete %s reel?',
+							'Delete %s reels?',
+							selected.length,
+							'productreels'
+						),
+						formatNumber( selected.length )
+					) }
+					confirm={ _n(
+						'Delete reel',
+						'Delete reels',
+						selected.length,
+						'productreels'
+					) }
 					busy={ deleting }
-					onConfirm={ confirming.bulk ? removeMany : removeOne }
+					onConfirm={ removeMany }
+					onClose={ () => setConfirming( null ) }
+				>
+					{ _n(
+						'It’ll be removed from every widget it’s in. This can’t be undone.',
+						'They’ll be removed from every widget they’re in. This can’t be undone.',
+						selected.length,
+						'productreels'
+					) }
+				</ConfirmDialog>
+			) }
+
+			{ confirming?.reel && (
+				<ConfirmDialog
+					title={ sprintf(
+						/* translators: %s: reel title. */
+						__( 'Delete “%s”?', 'productreels' ),
+						confirming.reel.title
+					) }
+					confirm={ __( 'Delete reel', 'productreels' ) }
+					busy={ deleting }
+					onConfirm={ removeOne }
 					onClose={ () => setConfirming( null ) }
 				>
 					{ __(
-						'This also removes it from every widget it appears in. Widgets themselves are kept.',
+						'It’ll be removed from every widget it’s in. This can’t be undone.',
 						'productreels'
 					) }
 				</ConfirmDialog>

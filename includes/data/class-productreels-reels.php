@@ -132,6 +132,15 @@ class Productreels_Reels extends Productreels_Repository {
 			$values[] = $exclude_widget;
 		}
 
+		$filter = isset( $args['filter'] ) ? (string) $args['filter'] : 'all';
+
+		if ( 'products' === $filter || 'buttons' === $filter ) {
+			$where[]  = 'links LIKE %s';
+			$values[] = $this->link_type_pattern( 'products' === $filter ? 'product' : 'custom' );
+		} elseif ( 'unused' === $filter ) {
+			$where[] = 'NOT ' . $this->in_a_widget_sql();
+		}
+
 		$where_sql = implode( ' AND ', $where );
 
 		$count_sql = "SELECT COUNT(*) FROM `{$table}` WHERE {$where_sql}";
@@ -146,9 +155,131 @@ class Productreels_Reels extends Productreels_Repository {
 			ARRAY_A
 		);
 
-		$items = $this->attach_first_file( $this->cast_rows( $rows ) );
+		$items = $this->attach_widget_counts( $this->attach_first_file( $this->cast_rows( $rows ) ) );
 
 		return $this->paginated( $items, $total, $page, $per_page );
+	}
+
+	/**
+	 * How many reels each library filter holds, for an optional search.
+	 *
+	 * One pass over the reels table: `products` have a tagged product,
+	 * `buttons` a custom button, `unused` are in no existing widget. A reel
+	 * can be in both of the first two.
+	 *
+	 * @since  1.1.0
+	 * @param  string $search Title search, as in paginate().
+	 * @return array{all:int,products:int,buttons:int,unused:int} The counts.
+	 */
+	public function filter_counts( $search = '' ) {
+		$table  = $this->table();
+		$where  = '1=1';
+		$values = array(
+			$this->link_type_pattern( 'product' ),
+			$this->link_type_pattern( 'custom' ),
+		);
+		$search = trim( (string) $search );
+
+		if ( '' !== $search ) {
+			$where    = 'title LIKE %s';
+			$values[] = '%' . $this->db()->esc_like( $search ) . '%';
+		}
+
+		$in_widget = $this->in_a_widget_sql();
+
+		$row = $this->db()->get_row( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			$this->db()->prepare( // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+				"SELECT COUNT(*) AS all_reels,
+					COALESCE( SUM( links LIKE %s ), 0 ) AS products,
+					COALESCE( SUM( links LIKE %s ), 0 ) AS buttons,
+					COALESCE( SUM( NOT {$in_widget} ), 0 ) AS unused
+				FROM `{$table}`
+				WHERE {$where}",
+				$values
+			),
+			ARRAY_A
+		);
+
+		return array(
+			'all'      => isset( $row['all_reels'] ) ? (int) $row['all_reels'] : 0,
+			'products' => isset( $row['products'] ) ? (int) $row['products'] : 0,
+			'buttons'  => isset( $row['buttons'] ) ? (int) $row['buttons'] : 0,
+			'unused'   => isset( $row['unused'] ) ? (int) $row['unused'] : 0,
+		);
+	}
+
+	/**
+	 * A LIKE pattern matching reels with at least one link of a type.
+	 *
+	 * `links` is always written by wp_json_encode() from validated links, so
+	 * every link carries the exact token `"btn_type":"<type>"`.
+	 *
+	 * @since  1.1.0
+	 * @access private
+	 * @param  string $type `product` or `custom`.
+	 * @return string The pattern, already escaped for LIKE.
+	 */
+	private function link_type_pattern( $type ) {
+		return '%' . $this->db()->esc_like( '"btn_type":"' . $type . '"' ) . '%';
+	}
+
+	/**
+	 * SQL that is true when the reel row `id` is in at least one widget that
+	 * still exists. Uses the pivot's reel index; contains no placeholders.
+	 *
+	 * @since  1.1.0
+	 * @access private
+	 * @return string The condition.
+	 */
+	private function in_a_widget_sql() {
+		$table   = $this->table();
+		$pivot   = Productreels_Schema::table( 'widget_reels' );
+		$widgets = Productreels_Schema::table( 'widgets' );
+
+		return "EXISTS ( SELECT 1 FROM `{$pivot}` p INNER JOIN `{$widgets}` w ON w.id = p.widget_id WHERE p.reel_id = `{$table}`.id )";
+	}
+
+	/**
+	 * Attach how many widgets each reel is in, in one query for the page.
+	 *
+	 * @since  1.1.0
+	 * @access private
+	 * @param  array[] $reels Typed reel rows.
+	 * @return array[] The same rows, each with a 'widget_count' key.
+	 */
+	private function attach_widget_counts( $reels ) {
+		if ( empty( $reels ) ) {
+			return $reels;
+		}
+
+		$ids          = wp_list_pluck( $reels, 'id' );
+		$pivot        = Productreels_Schema::table( 'widget_reels' );
+		$widgets      = Productreels_Schema::table( 'widgets' );
+		$placeholders = $this->placeholders( count( $ids ) );
+
+		$rows = $this->db()->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			$this->db()->prepare( // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+				"SELECT p.reel_id, COUNT(*) AS total
+				FROM `{$pivot}` p
+				INNER JOIN `{$widgets}` w ON w.id = p.widget_id
+				WHERE p.reel_id IN ({$placeholders})
+				GROUP BY p.reel_id",
+				$ids
+			),
+			ARRAY_A
+		);
+
+		$counts = array();
+
+		foreach ( (array) $rows as $row ) {
+			$counts[ (int) $row['reel_id'] ] = (int) $row['total'];
+		}
+
+		foreach ( $reels as $index => $reel ) {
+			$reels[ $index ]['widget_count'] = isset( $counts[ $reel['id'] ] ) ? $counts[ $reel['id'] ] : 0;
+		}
+
+		return $reels;
 	}
 
 	/**

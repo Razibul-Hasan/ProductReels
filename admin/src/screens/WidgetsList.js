@@ -737,7 +737,7 @@ export const WidgetsList = ( { navigate } ) => {
 						'productreels'
 					) }
 					actions={
-						<Button onClick={ () => setSearch( '' ) }>
+						<Button icon="x" onClick={ () => setSearch( '' ) }>
 							{ __( 'Clear search', 'productreels' ) }
 						</Button>
 					}

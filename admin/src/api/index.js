@@ -20,6 +20,7 @@ export const widgets = {
 
 export const reels = {
 	list: ( params ) => getList( '/reels', params ),
+	counts: ( params ) => get( '/reels/counts', params ),
 	get: ( id ) => get( `/reels/${ id }` ),
 	create: ( data ) => post( '/reels', data ),
 	update: ( id, data ) => put( `/reels/${ id }`, data ),

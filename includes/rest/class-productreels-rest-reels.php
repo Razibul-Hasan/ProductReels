@@ -34,6 +34,14 @@ class Productreels_Rest_Reels extends Productreels_Rest_Controller {
 	protected $rest_base = 'reels';
 
 	/**
+	 * The library filters GET /reels accepts.
+	 *
+	 * @since 1.1.0
+	 * @var   string[]
+	 */
+	const FILTERS = array( 'all', 'products', 'buttons', 'unused' );
+
+	/**
 	 * The reels repository.
 	 *
 	 * @since  1.0.0
@@ -75,6 +83,12 @@ class Productreels_Rest_Reels extends Productreels_Rest_Controller {
 								'minimum'           => 0,
 								'sanitize_callback' => 'absint',
 							),
+							'filter'         => array(
+								'description' => __( 'Limit the list to reels with tagged products, with a custom button, or in no widget.', 'productreels' ),
+								'type'        => 'string',
+								'default'     => 'all',
+								'enum'        => self::FILTERS,
+							),
 						)
 					),
 				),
@@ -83,6 +97,23 @@ class Productreels_Rest_Reels extends Productreels_Rest_Controller {
 					'callback'            => array( $this, 'create_item' ),
 					'permission_callback' => array( $this, 'admin_permission' ),
 					'args'                => $this->writable_args(),
+				),
+			)
+		);
+
+		register_rest_route(
+			$this->namespace,
+			'/' . $this->rest_base . '/counts',
+			array(
+				'methods'             => WP_REST_Server::READABLE,
+				'callback'            => array( $this, 'get_counts' ),
+				'permission_callback' => array( $this, 'admin_permission' ),
+				'args'                => array(
+					'search' => array(
+						'type'              => 'string',
+						'default'           => '',
+						'sanitize_callback' => 'sanitize_text_field',
+					),
 				),
 			)
 		);
@@ -166,12 +197,24 @@ class Productreels_Rest_Reels extends Productreels_Rest_Controller {
 				'per_page'       => $request->get_param( 'per_page' ),
 				'search'         => $request->get_param( 'search' ),
 				'exclude_widget' => $request->get_param( 'exclude_widget' ),
+				'filter'         => $request->get_param( 'filter' ),
 				'orderby'        => $request->get_param( 'orderby' ),
 				'order'          => $request->get_param( 'order' ),
 			)
 		);
 
 		return $this->list_response( $page );
+	}
+
+	/**
+	 * How many reels each library filter holds, following the search.
+	 *
+	 * @since  1.1.0
+	 * @param  WP_REST_Request $request The request.
+	 * @return WP_REST_Response The response.
+	 */
+	public function get_counts( $request ) {
+		return rest_ensure_response( $this->reels->filter_counts( $request->get_param( 'search' ) ) );
 	}
 
 	/**
