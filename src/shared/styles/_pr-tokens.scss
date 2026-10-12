@@ -1,0 +1,88 @@
+// Copied from redesign-kit/design/css/pr-tokens.css. Regenerate with
+// `node redesign-kit/design/build-tokens.mjs`, then copy it over this file.
+// Loaded by both the admin and public bundles; never on :root.
+
+/* ProductReels 1.1.0 design tokens. Generated from tokens.json: edit tokens.json, not this file. */
+.pr-app, .prs, .pr-portal {
+  --pr-canvas: #f4f5f9;
+  --pr-surface: #ffffff;
+  --pr-surface-sunken: #eceef4;
+  --pr-surface-hover: #f7f8fc;
+  --pr-line: #e2e5ee;
+  --pr-line-strong: #878da5;
+  --pr-ink: #141629;
+  --pr-ink-muted: #565c76;
+  --pr-ink-disabled: #a3a8bc;
+  --pr-scrim: #1416297a;
+  --pr-on-ink: #ffffff;
+  --pr-brand: #3044f2;
+  --pr-brand-strong: #1f2bb8;
+  --pr-brand-soft: #e9ecff;
+  --pr-on-brand: #ffffff;
+  --pr-link: var(--pr-brand);
+  --pr-spark: #d8135c;
+  --pr-spark-soft: #fff0f5;
+  --pr-spark-bright: #ff5c93;
+  --pr-studio: #161a33;
+  --pr-studio-raised: #22274a;
+  --pr-studio-line: #3a4166;
+  --pr-studio-line-strong: #6b7398;
+  --pr-on-studio: #eef0ff;
+  --pr-on-studio-muted: #a5abd0;
+  --pr-focus-studio: #7d8cff;
+  --pr-ok: #0b7650;
+  --pr-ok-soft: #e3f6ed;
+  --pr-warn: #9a5400;
+  --pr-warn-soft: #fff3dc;
+  --pr-danger: #c42a1b;
+  --pr-danger-soft: #fde8e5;
+  --pr-on-danger: #ffffff;
+  --pr-reel-scrim: #0a0c1acc;
+  --pr-reel-badge: #0a0c1a99;
+  --pr-on-reel: #ffffff;
+  --pr-reel-glass: #fffffff2;
+  --pr-shadow-sm: 0 1px 2px #1416291a, 0 0 0 1px #1416290d;
+  --pr-shadow-md: 0 8px 20px -6px #14162933, 0 2px 6px #1416291a;
+  --pr-shadow-lg: 0 28px 56px -16px #1416294d, 0 6px 16px #1416291f;
+  --pr-shadow-reel: 0 12px 28px -10px #0a0c1a66, 0 2px 6px #0a0c1a26;
+  --pr-focus-ring: 0 0 0 2px #ffffff, 0 0 0 4px #3044f2;
+  --pr-focus-ring-studio: 0 0 0 2px #161a33, 0 0 0 4px #7d8cff;
+  --pr-space-1: 4px;
+  --pr-space-2: 8px;
+  --pr-space-3: 12px;
+  --pr-space-4: 16px;
+  --pr-space-5: 20px;
+  --pr-space-6: 24px;
+  --pr-space-8: 32px;
+  --pr-space-10: 40px;
+  --pr-space-16: 64px;
+  --pr-radius-xs: 6px;
+  --pr-radius-sm: 8px;
+  --pr-radius-md: 12px;
+  --pr-radius-lg: 20px;
+  --pr-radius-reel: 16px;
+  --pr-radius-pill: 999px;
+  --pr-control-sm: 32px;
+  --pr-control: 40px;
+  --pr-control-lg: 48px;
+  --pr-appbar-height: 64px;
+  --pr-rail-width: 84px;
+  --pr-panel-width: 368px;
+  --pr-content-max: 1280px;
+  --pr-font-sans: "ProductReels Archivo", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  --pr-font-display: "ProductReels Archivo Expanded", "ProductReels Archivo", -apple-system, "Segoe UI", system-ui, sans-serif;
+  --pr-font-mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+}
+
+.pr-t-display-xl { font-family: var(--pr-font-display); font-size: 40px; line-height: 44px; font-weight: 800; letter-spacing: -0.02em; }
+.pr-t-display { font-family: var(--pr-font-display); font-size: 28px; line-height: 34px; font-weight: 800; letter-spacing: -0.015em; }
+.pr-t-metric { font-family: var(--pr-font-display); font-size: 30px; line-height: 36px; font-weight: 700; letter-spacing: -0.01em; }
+.pr-t-display-sm { font-family: var(--pr-font-display); font-size: 17px; line-height: 22px; font-weight: 800; letter-spacing: -0.005em; }
+.pr-t-title { font-family: var(--pr-font-sans); font-size: 17px; line-height: 24px; font-weight: 650; }
+.pr-t-heading { font-family: var(--pr-font-sans); font-size: 15px; line-height: 22px; font-weight: 600; }
+.pr-t-body { font-family: var(--pr-font-sans); font-size: 14px; line-height: 20px; font-weight: 400; }
+.pr-t-body-strong { font-family: var(--pr-font-sans); font-size: 14px; line-height: 20px; font-weight: 600; }
+.pr-t-label { font-family: var(--pr-font-sans); font-size: 13px; line-height: 18px; font-weight: 500; }
+.pr-t-small { font-family: var(--pr-font-sans); font-size: 13px; line-height: 18px; font-weight: 400; }
+.pr-t-caption { font-family: var(--pr-font-sans); font-size: 12px; line-height: 16px; font-weight: 500; }
+.pr-t-code { font-family: var(--pr-font-mono); font-size: 12px; line-height: 18px; font-weight: 400; }

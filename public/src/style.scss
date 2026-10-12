@@ -2,9 +2,13 @@
  * The public stylesheet.
  *
  * The same embed and player rules the admin preview loads — that is the
- * whole point — plus the loading placeholder only a real page needs.
+ * whole point — plus the loading placeholder only a real page needs. The
+ * 1.1.0 tokens and storefront layer come first, so the 1.0.0 embed rules
+ * still win until the storefront is ported.
  */
 
+@use '../../src/shared/styles/pr-tokens';
+@use '../../src/shared/styles/prs-storefront';
 @use '../../src/shared/styles/embed';
 @use '../../src/shared/styles/player';
 

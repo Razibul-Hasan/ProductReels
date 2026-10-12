@@ -21,5 +21,5 @@ if ( ! defined( 'WPINC' ) ) {
 ?>
 <div class="wrap productreels-wrap">
 	<h1 class="screen-reader-text"><?php esc_html_e( 'ProductReels', 'productreels' ); ?></h1>
-	<div id="productreels-admin-app"></div>
+	<div id="productreels-admin-app" class="pr-app"></div>
 </div>

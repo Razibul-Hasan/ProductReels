@@ -198,10 +198,19 @@ class Productreels_Admin {
 			'before'
 		);
 
+		// Archivo ships with the plugin and loads on ProductReels screens only:
+		// never on the storefront, other admin screens or the block editor.
+		wp_register_style(
+			'productreels-admin-fonts',
+			PRODUCTREELS_URL . 'admin/css/productreels-fonts.css',
+			array(),
+			PRODUCTREELS_VERSION
+		);
+
 		wp_enqueue_style(
 			'productreels-admin',
 			PRODUCTREELS_URL . 'admin/dist/style-productreels-admin.css',
-			array(),
+			array( 'productreels-admin-fonts' ),
 			$asset['version']
 		);
 

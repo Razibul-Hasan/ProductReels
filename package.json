@@ -22,6 +22,7 @@
 		"admin/class-productreels-admin.php",
 		"admin/partials/",
 		"admin/css/",
+		"admin/fonts/",
 		"admin/images/",
 		"admin/dist/*.js",
 		"admin/dist/*.css",

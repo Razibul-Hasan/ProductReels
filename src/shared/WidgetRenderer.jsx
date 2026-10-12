@@ -57,6 +57,7 @@ export const WidgetRenderer = ( {
 				ref={ revealRef }
 				className={ [
 					'productreels-embed',
+					'prs',
 					device ? `productreels-embed--${ device }` : '',
 					reveal ? 'productreels-embed--reveal' : '',
 					reveal && seen ? 'is-revealed' : '',

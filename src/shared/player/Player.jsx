@@ -46,13 +46,16 @@ const EXIT_MS = 240;
 /* The opening choreography — stage, chrome, foot — is over by then. */
 const OPEN_MS = 1000;
 
-/** The one node every player on the page renders into. */
+/**
+ * The one node every player on the page renders into. It sits outside every
+ * widget root, so it carries `prs` itself for the design tokens to resolve.
+ */
 const portalRoot = () => {
 	let node = document.querySelector( '.wr-portal-root' );
 
 	if ( ! node ) {
 		node = document.createElement( 'div' );
-		node.className = 'wr-portal-root';
+		node.className = 'wr-portal-root prs';
 		document.body.appendChild( node );
 	}
 

@@ -94,7 +94,7 @@ class Productreels_Shortcodes {
 		Productreels_Public::request_assets();
 
 		return sprintf(
-			'<div class="productreels-embed" data-widget-id="%1$d" data-version="%2$s" data-name="%3$s"></div>',
+			'<div class="productreels-embed prs" data-widget-id="%1$d" data-version="%2$s" data-name="%3$s"></div>',
 			$summary['id'],
 			esc_attr( Productreels_Render_Cache::version( $summary['updated_at'] ) ),
 			esc_attr( $summary['name'] )
@@ -124,7 +124,7 @@ class Productreels_Shortcodes {
 		Productreels_Public::request_assets();
 
 		return sprintf(
-			'<div class="productreels-embed productreels-embed--single" data-reel-id="%1$d" data-version="%2$s"></div>',
+			'<div class="productreels-embed productreels-embed--single prs" data-reel-id="%1$d" data-version="%2$s"></div>',
 			$reel_id,
 			esc_attr( Productreels_Render_Cache::version( 'reel' ) )
 		);

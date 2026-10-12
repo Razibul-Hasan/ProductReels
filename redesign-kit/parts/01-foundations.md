@@ -35,12 +35,12 @@ Put the design system's foundations into the plugin without changing any screen'
 
 ## Done when
 
-- [ ] On a ProductReels admin screen, `getComputedStyle(document.querySelector('.pr-app')).getPropertyValue('--pr-brand')` returns `#3044f2`.
-- [ ] "ProductReels Archivo" loads on ProductReels screens (Network tab) and nowhere else: check Dashboard, Posts, the block editor, and a storefront page.
-- [ ] Storefront widget roots carry `prs`, and the tokens resolve inside them.
-- [ ] Every 1.0.0 screen still works; only colours and the admin font have changed.
-- [ ] `Icon` renders the names used in `design/components/Icon.png`.
-- [ ] Build and lint pass.
+- [x] On a ProductReels admin screen, `getComputedStyle(document.querySelector('.pr-app')).getPropertyValue('--pr-brand')` returns `#3044f2`. *(Verified in an Edge harness: real mount markup, WP admin CSS and the built bundle. Not yet in a logged-in wp-admin.)*
+- [x] "ProductReels Archivo" loads on ProductReels screens (Network tab) and nowhere else: check Dashboard, Posts, the block editor, and a storefront page. *(Loads in the harness; no font requests on a storefront page with both shortcodes. Dashboard/Posts/block editor: by code, since the font style is registered only after the `is_productreels_screen()` guard. User to confirm.)*
+- [x] Storefront widget roots carry `prs`, and the tokens resolve inside them. *(Live on plugin-dev.local: shortcode mount nodes, WidgetRenderer roots and the player portal all resolve `--pr-brand`; pixels unchanged.)*
+- [x] Every 1.0.0 screen still works; only colours and the admin font have changed. *(Harness before/after at 1280/960/782 for widgets, reels, settings, editor: same layout, new palette and Archivo, plus the step-6 flush right edge. Unauthenticated, so data-filled states still need a logged-in check.)*
+- [x] `Icon` renders the names used in `design/components/Icon.png`. *(All 69, side by side with the PNG.)*
+- [x] Build and lint pass. *(Build passes. Lint: my files are clean; `npm run lint:js` still fails exactly as on 1.0.0 with ~14.6k Prettier CRLF errors from the Windows checkout plus 6 old ones in Player.jsx. PHP: `php -l` clean; phpcs not available here.)*
 
 ## Hand-off
 
