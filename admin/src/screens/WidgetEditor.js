@@ -517,6 +517,7 @@ export const WidgetEditor = ( { widgetId, navigate } ) => {
 					attached={ attached }
 					setAttached={ updateReels }
 					onPreview={ preview }
+					ready={ ! loading }
 				/>
 			);
 			break;

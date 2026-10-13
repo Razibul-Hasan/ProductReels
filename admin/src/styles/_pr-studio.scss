@@ -231,6 +231,141 @@ a.pr-studio__crumb:focus-visible {
 	border: 0;
 }
 
+/* ------------------------------------------------------------ Reels step */
+
+.pr-reelrows {
+	position: relative;
+}
+
+.pr-reelrow {
+	position: relative;
+	background: var(--pr-surface);
+}
+
+/* dnd-kit moves the row with an inline transform; the lift keeps the
+   design's tilt as `rotate`, which the inline transform doesn't touch. */
+.pr-reelrow[data-dragging='true'] {
+	z-index: 2;
+	transform: none;
+	rotate: -1deg;
+}
+
+.pr-reelrow__grip {
+	align-self: stretch;
+	height: auto;
+	padding: 0;
+	border: 0;
+	border-radius: var(--pr-radius-sm);
+	background: none;
+	touch-action: none;
+}
+
+.pr-reelrow[data-dragging='true'] .pr-reelrow__grip {
+	cursor: grabbing;
+}
+
+.pr-reelrow__grip:hover {
+	color: var(--pr-ink);
+}
+
+.pr-reelrow__grip:focus-visible {
+	outline: none;
+	box-shadow: var(--pr-focus-ring);
+}
+
+.pr-reelrow__thumb {
+	position: relative;
+	background: var(--pr-surface-sunken);
+}
+
+.pr-reelrow__meta {
+	min-width: 0;
+}
+
+.pr-reelrow__meta .pr-icon {
+	flex: none;
+}
+
+.pr-reelrow__sells {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.pr-libtools {
+	display: flex;
+	gap: var(--pr-space-2);
+}
+
+.pr-libtools > .pr-inputwrap {
+	flex: 1;
+	min-width: 0;
+}
+
+.pr-pick__media {
+	background: var(--pr-surface-sunken);
+}
+
+.pr-pick__media > img,
+.pr-pick__media > video {
+	position: absolute;
+	inset: 0;
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	display: block;
+}
+
+.pr-pick--skeleton {
+	cursor: default;
+}
+
+.pr-pick--skeleton .pr-pick__media {
+	box-shadow: none;
+}
+
+.pr-pick__line {
+	height: 10px;
+	width: 70%;
+	border-radius: var(--pr-radius-pill);
+	background: var(--pr-surface-sunken);
+}
+
+.pr-libnote,
+.pr-libmore {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: var(--pr-space-3);
+	padding: var(--pr-space-4) 0;
+	text-align: center;
+	color: var(--pr-ink-muted);
+}
+
+/* ----------------------------------------------------------- Panel fields */
+
+.pr-devicenote {
+	display: inline-flex;
+	align-items: center;
+	gap: 4px;
+	color: var(--pr-ink-muted);
+}
+
+/* Four corners as a 2 x 2 grid, laid out like the corners they name. */
+.pr-corners .pr-seg {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.pr-panel .pr-seg__item {
+	min-width: 0;
+	padding-inline: var(--pr-space-2);
+}
+
+.pr-panel__sechead .pr-btn {
+	margin-block: -6px;
+}
+
 /* ----------------------------------------------------------------- Stage */
 
 .pr-stage__canvas {

@@ -45,6 +45,7 @@ export { Filmstrip } from './Filmstrip';
 export { ShopLinks, shortUrl } from './ShopLinks';
 export { ProductPicker } from './ProductPicker';
 export { LinkForm, linkDraft, validateLink } from './LinkForm';
+export { ReelPicker, ReelRow, reelSells } from './ReelRow';
 export { TemplatePicker } from './TemplatePicker';
 export {
 	DEVICES,

@@ -7,7 +7,7 @@
  * with aria-describedby, so a screen reader hears them with the field.
  */
 
-import { useState } from '@wordpress/element';
+import { forwardRef, useState } from '@wordpress/element';
 import { useInstanceId } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 import { Icon } from '@shared/Icon';
@@ -114,25 +114,26 @@ export const TextField = ( {
 	);
 };
 
-export const SearchField = ( {
-	placeholder = __( 'Search', 'productreels' ),
-	label,
-	width,
-	...rest
-} ) => (
-	<div
-		className="pr-inputwrap pr-inputwrap--icon"
-		style={ width ? { width } : undefined }
-	>
-		<Icon name="search" size={ 18 } className="pr-inputwrap__icon" />
-		<input
-			type="search"
-			className="pr-input pr-t-body"
-			placeholder={ placeholder }
-			aria-label={ label || placeholder }
-			{ ...rest }
-		/>
-	</div>
+export const SearchField = forwardRef(
+	(
+		{ placeholder = __( 'Search', 'productreels' ), label, width, ...rest },
+		ref
+	) => (
+		<div
+			className="pr-inputwrap pr-inputwrap--icon"
+			style={ width ? { width } : undefined }
+		>
+			<Icon name="search" size={ 18 } className="pr-inputwrap__icon" />
+			<input
+				ref={ ref }
+				type="search"
+				className="pr-input pr-t-body"
+				placeholder={ placeholder }
+				aria-label={ label || placeholder }
+				{ ...rest }
+			/>
+		</div>
+	)
 );
 
 export const Checkbox = ( {
