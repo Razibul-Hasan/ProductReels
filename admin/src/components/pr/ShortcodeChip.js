@@ -50,7 +50,7 @@ export const copyText = async ( text, owner ) => {
 	}
 };
 
-export const ShortcodeChip = ( { code, copied: initial = false } ) => {
+export const ShortcodeChip = ( { code, copied: initial = false, size } ) => {
 	const [ copied, setCopied ] = useState( initial );
 	const timer = useRef();
 	const chip = useRef( null );
@@ -82,7 +82,9 @@ export const ShortcodeChip = ( { code, copied: initial = false } ) => {
 		<button
 			ref={ chip }
 			type="button"
-			className="pr-shortcode pr-t-code"
+			className={ `pr-shortcode pr-t-code${
+				size === 'lg' ? ' pr-shortcode--lg' : ''
+			}` }
 			data-copied={ copied ? 'true' : 'false' }
 			onClick={ copy }
 			aria-label={ sprintf(

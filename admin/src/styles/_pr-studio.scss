@@ -366,6 +366,183 @@ a.pr-studio__crumb:focus-visible {
 	margin-block: -6px;
 }
 
+/* Controls a toggle reveals sit right under it, set in by a rule. */
+.pr-subfields {
+	display: flex;
+	flex-direction: column;
+	gap: var(--pr-space-3);
+	margin-block-start: calc(var(--pr-space-1) * -1);
+	padding-inline-start: var(--pr-space-3);
+	border-inline-start: 2px solid var(--pr-line);
+}
+
+.pr-subfields.pr-fieldgrid {
+	display: grid;
+}
+
+/* ---------------------------------------------------- Product card step */
+
+.pr-cardstyles {
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.pr-cardart {
+	position: absolute;
+	inset: 0;
+	margin: auto;
+	display: flex;
+	background: var(--pr-surface);
+	border-radius: 6px;
+	box-shadow: inset 0 0 0 1px var(--pr-line);
+}
+
+.pr-cardart > span {
+	flex: none;
+}
+
+.pr-cardart__img {
+	border-radius: 4px;
+	background: var(--pr-line-strong);
+}
+
+.pr-cardart__lines {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	gap: 4px;
+}
+
+.pr-cardart__lines > span {
+	height: 4px;
+	border-radius: var(--pr-radius-pill);
+	background: var(--pr-line);
+}
+
+.pr-cardart__lines > span:first-child {
+	width: 70%;
+	background: var(--pr-line-strong);
+}
+
+.pr-cardart__btn {
+	background: var(--pr-ink-muted);
+}
+
+.pr-template[aria-checked='true'] .pr-cardart__img,
+.pr-template[aria-checked='true'] .pr-cardart__btn {
+	background: var(--pr-brand);
+}
+
+.pr-cardart--modern {
+	width: 78%;
+	height: 32px;
+	padding: 5px;
+	gap: 6px;
+	align-items: center;
+}
+
+.pr-cardart--modern .pr-cardart__img {
+	width: 22px;
+	height: 22px;
+}
+
+.pr-cardart--modern .pr-cardart__lines {
+	flex: 1;
+}
+
+.pr-cardart--modern .pr-cardart__btn {
+	width: 16px;
+	height: 16px;
+	border-radius: var(--pr-radius-pill);
+}
+
+.pr-cardart--classic {
+	width: 44%;
+	height: 88px;
+	padding: 5px;
+	gap: 5px;
+	flex-direction: column;
+}
+
+.pr-cardart--classic .pr-cardart__img {
+	flex: 1;
+}
+
+.pr-cardart--classic .pr-cardart__lines > span {
+	width: 80%;
+}
+
+.pr-cardart--classic .pr-cardart__btn {
+	height: 9px;
+	border-radius: var(--pr-radius-pill);
+}
+
+.pr-cardnote {
+	color: var(--pr-ink-muted);
+}
+
+.pr-cardnote:empty {
+	display: none;
+}
+
+/* -------------------------------------------------------- Place it step */
+
+.pr-shortcode--lg {
+	align-self: flex-start;
+	max-width: 100%;
+	height: 44px;
+	padding-inline: var(--pr-space-4) var(--pr-space-2);
+}
+
+.pr-builder--art {
+	gap: var(--pr-space-3);
+	padding: var(--pr-space-4);
+	background: var(--pr-canvas);
+	box-shadow: inset 0 0 0 1px var(--pr-line);
+	user-select: none;
+}
+
+.pr-builder--art .pr-builder__badge {
+	width: 28px;
+	height: 28px;
+}
+
+.pr-builder__fake {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: var(--pr-space-2);
+	height: 36px;
+	padding: 0 var(--pr-space-3);
+	border: 1px solid var(--pr-line-strong);
+	border-radius: var(--pr-radius-sm);
+	background: var(--pr-surface);
+	color: var(--pr-ink);
+}
+
+.pr-builder__fake > span {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.pr-builder__fake .pr-icon {
+	color: var(--pr-ink-muted);
+}
+
+.pr-placenote {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	gap: var(--pr-space-3);
+}
+
+.pr-placecode {
+	padding: 1px 6px;
+	border-radius: var(--pr-radius-xs);
+	background: var(--pr-surface-sunken);
+	white-space: nowrap;
+}
+
 /* ----------------------------------------------------------------- Stage */
 
 .pr-stage__canvas {
@@ -413,8 +590,8 @@ a.pr-studio__crumb:focus-visible {
 	width: 64%;
 }
 
-.pr-device .pr-empty {
-	padding-block: var(--pr-space-8);
+.pr-stage__empty {
+	width: min(440px, 100%);
 }
 
 /* ------------------------------------------------------- Narrow screens */

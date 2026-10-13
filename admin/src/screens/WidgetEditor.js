@@ -538,7 +538,12 @@ export const WidgetEditor = ( { widgetId, navigate } ) => {
 			break;
 		case 'place':
 			body = (
-				<PlaceStep id={ savedId } onSave={ save } saving={ saving } />
+				<PlaceStep
+					id={ savedId }
+					name={ name }
+					onSave={ save }
+					saving={ saving }
+				/>
 			);
 			break;
 	}
@@ -550,6 +555,7 @@ export const WidgetEditor = ( { widgetId, navigate } ) => {
 	} else if ( attached.length === 0 ) {
 		stageBody = (
 			<EmptyState
+				panel
 				icon="film"
 				title={ __( 'Add reels to see your widget', 'productreels' ) }
 				description={ __(
@@ -628,12 +634,18 @@ export const WidgetEditor = ( { widgetId, navigate } ) => {
 				}
 				stage={
 					<Stage device={ device } onDevice={ setDevice }>
-						<DeviceFrame
-							device={ device }
-							url={ window.location.host }
-						>
-							{ stageBody }
-						</DeviceFrame>
+						{ /* The empty state sits on the stage at full size; inside
+						     the zoomed page it would be too small to read. */ }
+						{ ! loading && attached.length === 0 ? (
+							<div className="pr-stage__empty">{ stageBody }</div>
+						) : (
+							<DeviceFrame
+								device={ device }
+								url={ window.location.host }
+							>
+								{ stageBody }
+							</DeviceFrame>
+						) }
 					</Stage>
 				}
 			/>

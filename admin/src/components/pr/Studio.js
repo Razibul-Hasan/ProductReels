@@ -80,7 +80,8 @@ export const StudioShell = ( { header, rail, panel, stage, panelOpen } ) => (
 
 /**
  * The widget's name: a button that becomes a text field. Enter or leaving
- * the field keeps the new name, Escape puts the old one back.
+ * the field keeps the new name, Escape (or an empty field) puts the old one
+ * back.
  *
  * @param {Object}   props          Props.
  * @param {string}   props.name     The current name.
@@ -105,8 +106,9 @@ const NameField = ( { name, fallback, onRename } ) => {
 		}
 	}, [ editing ] );
 
+	// An empty name isn't a name: it puts the old one back.
 	const finish = ( keep ) => {
-		if ( keep && draft.trim() !== name.trim() ) {
+		if ( keep && draft.trim() && draft.trim() !== name.trim() ) {
 			onRename( draft.trim() );
 		}
 
