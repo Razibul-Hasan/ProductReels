@@ -70,6 +70,9 @@ const toError = ( error ) => {
 
 	wrapped.code = error?.code || 'productreels_request_failed';
 	wrapped.status = error?.data?.status || 0;
+	// Which arguments the server refused (rest_invalid_param), so a form can
+	// mark the field rather than only report the request.
+	wrapped.params = error?.data?.params || {};
 
 	return wrapped;
 };
