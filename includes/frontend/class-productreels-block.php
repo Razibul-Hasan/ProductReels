@@ -21,7 +21,9 @@ if ( ! defined( 'WPINC' ) ) {
  * same mount node as the shortcode, through the same function, so a block
  * and a shortcode pointing at one widget are indistinguishable in the DOM.
  * The editor script is registered under the `productreels-block` handle and
- * enqueued by WordPress only on block-editor screens.
+ * enqueued by WordPress only on block-editor screens. Since 1.1.0 the editor
+ * shows the live widget; its stylesheet carries the storefront styles for
+ * that, and loads into the editor canvas only.
  *
  * @since      1.0.0
  * @package    Productreels
@@ -71,6 +73,8 @@ class Productreels_Block {
 						'adminUrl'  => esc_url_raw( admin_url( 'admin.php?page=productreels' ) ),
 						// An editor may place a widget without being able to open the app.
 						'canManage' => current_user_can( Productreels_Rest_Controller::CAPABILITY ),
+						// The live preview only asks for product cards when there is a shop.
+						'hasWoo'    => Productreels_WooCommerce::is_active(),
 					)
 				) . ';',
 				'before'

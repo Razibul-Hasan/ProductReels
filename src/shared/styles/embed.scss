@@ -774,6 +774,29 @@
 	pointer-events: none;
 }
 
+/* ----------------------------------------------- Elementor, nothing chosen */
+
+/* Printed only in Elementor's editor before a widget is chosen. */
+.prs.prs-builder-hint {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 4px;
+	padding: var(--pr-space-6) var(--pr-space-4);
+	border: 1px dashed var(--pr-line-strong);
+	border-radius: var(--pr-radius-md);
+	background: var(--pr-surface);
+	color: var(--pr-ink-muted);
+	font-size: 13px;
+	line-height: 1.4;
+	text-align: center;
+}
+
+.prs-builder-hint strong {
+	color: var(--pr-ink);
+	font-size: 15px;
+}
+
 /* ------------------------------------------------- Responsive style buckets */
 
 @media (max-width: 1024px) {
