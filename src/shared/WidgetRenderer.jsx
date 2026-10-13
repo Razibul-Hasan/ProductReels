@@ -58,6 +58,7 @@ export const WidgetRenderer = ( {
 				className={ [
 					'productreels-embed',
 					'prs',
+					'prs-widget',
 					device ? `productreels-embed--${ device }` : '',
 					reveal ? 'productreels-embed--reveal' : '',
 					reveal && seen ? 'is-revealed' : '',
@@ -78,7 +79,7 @@ export const WidgetRenderer = ( {
 			>
 				{ titled && (
 					<h2
-						className="wr-widget-title"
+						className="prs-widget__title pr-t-title wr-widget-title"
 						style={ { textAlign: styles.widgetTitle.alignment } }
 					>
 						{ widget.name }

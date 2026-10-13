@@ -15,14 +15,13 @@ import { forwardRef, useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { posterOf } from '../format';
 import { providerFor } from '../providers';
+import { ReelIcon } from '../ReelIcon';
 import { LinkStack } from './LinkStack';
 
-/* The disc is drawn by the stylesheet; this is only the triangle. */
+/* The paused mark: the tile's play disc, larger. */
 const BigPlay = () => (
-	<span className="wr-player__bigplay" aria-hidden="true">
-		<svg viewBox="0 0 24 24" width="30" height="30" fill="#fff">
-			<path d="M8 5.5v13a1 1 0 0 0 1.5.87l11-6.5a1 1 0 0 0 0-1.74l-11-6.5A1 1 0 0 0 8 5.5Z" />
-		</svg>
+	<span className="prs-play prs-play--lg" aria-hidden="true">
+		<ReelIcon name="play" size={ 26 } fill="currentColor" />
 	</span>
 );
 
@@ -86,10 +85,14 @@ export const PlayerSlide = forwardRef(
 
 		return (
 			<div
-				className={ `wr-player__slide${ active ? ' is-active' : '' }` }
+				className={ `prs-player__slide${ active ? ' is-active' : '' }` }
 				aria-hidden={ active ? undefined : 'true' }
+				// A neighbour is only a preview of the next step: nothing in it
+				// (its buttons, its product card) can be reached until it is
+				// the reel in front.
+				inert={ active ? undefined : '' }
 			>
-				<div className="wr-player__media">
+				<div className="prs-player__media">
 					{ live && (
 						<Provider
 							ref={ providerRef }
@@ -105,7 +108,7 @@ export const PlayerSlide = forwardRef(
 					) }
 					{ ! live && poster && (
 						<img
-							className="wr-player__poster"
+							className="prs-player__poster"
 							src={ poster }
 							alt=""
 							decoding="async"
@@ -113,7 +116,7 @@ export const PlayerSlide = forwardRef(
 					) }
 					{ ! live && ! poster && (
 						<span
-							className="wr-player__poster wr-player__poster--blank"
+							className="prs-player__poster prs-player__poster--blank"
 							aria-hidden="true"
 						/>
 					) }
@@ -122,17 +125,11 @@ export const PlayerSlide = forwardRef(
 				{ active && (
 					<button
 						type="button"
-						className="wr-player__tap"
+						className="prs-player__tap"
 						aria-label={
 							playing && ! standby
-								? __(
-										'Pause',
-										'productreels'
-									)
-								: __(
-										'Play',
-										'productreels'
-									)
+								? __( 'Pause', 'productreels' )
+								: __( 'Play', 'productreels' )
 						}
 						onPointerDown={ onPointerDown }
 						onClick={ onClick }
@@ -142,12 +139,12 @@ export const PlayerSlide = forwardRef(
 				) }
 
 				{ fileCount > 1 && (
-					<div className="wr-player__dots" aria-hidden="true">
+					<div className="prs-player__dots" aria-hidden="true">
 						{ Array.from( { length: fileCount } ).map(
 							( _, index ) => (
 								<span
 									key={ index }
-									className={ `wr-player__dot${
+									className={ `prs-player__dot${
 										index === fileIndex ? ' is-on' : ''
 									}` }
 								/>
@@ -157,9 +154,11 @@ export const PlayerSlide = forwardRef(
 				) }
 
 				{ ( showTitle || showLinks ) && (
-					<div className="wr-player__foot">
+					<div className="prs-player__foot">
 						{ showTitle && (
-							<p className="wr-player__title">{ reel.title }</p>
+							<p className="prs-player__title pr-t-body-strong">
+								{ reel.title }
+							</p>
 						) }
 						{ showLinks && (
 							<LinkStack

@@ -105,22 +105,16 @@ export const Seekbar = ( { current, duration, onSeek } ) => {
 	return (
 		<div
 			ref={ track }
-			className={ `wr-seek${ scrub !== null ? ' is-scrubbing' : '' }` }
+			className={ `prs-seek${ scrub !== null ? ' is-scrubbing' : '' }` }
 			role="slider"
 			tabIndex={ 0 }
-			aria-label={ __(
-				'Seek',
-				'productreels'
-			) }
+			aria-label={ __( 'Seek', 'productreels' ) }
 			aria-valuemin={ 0 }
 			aria-valuemax={ Math.round( duration ) }
 			aria-valuenow={ Math.round( shown ) }
 			aria-valuetext={ sprintf(
 				/* translators: 1: elapsed time, 2: total duration. */
-				__(
-					'%1$s of %2$s',
-					'productreels'
-				),
+				__( '%1$s of %2$s', 'productreels' ),
 				formatClock( shown ),
 				formatClock( duration )
 			) }
@@ -131,13 +125,13 @@ export const Seekbar = ( { current, duration, onSeek } ) => {
 			onPointerCancel={ onPointerUp }
 			onKeyDown={ onKeyDown }
 		>
-			<span className="wr-seek__track">
+			<span className="prs-seek__track">
 				<span
-					className="wr-seek__fill"
+					className="prs-seek__fill"
 					style={ { width: `${ ratio * 100 }%` } }
 				/>
 				<span
-					className="wr-seek__thumb"
+					className="prs-seek__knob"
 					style={ { insetInlineStart: `${ ratio * 100 }%` } }
 				/>
 			</span>

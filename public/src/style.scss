@@ -1,10 +1,10 @@
 /**
  * The public stylesheet.
  *
- * The same embed and player rules the admin preview loads — that is the
+ * The same widget and player rules the admin preview loads — that is the
  * whole point — plus the loading placeholder only a real page needs. The
- * 1.1.0 tokens and storefront layer come first, so the 1.0.0 embed rules
- * still win until the storefront is ported.
+ * design's tokens and storefront components come first; embed and player
+ * fit them to a real widget and its stored settings.
  */
 
 @use '../../src/shared/styles/pr-tokens';

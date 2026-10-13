@@ -1,11 +1,16 @@
 /**
- * The fullscreen player.
+ * The fullscreen player: the design's ReelPlayer, in a PlayerTheater room.
  *
  * Rendered through a portal into `.wr-portal-root` on <body>, so no theme's
  * overflow:hidden or stacking context can clip it. It is a dialog in every
  * sense: modal to assistive technology, focus trapped inside and returned on
  * close, Escape closes, the page behind it cannot scroll, and on a phone the
  * back button closes it instead of leaving the page.
+ *
+ * On a phone the reel is the whole screen. On a wider screen it is a theatre:
+ * the current reel centred on the studio colour, its neighbours dimmed on
+ * either side, the previous / next buttons between them, the position ("2 of
+ * 6") and the close button in the room's top corners.
  *
  * Reels are flattened into slots — one per file — and the stage carries the
  * current slot with its two neighbours, so a swipe reveals what is next
@@ -21,7 +26,7 @@ import {
 	useState,
 } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
-import { slotsFor } from '../format';
+import { formatClock, posterOf, slotsFor, viewCount } from '../format';
 import { useKeyboardNav } from '../hooks/useKeyboardNav';
 import { useMediaQuery } from '../hooks/useMediaQuery';
 import { useReducedMotion } from '../hooks/useReducedMotion';
@@ -29,8 +34,9 @@ import { useSwipe } from '../hooks/useSwipe';
 import { useWheelNav } from '../hooks/useWheelNav';
 import { claimPlayback } from '../playback';
 import { useProducts } from '../products';
+import { ReelIcon } from '../ReelIcon';
 import { withDefaults } from '../services';
-import { styleVars } from '../styleVars';
+import { playerVars } from '../styleVars';
 import { PlayerNav } from './PlayerNav';
 import { PlayerSlide } from './PlayerSlide';
 import { Seekbar } from './Seekbar';
@@ -62,53 +68,18 @@ const portalRoot = () => {
 	return node;
 };
 
-const CloseIcon = () => (
-	<svg
-		viewBox="0 0 24 24"
-		width="20"
-		height="20"
-		fill="none"
-		stroke="currentColor"
-		strokeWidth="2.2"
-		strokeLinecap="round"
-		aria-hidden="true"
-	>
-		<path d="M18 6 6 18M6 6l12 12" />
-	</svg>
-);
+/* A neighbour, dimmed beside the stage in the theatre: its poster only. */
+const Peek = ( { slot } ) => {
+	const poster = slot
+		? posterOf( slot.reel ) || ( slot.file && slot.file.poster_url ) || ''
+		: '';
 
-const PlayPauseIcon = ( { playing } ) => (
-	<svg
-		viewBox="0 0 24 24"
-		width="18"
-		height="18"
-		fill="currentColor"
-		aria-hidden="true"
-	>
-		{ playing ? (
-			<path d="M7 5h4v14H7zM13 5h4v14h-4z" />
-		) : (
-			<path d="M8 5.5v13a1 1 0 0 0 1.5.87l11-6.5a1 1 0 0 0 0-1.74l-11-6.5A1 1 0 0 0 8 5.5Z" />
-		) }
-	</svg>
-);
-
-const SoundIcon = () => (
-	<svg
-		viewBox="0 0 24 24"
-		width="16"
-		height="16"
-		fill="none"
-		stroke="currentColor"
-		strokeWidth="2"
-		strokeLinecap="round"
-		strokeLinejoin="round"
-		aria-hidden="true"
-	>
-		<path d="M11 5 6 9H2v6h4l5 4V5Z" fill="currentColor" stroke="none" />
-		<path d="M15.5 8.5a5 5 0 0 1 0 7M19 5.5a9 9 0 0 1 0 13" />
-	</svg>
-);
+	return (
+		<div className="prs-room__peek" aria-hidden="true">
+			{ poster && <img src={ poster } alt="" decoding="async" /> }
+		</div>
+	);
+};
 
 export const Player = ( {
 	widget,
@@ -532,10 +503,15 @@ export const Player = ( {
 			}
 
 			const active = node.ownerDocument.activeElement;
+			// Only what Tab can really reach: not a picture link taken out of
+			// the order, nothing in a neighbouring (inert) slide, nothing hidden.
 			const items = Array.from(
 				node.querySelectorAll( FOCUSABLE )
 			).filter(
-				( item ) => item.offsetParent !== null || item === active
+				( item ) =>
+					item.getAttribute( 'tabindex' ) !== '-1' &&
+					! item.closest( '[inert]' ) &&
+					( item.offsetParent !== null || item === active )
 			);
 
 			if ( items.length === 0 ) {
@@ -628,29 +604,58 @@ export const Player = ( {
 	const label = current
 		? sprintf(
 				/* translators: %s: reel title. */
-				__(
-					'Reel player: %s',
-					'productreels'
-				),
+				__( 'Reel player: %s', 'productreels' ),
 				current.reel.title || widget.name || ''
 			)
-		: __(
-				'Reel player',
-				'productreels'
-			);
+		: __( 'Reel player', 'productreels' );
 
 	const hasFile = !! ( current && current.file );
 	const showBar = hasFile && styles.showSeekbar;
+	// The theatre's neighbours only make sense beside a sideways step.
+	const theatre = ! mobile && horizontal && many;
+	const position = many
+		? sprintf(
+				/* translators: 1: the reel's position, 2: how many reels there are. */
+				__( '%1$d of %2$d', 'productreels' ),
+				current.reelIndex + 1,
+				widget.reels.length
+			)
+		: '';
+
+	const close = (
+		<button
+			type="button"
+			className={ `${
+				mobile ? 'prs-iconbtn' : 'prs-navbtn prs-room__close'
+			} wr-player__close` }
+			aria-label={ __( 'Close player', 'productreels' ) }
+			onClick={ requestClose }
+		>
+			<ReelIcon name="x" size={ mobile ? 18 : 20 } />
+		</button>
+	);
+
+	const nav = ( which ) =>
+		! mobile &&
+		many && (
+			<PlayerNav
+				direction={ horizontal ? 'horizontal' : 'vertical' }
+				which={ which }
+				onClick={ () => step( which === 'prev' ? -1 : 1 ) }
+			/>
+		);
 
 	return createPortal(
 		<div
 			ref={ root }
 			className={ [
+				'prs-room',
 				'wr-player',
-				horizontal ? 'wr-player--horizontal' : 'wr-player--vertical',
-				mobile ? 'wr-player--mobile' : '',
-				current && current.fileCount > 1 ? 'wr-player--files' : '',
-				showBar ? '' : 'wr-player--no-bar',
+				horizontal ? 'is-horizontal' : 'is-vertical',
+				mobile ? 'is-mobile' : '',
+				theatre ? 'is-theatre' : '',
+				current && current.fileCount > 1 ? 'has-files' : '',
+				showBar ? '' : 'no-bar',
 				swipe.dragging ? 'is-dragging' : '',
 				snap || reduced ? 'is-snap' : '',
 				opening ? 'is-opening' : '',
@@ -658,33 +663,44 @@ export const Player = ( {
 			]
 				.filter( Boolean )
 				.join( ' ' ) }
-			style={ styleVars( styles ) }
+			style={ playerVars( styles ) }
 			role="dialog"
 			aria-modal="true"
 			aria-label={ label }
 		>
 			<div
-				className="wr-player__backdrop"
+				className="prs-room__backdrop"
 				aria-hidden="true"
 				onPointerDown={ onBackdropPointerDown }
 				onClick={ onBackdropClick }
 			/>
 
-			<div className="wr-player__layout">
-				<PlayerNav
-					direction={ horizontal ? 'horizontal' : 'vertical' }
-					onPrev={ () => step( -1 ) }
-					onNext={ () => step( 1 ) }
-					hidden={ mobile || ! many }
-				/>
+			{ /* The position is spoken on every step; a phone has no room
+			     for it on screen, so there it is for assistive technology only. */ }
+			{ many && (
+				<span
+					className={
+						mobile ? 'pr-sr' : 'prs-room__count pr-t-label'
+					}
+					aria-live="polite"
+				>
+					{ position }
+				</span>
+			) }
+
+			{ ! mobile && close }
+
+			<div className="prs-room__layout">
+				{ theatre && <Peek slot={ prevSlot } /> }
+				{ nav( 'prev' ) }
 
 				<div
 					ref={ stage }
-					className="wr-player__stage"
+					className="prs-player prs-room__stage"
 					{ ...swipe.handlers }
 				>
 					<div
-						className="wr-player__track"
+						className="prs-player__track"
 						style={ { transform } }
 						onTransitionEnd={ onTransitionEnd }
 					>
@@ -713,23 +729,17 @@ export const Player = ( {
 						) }
 					</div>
 
-					{ /* The controls live on the stage itself, the way a
-					     phone's reels feed keeps them within thumb reach:
-					     the counter on the start side, sound / play / close
-					     in one pill on the end side. */ }
-					<div className="wr-player__head" data-wr-no-swipe="">
-						{ many && (
-							<span
-								className="wr-player__counter"
-								aria-live="polite"
-							>
-								<b>{ current.reelIndex + 1 }</b>
-								<span aria-hidden="true">/</span>
-								{ widget.reels.length }
+					{ /* Views on the start side; sound (and, on a phone, close)
+					     on the end side, within thumb reach. */ }
+					<div className="prs-player__top" data-wr-no-swipe="">
+						{ styles.showViews && current && (
+							<span className="prs-views pr-t-caption">
+								<ReelIcon name="eye" size={ 12 } />
+								{ viewCount( current.reel.view_count ) }
 							</span>
 						) }
 
-						<div className="wr-player__tools">
+						<div className="prs-player__tools">
 							{ hasFile && styles.showVolumeControl && (
 								<VolumeControl
 									muted={ muted }
@@ -738,70 +748,46 @@ export const Player = ( {
 									onVolume={ changeVolume }
 								/>
 							) }
-							{ hasFile && (
-								<button
-									type="button"
-									className="wr-player__ctl"
-									aria-label={
-										playing
-											? __(
-													'Pause',
-													'productreels'
-												)
-											: __(
-													'Play',
-													'productreels'
-												)
-									}
-									onClick={ toggle }
-								>
-									<PlayPauseIcon playing={ playing } />
-								</button>
-							) }
-							<button
-								type="button"
-								className="wr-player__ctl wr-player__close"
-								aria-label={ __(
-									'Close',
-									'productreels'
-								) }
-								onClick={ requestClose }
-							>
-								<CloseIcon />
-							</button>
+							{ mobile && close }
 						</div>
 					</div>
 
 					{ soundTap && (
 						<button
 							type="button"
-							className="wr-player__sound"
+							className="prs-btn prs-btn--light prs-btn--sm pr-t-body-strong prs-player__sound"
 							data-wr-no-swipe=""
 							onClick={ toggle }
 						>
-							<SoundIcon />
-							{ __(
-								'Tap for sound',
-								'productreels'
-							) }
+							<ReelIcon name="volume" size={ 16 } />
+							{ __( 'Tap for sound', 'productreels' ) }
 						</button>
 					) }
 
 					{ showBar && (
-						<div className="wr-player__bar" data-wr-no-swipe="">
+						<div className="prs-player__bar" data-wr-no-swipe="">
 							<Seekbar
 								current={ time }
 								duration={ duration }
 								onSeek={ seek }
 							/>
+							{ mobile && (
+								<span className="prs-player__time pr-t-caption">
+									<span>{ formatClock( time ) }</span>
+									<span>{ formatClock( duration ) }</span>
+								</span>
+							) }
 						</div>
 					) }
 				</div>
+
+				{ nav( 'next' ) }
+				{ theatre && <Peek slot={ nextSlot } /> }
 			</div>
 
 			{ toast && (
 				<div
-					className={ `wr-player__toast wr-player__toast--${ toast.tone }` }
+					className={ `prs-toast prs-toast--${ toast.tone } pr-t-label` }
 					role="status"
 				>
 					{ toast.message }

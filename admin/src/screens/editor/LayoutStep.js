@@ -44,11 +44,11 @@ const TITLE_KEYS = [
 	'spacingBottom',
 ];
 
-/* 1.0.0's title defaults, in case the bootstrap lacks them. */
+/* The title defaults (default_styles()), in case the bootstrap lacks them. */
 const TITLE_FALLBACK = {
 	alignment: 'hidden',
-	fontSize: 24,
-	color: '#000000',
+	fontSize: 17,
+	color: '#141629',
 	spacingTop: 0,
 	spacingBottom: 16,
 };

@@ -1,6 +1,6 @@
 // Copied from redesign-kit/design/css/prs-storefront.css. Class names are final.
-// Loaded by both bundles, before embed.scss and player.scss, so the 1.0.0
-// rules keep winning until part 12 ports the storefront.
+// Loaded by both bundles, before embed.scss and player.scss, which fit these
+// components to stored widget settings and hold them against theme rules.
 
 /* ProductReels 1.1.0 storefront components (prs-*). Needs pr-tokens.css first. Inherits the theme font. */
 :where(.prs) :where(*, *::before, *::after) { box-sizing: border-box; }

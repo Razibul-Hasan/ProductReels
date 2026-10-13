@@ -1,89 +1,33 @@
 /**
- * One reel as it appears before anyone opens it.
+ * One reel as it appears before anyone opens it: the design's ReelTile.
  *
  * Shared by the editor preview and the public bundle, so what a store owner
  * styles is literally the component a visitor will see.
  *
- * It is a <button>, not a div with a click handler: it is the thing you press
- * to open a reel, and it needs to be reachable and announceable as such.
+ * It is one <button>: the thing you press to open a reel, reachable and
+ * announced as such. Everything inside it — the view count, the play mark,
+ * the product card — is a picture of the reel, never a second control.
  */
 
-import { useEffect, useRef } from '@wordpress/element';
+import { useEffect, useRef, useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import {
-	compactCount,
 	firstFile,
 	isNativePlayable,
 	posterOf,
 	taggedProductId,
+	viewCount,
 } from './format';
 import { useInView } from './hooks/useInView';
 import { claimPlayback } from './playback';
-import { PlayIcon } from './PlayIcon';
-import { Stars } from './ProductCard';
+import { TileCard } from './ProductCard';
 import { useWidgetProducts } from './products';
-import { ViewsBadge } from './ViewsBadge';
+import { ReelIcon } from './ReelIcon';
 
-/**
- * The tagged product, on the thumbnail.
- *
- * The same two looks as the player's card, cut down to what fits a
- * thumbnail: image, name, rating and price. Nothing in it is a link — the
- * thumbnail is one button, and pressing it opens the reel — so the card is
- * the product's introduction, not its shop page.
- *
- * @param {Object}  props             Props.
- * @param {Object}  props.product     The product, or undefined while loading.
- * @param {string}  props.variant     'modern' or 'classic'.
- * @param {boolean} props.showRatings Whether to draw the stars.
- * @return {Object} The card.
- */
-const ThumbProduct = ( { product, variant, showRatings } ) => (
-	<span
-		className={ `wr-thumb__product wr-thumb__product--${ variant }${
-			product ? '' : ' is-loading'
-		}` }
-		aria-busy={ product ? undefined : 'true' }
-	>
-		<span className="wr-thumb__product-img">
-			{ product && product.image && (
-				<img
-					src={ product.image }
-					alt=""
-					loading="lazy"
-					decoding="async"
-				/>
-			) }
-		</span>
-		<span className="wr-thumb__product-text">
-			{ product ? (
-				<>
-					<span className="wr-thumb__product-name">
-						{ product.name }
-					</span>
-					<span className="wr-thumb__product-meta">
-						{ showRatings && product.rating_count > 0 && (
-							<Stars
-								rating={ product.rating }
-								count={ product.rating_count }
-							/>
-						) }
-						{ /* WooCommerce formats this string itself; it is the same markup the shop page prints. */ }
-						<span
-							className="wr-thumb__product-price"
-							dangerouslySetInnerHTML={ {
-								__html: product.price_html || '',
-							} }
-						/>
-					</span>
-				</>
-			) : (
-				<>
-					<span className="wr-thumb__product-line" />
-					<span className="wr-thumb__product-line wr-thumb__product-line--short" />
-				</>
-			) }
-		</span>
+const Views = ( { count, className = '' } ) => (
+	<span className={ `prs-views pr-t-caption ${ className }` }>
+		<ReelIcon name="eye" size={ 12 } />
+		{ viewCount( count ) }
 	</span>
 );
 
@@ -93,10 +37,13 @@ const ThumbProduct = ( { product, variant, showRatings } ) => (
  * @param {Object}   props.styles     The widget's styles.
  * @param {Function} props.onOpen     Called with the reel and the button when pressed.
  * @param {number}   props.index      Position in the widget, for the entrance stagger.
- * @param {boolean}  props.decorative A repeat of a thumbnail already on the page —
+ * @param {boolean}  props.decorative A repeat of a tile already on the page —
  *                                    the marquee's extra copies — hidden from
  *                                    assistive technology and the tab order.
- * @return {Object} The thumbnail.
+ * @param {boolean}  props.plain      Footage only: a card at the back of a
+ *                                    deck, which shows no badge, play mark,
+ *                                    title or product.
+ * @return {Object} The tile.
  */
 export const Thumbnail = ( {
 	reel,
@@ -104,9 +51,12 @@ export const Thumbnail = ( {
 	onOpen,
 	index = 0,
 	decorative = false,
+	plain = false,
 } ) => {
 	const video = useRef( null );
 	const [ frameRef, inView ] = useInView( { rootMargin: '200px' } );
+	// Whether a preview is running, which is when the cover steps aside.
+	const [ live, setLive ] = useState( false );
 	const products = useWidgetProducts();
 
 	const file = firstFile( reel );
@@ -120,22 +70,29 @@ export const Thumbnail = ( {
 	// skeleton meanwhile rather than flashing the title first.
 	const productId = taggedProductId( reel );
 	const product = productId && products ? products[ productId ] : undefined;
-	// A circle has nowhere to put a card; it keeps the caption.
+	// A circle has nowhere to put a card; it keeps the title.
 	const showProduct =
+		! plain &&
 		overlay &&
 		! circle &&
 		!! productId &&
 		( products === null || !! product );
 	const caption =
-		overlay && ! showProduct && styles.showFallbackTitle
+		! plain && overlay && ! showProduct && styles.showFallbackTitle
 			? reel.title || ''
 			: '';
 	// A circle is a story ring: nothing is written over the footage, so the
-	// caption and the view count sit underneath it instead, the way a handle
+	// title and the view count sit underneath it instead, the way a handle
 	// sits under a story. Both appearances end up in the same place.
-	const underTitle = circle
-		? ( styles.appearance === 'title' ? reel.title : caption ) || ''
-		: '';
+	const label =
+		circle && ! plain
+			? ( styles.appearance === 'title' ? reel.title : caption ) || ''
+			: '';
+	const below =
+		! circle && ! plain && styles.appearance === 'title'
+			? reel.title || ''
+			: '';
+	const views = styles.showViews && ! plain;
 
 	// With lazyLoad on, the <video> gets no src at all until it is near the
 	// viewport — an off-screen widget should cost nothing but markup.
@@ -146,6 +103,12 @@ export const Thumbnail = ( {
 
 	const previewable =
 		styles.playBehavior === 'hover' && ! styles.disablePreview && playable;
+	const autoplay =
+		styles.playBehavior === 'autoplay' && ! styles.disablePreview;
+	// The cover is the picture. A <video> is only there to preview (on hover
+	// or in view), or to stand in with its first frame for a reel without a
+	// cover; a tile that only opens the player never loads any footage.
+	const withVideo = playable && ( previewable || autoplay || ! poster );
 
 	useEffect( () => {
 		const node = video.current;
@@ -192,25 +155,20 @@ export const Thumbnail = ( {
 			type="button"
 			ref={ frameRef }
 			className={ [
+				'prs-tile',
+				circle ? 'prs-tile--circle' : '',
+				styles.hoverEffect && styles.hoverEffect !== 'none'
+					? `prs-tile--${ styles.hoverEffect }`
+					: '',
 				'wr-thumb',
-				`wr-thumb--${ styles.shape }`,
-				`wr-thumb--hover-${ styles.hoverEffect }`,
-				`wr-thumb--${ styles.appearance }`,
-			].join( ' ' ) }
-			style={ {
-				'--wr-index': index,
-			} }
+			]
+				.filter( Boolean )
+				.join( ' ' ) }
+			style={ { '--prs-index': index } }
 			aria-label={ sprintf(
 				/* translators: %s: reel title. */
-				__(
-					'Play reel: %s',
-					'productreels'
-				),
-				reel.title ||
-					__(
-						'Untitled',
-						'productreels'
-					)
+				__( 'Play reel: %s', 'productreels' ),
+				reel.title || __( 'Untitled', 'productreels' )
 			) }
 			aria-hidden={ decorative ? 'true' : undefined }
 			tabIndex={ decorative ? -1 : undefined }
@@ -220,86 +178,78 @@ export const Thumbnail = ( {
 				onOpen && onOpen( reel, event.currentTarget )
 			}
 		>
-			<span className="wr-thumb__media">
-				<span className="wr-thumb__frame">
-					{ playable && (
+			<span className="prs-tile__media">
+				<span className="prs-tile__frame">
+					{ withVideo && (
 						<video
 							ref={ video }
-							className="wr-thumb__video"
 							src={ videoSrc }
-							poster={ poster || undefined }
 							muted
 							loop
 							playsInline
 							preload="metadata"
 							tabIndex={ -1 }
 							aria-hidden="true"
+							onPlaying={ () => setLive( true ) }
+							onPause={ () => setLive( false ) }
 						/>
 					) }
-					{ ! playable && poster && (
+					{ poster && (
 						<img
-							className="wr-thumb__img"
+							className={ live ? 'is-hidden' : undefined }
 							src={ poster }
 							alt=""
 							loading="lazy"
 							decoding="async"
 						/>
 					) }
-					{ ! playable && ! poster && (
-						<span className="wr-thumb__blank" aria-hidden="true" />
-					) }
 				</span>
 
-				{ styles.showPlayButton && (
-					<PlayIcon
-						size={ styles.playIconSize }
-						color={ styles.playIconColor }
+				{ ( showProduct || caption !== '' ) && ! circle && (
+					<span className="prs-tile__scrim" />
+				) }
+
+				{ views && ! circle && (
+					<Views
+						count={ reel.view_count }
+						className="prs-tile__views"
 					/>
 				) }
 
+				{ styles.showPlayButton && ! plain && (
+					<span className="prs-play" aria-hidden="true">
+						<ReelIcon name="play" fill="currentColor" />
+					</span>
+				) }
+
 				{ showProduct && (
-					<span className="wr-thumb__scrim wr-thumb__scrim--product">
-						<ThumbProduct
+					<span className="prs-tile__card">
+						<TileCard
 							product={ product }
-							variant={ styles.productCardStyle }
 							showRatings={ styles.showRatings }
 						/>
 					</span>
 				) }
 
 				{ ! circle && caption !== '' && (
-					<span className="wr-thumb__scrim">
-						<span className="wr-thumb__caption">{ caption }</span>
+					<span className="prs-tile__title pr-t-body-strong">
+						{ caption }
 					</span>
-				) }
-
-				{ ! circle && styles.showViews && (
-					<ViewsBadge
-						count={ compactCount( reel.view_count ) }
-						background={ styles.viewsBgColor }
-						color={ styles.viewsTextIconColor }
-						shape={ styles.shape }
-					/>
 				) }
 			</span>
 
-			{ ! circle && styles.appearance === 'title' && (
-				<span className="wr-thumb__below">{ reel.title }</span>
+			{ below !== '' && (
+				<span className="prs-tile__below pr-t-body-strong">
+					{ below }
+				</span>
 			) }
 
-			{ circle && ( underTitle !== '' || styles.showViews ) && (
-				<span className="wr-thumb__under">
-					{ underTitle !== '' && (
-						<span className="wr-thumb__below">{ underTitle }</span>
+			{ circle && ( label !== '' || views ) && (
+				<span className="prs-tile__label">
+					{ label !== '' && (
+						<span className="pr-t-label">{ label }</span>
 					) }
-					{ styles.showViews && (
-						<ViewsBadge
-							count={ compactCount( reel.view_count ) }
-							background={ styles.viewsBgColor }
-							color={ styles.viewsTextIconColor }
-							shape={ styles.shape }
-						/>
-					) }
+					{ views && <Views count={ reel.view_count } /> }
 				</span>
 			) }
 		</button>

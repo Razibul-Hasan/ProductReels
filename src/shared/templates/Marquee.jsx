@@ -1,9 +1,10 @@
 /**
  * Marquee — an endlessly scrolling rail.
  *
- * Driven by requestAnimationFrame over a repeated track rather than a CSS
- * keyframe: a keyframe needs the track width baked in, and this rail's width
- * depends on how many reels there are and how big they have been styled.
+ * Driven by requestAnimationFrame over a repeated track rather than the
+ * design's CSS keyframe: a keyframe needs the track width baked in, and this
+ * rail's width depends on how many reels there are and how big they have
+ * been styled. (embed.scss switches the keyframe off.)
  *
  * The reels repeat as many times as the container needs: enough copies that
  * the track is always at least one period longer than the container, so the
@@ -133,11 +134,11 @@ export const Marquee = ( { reels, styles, onOpen } ) => {
 	return (
 		<div
 			ref={ viewRef }
-			className={ `wr-marquee${ reduced ? ' is-static' : '' }` }
+			className={ `prs-marquee wr-marquee${ reduced ? ' is-static' : '' }` }
 			onPointerEnter={ () => pauseOnHover && setPaused( true ) }
 			onPointerLeave={ () => pauseOnHover && setPaused( false ) }
 		>
-			<div className="wr-marquee__track" ref={ track }>
+			<div className="prs-marquee__track" ref={ track }>
 				{ /* Only the first copy is announced or tabbed to; the
 				     rest are the same reels again, there to fill the loop. */ }
 				{ run.map( ( reel, index ) => (

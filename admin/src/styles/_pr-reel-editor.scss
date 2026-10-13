@@ -49,20 +49,19 @@
 
 /* The compact player is storefront markup inside an admin dialog, and the
    design's admin link colour (`:where(.pr-app, .pr-portal) a`, loaded here at
-   app strength) out-ranks its single-class links. Its links get back the
-   colours player.scss gives them. */
+   app strength) out-ranks its links. They get back the colours player.scss
+   gives them: ink on the white pills and cards, white on the ink buttons. */
 .wr-player-compact a {
 	color: inherit;
 }
 
-.wr-player-compact .wr-cta,
-.wr-player-compact .wr-product__btn {
-	color: var(--wr-p-ink-text);
+.wr-player-compact .prs-btn--light {
+	color: var(--pr-ink);
 }
 
-.wr-player-compact .wr-product--classic .wr-product__btn,
-.wr-player-compact .wr-product__btn--done {
-	color: var(--wr-p-fg);
+.wr-player-compact .prs-btn:not(.prs-btn--light),
+.wr-player-compact .prs-card__add {
+	color: var(--pr-on-ink);
 }
 
 /* Every real picture fills the frame the design gives it. */

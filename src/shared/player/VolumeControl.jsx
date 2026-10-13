@@ -6,30 +6,7 @@
  */
 
 import { __ } from '@wordpress/i18n';
-
-const SpeakerIcon = ( { muted, level } ) => (
-	<svg
-		viewBox="0 0 24 24"
-		width="20"
-		height="20"
-		fill="none"
-		stroke="currentColor"
-		strokeWidth="2"
-		strokeLinecap="round"
-		strokeLinejoin="round"
-		aria-hidden="true"
-	>
-		<path d="M11 5 6 9H2v6h4l5 4V5Z" fill="currentColor" stroke="none" />
-		{ muted ? (
-			<path d="m22 9-6 6M16 9l6 6" />
-		) : (
-			<>
-				{ level > 0 && <path d="M15.5 8.5a5 5 0 0 1 0 7" /> }
-				{ level > 0.5 && <path d="M19 5.5a9 9 0 0 1 0 13" /> }
-			</>
-		) }
-	</svg>
-);
+import { ReelIcon } from '../ReelIcon';
 
 export const VolumeControl = ( { muted, volume, onToggleMute, onVolume } ) => {
 	const shown = muted ? 0 : Math.round( volume * 100 );
@@ -84,35 +61,26 @@ export const VolumeControl = ( { muted, volume, onToggleMute, onVolume } ) => {
 	};
 
 	return (
-		<div className="wr-volume" data-wr-no-swipe="">
+		<div className="prs-volume" data-wr-no-swipe="">
 			<button
 				type="button"
-				className="wr-player__ctl"
+				className="prs-iconbtn"
 				aria-label={
 					muted
-						? __(
-								'Unmute',
-								'productreels'
-							)
-						: __(
-								'Mute',
-								'productreels'
-							)
+						? __( 'Unmute', 'productreels' )
+						: __( 'Mute', 'productreels' )
 				}
 				aria-pressed={ muted ? 'true' : 'false' }
 				onClick={ onToggleMute }
 			>
-				<SpeakerIcon muted={ muted } level={ volume } />
+				<ReelIcon name={ muted ? 'mute' : 'volume' } size={ 17 } />
 			</button>
 
 			<div
-				className="wr-volume__slider"
+				className="prs-volume__slider"
 				role="slider"
 				tabIndex={ 0 }
-				aria-label={ __(
-					'Volume',
-					'productreels'
-				) }
+				aria-label={ __( 'Volume', 'productreels' ) }
 				aria-valuemin={ 0 }
 				aria-valuemax={ 100 }
 				aria-valuenow={ shown }
@@ -122,9 +90,9 @@ export const VolumeControl = ( { muted, volume, onToggleMute, onVolume } ) => {
 				onPointerDown={ onPointer }
 				onPointerMove={ onPointer }
 			>
-				<span className="wr-volume__track">
+				<span className="prs-volume__track">
 					<span
-						className="wr-volume__fill"
+						className="prs-volume__fill"
 						style={ { width: `${ shown }%` } }
 					/>
 				</span>

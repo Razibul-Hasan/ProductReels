@@ -35,6 +35,31 @@ export const compactCount = ( value ) => {
 };
 
 /**
+ * A view count for a pill: grouped in the page's locale up to 9,999 (the
+ * design's "4,210"), compact from there on, where every digit would make the
+ * pill wider than the reel can spare.
+ *
+ * @param {number} value The count.
+ * @return {string} The count as shown.
+ */
+export const viewCount = ( value ) => {
+	const n = Number( value ) || 0;
+
+	if ( n >= 10000 ) {
+		return compactCount( n );
+	}
+
+	try {
+		return new Intl.NumberFormat(
+			document.documentElement.lang || undefined
+		).format( n );
+	} catch ( error ) {
+		// An unknown locale tag in <html lang>.
+		return String( n );
+	}
+};
+
+/**
  * The product a reel is tagged with — the first product link's product.
  *
  * @param {Object} reel The reel.

@@ -1,17 +1,19 @@
 /**
- * Carousel — a snapping horizontal rail with nav buttons.
+ * Carousel — a snapping horizontal rail with arrows.
  *
  * Scroll snapping and overflow do the real work, so the rail keeps native
  * touch momentum and never fights the page's own vertical scroll. Pointer drag
  * is layered on top for mouse users, with a movement threshold so that a drag
- * does not also fire the thumbnail's click.
+ * does not also fire the tile's click.
  *
- * The nav buttons disable themselves at each end rather than wrapping — a rail
- * that silently jumps back to the start is disorienting.
+ * The arrows disable themselves at each end rather than wrapping — a rail
+ * that silently jumps back to the start is disorienting — and are not drawn
+ * at all while every reel fits.
  */
 
 import { useCallback, useEffect, useRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import { ReelIcon } from '../ReelIcon';
 import { Thumbnail } from '../Thumbnail';
 
 const DRAG_THRESHOLD = 4;
@@ -25,6 +27,9 @@ export const Carousel = ( { reels, styles, onOpen } ) => {
 		moved: 0,
 	} );
 	const [ edges, setEdges ] = useState( { start: true, end: false } );
+	// Outside arrows hang 20px past the rail; with no room for that before
+	// the screen's edge they would widen the page, so they come inside.
+	const [ tight, setTight ] = useState( false );
 
 	const measure = useCallback( () => {
 		const node = rail.current;
@@ -38,6 +43,13 @@ export const Carousel = ( { reels, styles, onOpen } ) => {
 		const max = node.scrollWidth - node.clientWidth;
 
 		setEdges( { start: position <= 1, end: position >= max - 1 } );
+
+		const box = node.getBoundingClientRect();
+
+		setTight(
+			box.left < 24 ||
+				document.documentElement.clientWidth - box.right < 24
+		);
 	}, [] );
 
 	useEffect( () => {
@@ -53,8 +65,8 @@ export const Carousel = ( { reels, styles, onOpen } ) => {
 		window.addEventListener( 'resize', measure );
 
 		// The rail's own size changes without the window's: the editor's size
-		// slider and device toggle, a theme's collapsing sidebar. The edge
-		// fades are drawn from these measurements, so they must keep up.
+		// slider and device toggle, a theme's collapsing sidebar. Whether the
+		// arrows show at all follows these measurements, so they must keep up.
 		const observer =
 			typeof window.ResizeObserver === 'function'
 				? new window.ResizeObserver( measure )
@@ -139,41 +151,43 @@ export const Carousel = ( { reels, styles, onOpen } ) => {
 		}
 	};
 
+	// Every reel already in view: nothing to scroll to, so no arrows.
+	const fits = edges.start && edges.end;
+
+	const arrow = ( which ) => (
+		<button
+			type="button"
+			className={ `prs-arrow prs-arrow--${ which }` }
+			aria-label={
+				which === 'prev'
+					? __( 'Previous reels', 'productreels' )
+					: __( 'Next reels', 'productreels' )
+			}
+			disabled={ which === 'prev' ? edges.start : edges.end }
+			onClick={ () => page( which === 'prev' ? -1 : 1 ) }
+		>
+			<ReelIcon
+				name={ which === 'prev' ? 'chevron-left' : 'chevron-right' }
+				size={ 20 }
+			/>
+		</button>
+	);
+
 	return (
 		<div
 			className={ [
+				'prs-carousel',
 				'wr-carousel',
-				`wr-carousel--nav-${ styles.carouselBtnPosition }`,
-				styles.shape === 'circle' ? 'wr-carousel--circle' : '',
-				// The stylesheet fades the edge the rail can still travel to.
-				edges.start ? 'is-start' : '',
-				edges.end ? 'is-end' : '',
+				styles.carouselBtnPosition === 'inside'
+					? 'prs-carousel--inside'
+					: 'prs-carousel--outside',
+				styles.shape === 'circle' ? 'prs-carousel--circle' : '',
+				tight ? 'is-tight' : '',
 			]
 				.filter( Boolean )
 				.join( ' ' ) }
 		>
-			<button
-				type="button"
-				className="wr-nav wr-nav--prev"
-				aria-label={ __(
-					'Previous',
-					'productreels'
-				) }
-				disabled={ edges.start }
-				onClick={ () => page( -1 ) }
-			>
-				<svg
-					viewBox="0 0 24 24"
-					width="18"
-					height="18"
-					fill="none"
-					stroke="currentColor"
-					strokeWidth="2"
-					aria-hidden="true"
-				>
-					<path d="m15 5-7 7 7 7" />
-				</svg>
-			</button>
+			{ ! fits && arrow( 'prev' ) }
 
 			{ /* A scroll container that takes keyboard focus for arrow-key paging;
 			     no interactive ARIA role describes a scroll region, so the a11y
@@ -181,13 +195,10 @@ export const Carousel = ( { reels, styles, onOpen } ) => {
 			{ /* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */ }
 			<div
 				ref={ rail }
-				className="wr-carousel__rail"
-				tabIndex={ 0 }
+				className="prs-carousel__track"
+				tabIndex={ fits ? undefined : 0 }
 				role="group"
-				aria-label={ __(
-					'Reels',
-					'productreels'
-				) }
+				aria-label={ __( 'Reels', 'productreels' ) }
 				onKeyDown={ onKeyDown }
 				onPointerDown={ onPointerDown }
 				onPointerMove={ onPointerMove }
@@ -206,28 +217,7 @@ export const Carousel = ( { reels, styles, onOpen } ) => {
 				) ) }
 			</div>
 
-			<button
-				type="button"
-				className="wr-nav wr-nav--next"
-				aria-label={ __(
-					'Next',
-					'productreels'
-				) }
-				disabled={ edges.end }
-				onClick={ () => page( 1 ) }
-			>
-				<svg
-					viewBox="0 0 24 24"
-					width="18"
-					height="18"
-					fill="none"
-					stroke="currentColor"
-					strokeWidth="2"
-					aria-hidden="true"
-				>
-					<path d="m9 5 7 7-7 7" />
-				</svg>
-			</button>
+			{ ! fits && arrow( 'next' ) }
 		</div>
 	);
 };

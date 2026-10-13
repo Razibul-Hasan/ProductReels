@@ -1,5 +1,5 @@
 /**
- * Popup — a floating bubble that shows one reel in a corner of the page.
+ * Popup — one reel floating in a corner of the page, with a close button.
  *
  * How long a dismissal sticks is the store owner's call (`dismissFor`), per
  * widget: until the next page, for the rest of the browsing session, or for
@@ -19,6 +19,7 @@
 
 import { useEffect, useRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import { ReelIcon } from '../ReelIcon';
 import { Thumbnail } from '../Thumbnail';
 
 const DAY = 24 * 60 * 60 * 1000;
@@ -145,54 +146,39 @@ export const Popup = ( {
 	return (
 		<div
 			className={ [
+				'prs-popup',
 				'wr-popup',
-				`wr-popup--${ position }`,
-				styles.shape === 'circle' ? 'wr-popup--circle' : '',
-				showOnMobile ? '' : 'wr-popup--desktop-only',
-				alwaysOpen ? 'wr-popup--inline' : '',
-				closing ? 'wr-popup--closing' : '',
+				`prs-popup--${ position }`,
+				styles.shape === 'circle' ? 'prs-popup--circle' : '',
+				showOnMobile ? '' : 'prs-popup--desktop-only',
+				alwaysOpen ? 'prs-popup--inline' : '',
+				closing ? 'is-closing' : '',
 			]
 				.filter( Boolean )
 				.join( ' ' ) }
 			onAnimationEnd={ ( event ) => {
-				// Only the bubble's own exit, not the pulse or the close
-				// button's fade bubbling up from inside.
+				// Only the popup's own exit, not the close button's fade
+				// bubbling up from inside.
 				if ( closing && event.target === event.currentTarget ) {
 					finishClosing();
 				}
 			} }
 		>
-			<div className="wr-popup__card">
-				<button
-					type="button"
-					className="wr-popup__close"
-					aria-label={ __(
-						'Close',
-						'productreels'
-					) }
-					onClick={ dismiss }
-				>
-					<svg
-						viewBox="0 0 24 24"
-						width="14"
-						height="14"
-						fill="none"
-						stroke="currentColor"
-						strokeWidth="2.2"
-						strokeLinecap="round"
-						aria-hidden="true"
-					>
-						<path d="M18 6 6 18M6 6l12 12" />
-					</svg>
-				</button>
+			<button
+				type="button"
+				className="prs-close"
+				aria-label={ __( 'Close', 'productreels' ) }
+				onClick={ dismiss }
+			>
+				<ReelIcon name="x" size={ 14 } strokeWidth={ 2.25 } />
+			</button>
 
-				<Thumbnail
-					reel={ reels[ 0 ] }
-					styles={ styles }
-					onOpen={ onOpen }
-					index={ 0 }
-				/>
-			</div>
+			<Thumbnail
+				reel={ reels[ 0 ] }
+				styles={ styles }
+				onOpen={ onOpen }
+				index={ 0 }
+			/>
 		</div>
 	);
 };

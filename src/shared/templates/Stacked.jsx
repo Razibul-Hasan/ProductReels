@@ -1,9 +1,12 @@
 /**
- * Stacked — a deck of reels, only the front one interactive.
+ * Stacked — a fanned deck of reels, only the front one interactive.
  *
- * The cards behind are decoration: they are aria-hidden and cannot be tabbed
- * to, so a keyboard or screen-reader user meets one reel at a time rather than
- * a pile of identical buttons.
+ * The front reel sits in the middle; the ones behind fan out to either side,
+ * each a step further out (the widget's offset), tilted and a little smaller
+ * (its scale). They are decoration: footage only, aria-hidden and out of the
+ * tab order, so a keyboard or screen-reader user meets one reel at a time
+ * rather than a pile of identical buttons, and only the front reel shows its
+ * badges and card.
  *
  * A step is choreographed rather than swapped. `front` counts steps without
  * wrapping, so every card in the deck is keyed by its place in that count:
@@ -16,6 +19,7 @@
 
 import { useRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import { ReelIcon } from '../ReelIcon';
 import { Thumbnail } from '../Thumbnail';
 import { useReducedMotion } from '../hooks/useReducedMotion';
 
@@ -26,6 +30,8 @@ const TAP = 10;
 /* Degrees of tilt per pixel of travel, and the most a card tilts. */
 const TILT = 0.045;
 const TILT_MAX = 7;
+/* The fan: degrees each step out from the front card turns. */
+const FAN_TILT = 5;
 
 export const Stacked = ( { reels, styles, onOpen } ) => {
 	const [ front, setFront ] = useState( 0 );
@@ -98,8 +104,8 @@ export const Stacked = ( { reels, styles, onOpen } ) => {
 
 		const tilt = Math.max( -TILT_MAX, Math.min( TILT_MAX, x * TILT ) );
 
-		node.style.setProperty( '--wr-drag-x', `${ x }px` );
-		node.style.setProperty( '--wr-drag-r', `${ tilt }deg` );
+		node.style.setProperty( '--prs-drag-x', `${ x }px` );
+		node.style.setProperty( '--prs-drag-r', `${ tilt }deg` );
 
 		if ( x === 0 ) {
 			node.removeAttribute( 'data-dragging' );
@@ -167,28 +173,34 @@ export const Stacked = ( { reels, styles, onOpen } ) => {
 		}
 	};
 
-	const place = ( layer ) => ( {
-		'--wr-layer': layer,
-		'--wr-card-y': `${ layer * offset }px`,
-		'--wr-card-s': String( Math.pow( scale, layer ) ),
-		'--wr-card-o': String( 1 - layer * 0.18 ),
-		zIndex: visible - layer,
-	} );
+	/* Layer 1 fans to the start side, 2 to the end, 3 further to the start… */
+	const place = ( layer ) => {
+		const out = Math.ceil( layer / 2 );
+		const side = layer % 2 ? -1 : 1;
+
+		return {
+			'--prs-layer': layer,
+			'--prs-card-x': `${ side * out * offset }px`,
+			'--prs-card-r': `${ side * out * FAN_TILT }deg`,
+			'--prs-card-s': String( Math.pow( scale, out ) ),
+			zIndex: visible - layer,
+		};
+	};
 
 	const count = ( ( front % total ) + total ) % total;
 
 	return (
-		<div className={ `wr-stacked${ reduced ? ' is-static' : '' }` }>
-			{ /* The last card back is shifted down by its offsets and shrunk by
-			     its scale; the stylesheet turns those into how far it peeks
-			     out under the front card, which depends on the card's height
-			     — a circle and a 9:16 card differ by half a card. */ }
+		<div
+			className={ `prs-stack wr-stacked${ reduced ? ' is-static' : '' }` }
+		>
+			{ /* The deck is as wide as the front card plus the fan on each
+			     side, so the outermost cards never hang over the content
+			     beside the widget. */ }
 			<div
 				ref={ deck }
-				className="wr-stacked__deck"
+				className="prs-deck"
 				style={ {
-					'--wr-stack-shift': `${ ( visible - 1 ) * offset }px`,
-					'--wr-stack-shrink': 1 - Math.pow( scale, visible - 1 ),
+					'--prs-fan': `${ Math.ceil( ( visible - 1 ) / 2 ) * offset }px`,
 				} }
 				onPointerDown={ onPointerDown }
 				onPointerMove={ onPointerMove }
@@ -209,7 +221,7 @@ export const Stacked = ( { reels, styles, onOpen } ) => {
 					return (
 						<div
 							key={ pos }
-							className={ `wr-stacked__card${
+							className={ `prs-deck__card${
 								isFront ? ' is-front' : ''
 							}${ arriving }` }
 							aria-hidden={ isFront ? undefined : 'true' }
@@ -221,6 +233,7 @@ export const Stacked = ( { reels, styles, onOpen } ) => {
 								styles={ styles }
 								onOpen={ isFront ? onOpen : undefined }
 								index={ layer }
+								plain={ ! isFront }
 							/>
 						</div>
 					);
@@ -229,14 +242,14 @@ export const Stacked = ( { reels, styles, onOpen } ) => {
 				{ leaving.map( ( entry ) => (
 					<div
 						key={ entry.key }
-						className={ `wr-stacked__card is-${ entry.kind }` }
+						className={ `prs-deck__card is-${ entry.kind }` }
 						aria-hidden="true"
 						inert=""
 						style={ {
 							...place( entry.layer ),
 							zIndex: visible + 1,
-							'--wr-from-x': `${ entry.fromX }px`,
-							'--wr-from-r': `${ Math.max(
+							'--prs-from-x': `${ entry.fromX }px`,
+							'--prs-from-r': `${ Math.max(
 								-TILT_MAX,
 								Math.min( TILT_MAX, entry.fromX * TILT )
 							) }deg`,
@@ -251,57 +264,32 @@ export const Stacked = ( { reels, styles, onOpen } ) => {
 							reel={ entry.reel }
 							styles={ styles }
 							index={ entry.layer }
+							plain={ entry.layer !== 0 }
 						/>
 					</div>
 				) ) }
 			</div>
 
 			{ total > 1 && (
-				<div className="wr-stacked__nav">
+				<div className="prs-stack__nav">
 					<button
 						type="button"
-						className="wr-nav"
-						aria-label={ __(
-							'Previous',
-							'productreels'
-						) }
+						className="prs-arrow prs-arrow--sm"
+						aria-label={ __( 'Previous reel', 'productreels' ) }
 						onClick={ () => advance( -1 ) }
 					>
-						<svg
-							viewBox="0 0 24 24"
-							width="16"
-							height="16"
-							fill="none"
-							stroke="currentColor"
-							strokeWidth="2"
-							aria-hidden="true"
-						>
-							<path d="m15 5-7 7 7 7" />
-						</svg>
+						<ReelIcon name="chevron-left" size={ 18 } />
 					</button>
-					<span className="wr-stacked__count">
+					<span className="prs-stack__count pr-t-caption">
 						{ count + 1 } / { total }
 					</span>
 					<button
 						type="button"
-						className="wr-nav"
-						aria-label={ __(
-							'Next',
-							'productreels'
-						) }
+						className="prs-arrow prs-arrow--sm"
+						aria-label={ __( 'Next reel', 'productreels' ) }
 						onClick={ () => advance( 1 ) }
 					>
-						<svg
-							viewBox="0 0 24 24"
-							width="16"
-							height="16"
-							fill="none"
-							stroke="currentColor"
-							strokeWidth="2"
-							aria-hidden="true"
-						>
-							<path d="m9 5 7 7-7 7" />
-						</svg>
+						<ReelIcon name="chevron-right" size={ 18 } />
 					</button>
 				</div>
 			) }

@@ -173,7 +173,14 @@ class Productreels_Settings {
 	 * payload against it: unknown keys are dropped, numbers out of range are
 	 * clamped.
 	 *
+	 * Since 1.1.0 the values are the storefront design's defaults (radius 16, no
+	 * border, the reel shadow, play button on, zoom on hover, the design's
+	 * overlay and view-pill shades). Only new widgets and the single-reel
+	 * shortcode start from them: every widget saved before holds its own full
+	 * style object, and a stored value always wins.
+	 *
 	 * @since  1.0.0
+	 * @since  1.1.0 Design defaults.
 	 * @return array<string,mixed> The default styles.
 	 */
 	public static function default_styles() {
@@ -182,9 +189,9 @@ class Productreels_Settings {
 			// Layout.
 			'template'                  => 'carousel',
 			'shape'                     => 'rectangle',
-			'size'                      => 200,
+			'size'                      => 180,
 			'sizeOnTab'                 => 150,
-			'sizeOnMobile'              => 150,
+			'sizeOnMobile'              => 140,
 			'gap'                       => 16,
 			'gapOnTab'                  => 16,
 			'gapOnMobile'               => 16,
@@ -195,36 +202,36 @@ class Productreels_Settings {
 			'appearance'                => 'overlay',
 			'showFallbackTitle'         => true,
 			'captionColor'              => '#ffffff',
-			'overlayColor'              => '#000000b8',
-			'titleColor'                => '#111827',
-			'hoverEffect'               => 'none',
+			'overlayColor'              => '#0a0c1acc',
+			'titleColor'                => '#141629',
+			'hoverEffect'               => 'zoom-in',
 			'cardBgColor'               => '#ffffff00',
 			'border'                    => array(
-				'width'          => 2,
-				'color'          => '#9ca3af',
-				'radius'         => 6,
-				'radiusOnTab'    => 6,
-				'radiusOnMobile' => 6,
+				'width'          => 0,
+				'color'          => '#141629',
+				'radius'         => 16,
+				'radiusOnTab'    => 16,
+				'radiusOnMobile' => 16,
 			),
 			'shadow'                    => array(
 				'size' => 16,
 			),
 
 			// Play icon.
-			'showPlayButton'            => false,
-			'playIconSize'              => 40,
+			'showPlayButton'            => true,
+			'playIconSize'              => 44,
 			'playIconColor'             => '#ffffff',
 
 			// View count badge.
 			'showViews'                 => true,
-			'viewsBgColor'              => '#6b7280',
+			'viewsBgColor'              => '#0a0c1a99',
 			'viewsTextIconColor'        => '#ffffff',
 
 			// Widget title.
 			'widgetTitle'               => array(
 				'alignment'     => 'hidden',
-				'fontSize'      => 24,
-				'color'         => '#000000',
+				'fontSize'      => 17,
+				'color'         => '#141629',
 				'spacingTop'    => 0,
 				'spacingBottom' => 16,
 			),
@@ -241,19 +248,19 @@ class Productreels_Settings {
 			'showVolumeControl'         => true,
 
 			// Preview nav buttons, inside the player.
-			'previewBtnBgColor'         => '#ffffff',
-			'previewBtnIconColor'       => '#374151',
-			'previewBtnHoverBgColor'    => '#ffffff',
-			'previewBtnHoverIconColor'  => '#374151',
+			'previewBtnBgColor'         => '#22274a',
+			'previewBtnIconColor'       => '#eef0ff',
+			'previewBtnHoverBgColor'    => '#3a4166',
+			'previewBtnHoverIconColor'  => '#ffffff',
 			'previewBtnBorderRadius'    => 40,
 
 			// Carousel nav buttons, on the thumbnail rail.
 			'carouselBtnBgColor'        => '#ffffff',
-			'carouselBtnIconColor'      => '#1f2937',
-			'carouselBtnHoverBgColor'   => '#dbeafe',
-			'carouselBtnHoverIconColor' => '#1f2937',
+			'carouselBtnIconColor'      => '#141629',
+			'carouselBtnHoverBgColor'   => '#f7f8fc',
+			'carouselBtnHoverIconColor' => '#141629',
 			'carouselBtnBorderRadius'   => 40,
-			'carouselBtnPosition'       => 'inside',
+			'carouselBtnPosition'       => 'outside',
 
 			// Product card.
 			'productCardStyle'          => 'modern',
@@ -272,8 +279,8 @@ class Productreels_Settings {
 				'pauseOnHover' => true,
 			),
 			'stacked'                   => array(
-				'depth'  => 3,
-				'offset' => 24,
+				'depth'  => 5,
+				'offset' => 64,
 				'scale'  => 0.92,
 			),
 			'popup'                     => array(

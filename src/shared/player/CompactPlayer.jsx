@@ -21,11 +21,12 @@ import {
 	useRef,
 	useState,
 } from '@wordpress/element';
-import { slotsFor } from '../format';
+import { slotsFor, viewCount } from '../format';
 import { claimPlayback } from '../playback';
 import { useProducts } from '../products';
+import { ReelIcon } from '../ReelIcon';
 import { withDefaults } from '../services';
-import { styleVars } from '../styleVars';
+import { playerVars } from '../styleVars';
 import { PlayerSlide } from './PlayerSlide';
 import { Seekbar } from './Seekbar';
 import { VolumeControl } from './VolumeControl';
@@ -197,12 +198,12 @@ export const CompactPlayer = ( { reel, styles, services: given, label } ) => {
 			className={ [
 				'wr-player-compact',
 				'prs',
-				current.fileCount > 1 ? 'wr-player--files' : '',
-				showBar ? '' : 'wr-player--no-bar',
+				current.fileCount > 1 ? 'has-files' : '',
+				showBar ? '' : 'no-bar',
 			]
 				.filter( Boolean )
 				.join( ' ' ) }
-			style={ styleVars( styles ) }
+			style={ playerVars( styles ) }
 			role="group"
 			aria-label={ label }
 			onClickCapture={ ( event ) => {
@@ -211,7 +212,7 @@ export const CompactPlayer = ( { reel, styles, services: given, label } ) => {
 				}
 			} }
 		>
-			<div className="wr-player-compact__stage">
+			<div className="prs-player">
 				<PlayerSlide
 					key={ `${ cursor }-${ fileKey }` }
 					ref={ provider }
@@ -231,9 +232,16 @@ export const CompactPlayer = ( { reel, styles, services: given, label } ) => {
 					onReady={ onReady }
 				/>
 
-				{ hasFile && styles.showVolumeControl && (
-					<div className="wr-player__head">
-						<div className="wr-player__tools">
+				<div className="prs-player__top">
+					{ /* A reel not saved yet has no views to show. */ }
+					{ styles.showViews && !! reel.id && (
+						<span className="prs-views pr-t-caption">
+							<ReelIcon name="eye" size={ 12 } />
+							{ viewCount( reel.view_count ) }
+						</span>
+					) }
+					{ hasFile && styles.showVolumeControl && (
+						<div className="prs-player__tools">
 							<VolumeControl
 								muted={ muted }
 								volume={ volume }
@@ -241,11 +249,11 @@ export const CompactPlayer = ( { reel, styles, services: given, label } ) => {
 								onVolume={ changeVolume }
 							/>
 						</div>
-					</div>
-				) }
+					) }
+				</div>
 
 				{ showBar && (
-					<div className="wr-player__bar">
+					<div className="prs-player__bar">
 						<Seekbar
 							current={ time }
 							duration={ duration }
@@ -256,7 +264,7 @@ export const CompactPlayer = ( { reel, styles, services: given, label } ) => {
 
 				{ toast && (
 					<div
-						className={ `wr-player__toast wr-player__toast--${ toast.tone }` }
+						className={ `prs-toast prs-toast--${ toast.tone } pr-t-label` }
 						role="status"
 					>
 						{ toast.message }

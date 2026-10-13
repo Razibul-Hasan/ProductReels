@@ -148,6 +148,11 @@ const snapshot = ( widgetName, widgetStyles, reels ) =>
  * What a new widget starts from: the defaults, with the layout and shape
  * chosen in the Create widget dialog.
  *
+ * A circle and a popup start where the storefront design draws them: a
+ * circle as a small story ring (2px ink ring, no shadow, the title and a
+ * light view pill under it), a popup at 124px. Only the starting point: the
+ * owner changes any of it in the editor, and nothing saved is touched.
+ *
  * @return {{name: string, styles: Object}} The starting point.
  */
 const startingPoint = () => {
@@ -160,6 +165,25 @@ const startingPoint = () => {
 
 	if ( draft.shape === 'rectangle' || draft.shape === 'circle' ) {
 		styles.shape = draft.shape;
+	}
+
+	if ( styles.shape === 'circle' ) {
+		Object.assign( styles, {
+			size: 104,
+			sizeOnTab: 96,
+			sizeOnMobile: 88,
+			appearance: 'title',
+			border: { ...styles.border, width: 2 },
+			shadow: { ...styles.shadow, size: 0 },
+			viewsBgColor: '#eceef4',
+			viewsTextIconColor: '#141629',
+		} );
+	} else if ( styles.template === 'popup' ) {
+		Object.assign( styles, {
+			size: 124,
+			sizeOnTab: 124,
+			sizeOnMobile: 112,
+		} );
 	}
 
 	return { name: draft.name || '', styles };
