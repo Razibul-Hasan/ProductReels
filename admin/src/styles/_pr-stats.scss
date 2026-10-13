@@ -12,6 +12,7 @@
 }
 
 .pr-stats__table {
+	position: relative; /* see .pr-widgettable */
 	overflow-x: auto;
 }
 

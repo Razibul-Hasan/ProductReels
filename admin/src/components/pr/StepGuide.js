@@ -85,7 +85,7 @@ const StepArt = ( { step, covers, shortcode } ) => {
 				) ) }
 			</div>
 			<span className="pr-shortcode pr-t-code pr-stepart__code">
-				{ shortcode }
+				<bdi dir="ltr">{ shortcode }</bdi>
 				<span className="pr-shortcode__icon">
 					<Icon name="copy" size={ 14 } />
 				</span>

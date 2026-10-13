@@ -181,7 +181,7 @@ const ReelTable = ( {
 									<div className="pr-rowactions">
 										<Menu
 											label={ sprintf(
-												/* translators: %s: reel title. */
+												/* translators: %s: a reel title or widget name. */
 												__(
 													'More actions for %s',
 													'productreels'
@@ -591,7 +591,7 @@ export const ReelsLibrary = () => {
 							aria-live="polite"
 						>
 							{ sprintf(
-								/* translators: 1: reels shown so far, 2: reels in this list. */
+								/* translators: 1: how many are shown, 2: how many there are in all. */
 								__( 'Showing %1$s of %2$s', 'productreels' ),
 								formatNumber( items.length ),
 								formatNumber( total )
@@ -763,7 +763,7 @@ export const ReelsLibrary = () => {
 			{ confirming?.reel && (
 				<ConfirmDialog
 					title={ sprintf(
-						/* translators: %s: reel title. */
+						/* translators: %s: a reel title or widget name. */
 						__( 'Delete “%s”?', 'productreels' ),
 						confirming.reel.title
 					) }

@@ -9,7 +9,7 @@
  */
 
 import { useCallback, useRef, useState } from '@wordpress/element';
-import { __, sprintf } from '@wordpress/i18n';
+import { __, _x, sprintf } from '@wordpress/i18n';
 import { formatClock } from '../format';
 
 const STEP = 5;
@@ -114,7 +114,11 @@ export const Seekbar = ( { current, duration, onSeek } ) => {
 			aria-valuenow={ Math.round( shown ) }
 			aria-valuetext={ sprintf(
 				/* translators: 1: elapsed time, 2: total duration. */
-				__( '%1$s of %2$s', 'productreels' ),
+				_x(
+					'%1$s of %2$s',
+					'elapsed time of total duration',
+					'productreels'
+				),
 				formatClock( shown ),
 				formatClock( duration )
 			) }

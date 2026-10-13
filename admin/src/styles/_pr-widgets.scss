@@ -116,7 +116,11 @@
 
 /* --------------------------------------------------------- Widget table */
 
+/* The table scrolls inside its frame on narrow screens. The frame is also the
+   containing block, so the visually hidden labels (.pr-sr, absolutely
+   positioned) scroll with it instead of widening the whole page. */
 .pr-widgettable {
+	position: relative;
 	overflow-x: auto;
 }
 
@@ -266,10 +270,6 @@
 	background: var(--pr-surface);
 	color: var(--pr-ink);
 	box-shadow: var(--pr-shadow-sm);
-}
-
-[dir="rtl"] .pr-stepart__arrow svg {
-	transform: scaleX(-1);
 }
 
 .pr-stepart--page {

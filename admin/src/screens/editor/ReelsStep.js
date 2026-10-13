@@ -323,7 +323,7 @@ export const ReelsStep = ( {
 					<div className="pr-libmore">
 						<span className="pr-t-small pr-muted">
 							{ sprintf(
-								/* translators: 1: reels shown, 2: reels in the library. */
+								/* translators: 1: how many are shown, 2: how many there are in all. */
 								__( 'Showing %1$s of %2$s', 'productreels' ),
 								formatNumber( library.length ),
 								formatNumber( total )

@@ -233,6 +233,9 @@ class Productreels {
 		// Registered on every page, enqueued only when a mount node was printed.
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'register_assets' );
 		$this->loader->add_action( 'wp_footer', $plugin_public, 'maybe_enqueue', 5 );
+
+		// The on-demand player chunk has no handle of its own to carry its strings.
+		$this->loader->add_filter( 'load_script_translations', $plugin_public, 'merge_player_translations', 10, 4 );
 	}
 
 	/**

@@ -11,7 +11,7 @@ import { IconSvg } from './IconSvg';
 export const iconNames = Object.keys( ICONS );
 
 export const Icon = ( { name, ...rest } ) => (
-	<IconSvg markup={ ICONS[ name ] } { ...rest } />
+	<IconSvg markup={ ICONS[ name ] } name={ name } { ...rest } />
 );
 
 export default Icon;

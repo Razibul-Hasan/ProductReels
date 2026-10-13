@@ -6,6 +6,8 @@
  * the classic `wc_fragment_refresh` trigger that updates header cart counts.
  */
 
+import { __ } from '@wordpress/i18n';
+
 /**
  * Build the add-to-cart function for a given site.
  *
@@ -18,7 +20,9 @@ export const createAddToCart =
 	( { restUrl, nonce } ) =>
 	async ( product, link, quantity = 1 ) => {
 		if ( ! restUrl ) {
-			throw new Error( 'WooCommerce is not available.' );
+			throw new Error(
+				__( 'WooCommerce is not available.', 'productreels' )
+			);
 		}
 
 		const response = await fetch( `${ restUrl }wc/store/v1/cart/add-item`, {

@@ -198,7 +198,7 @@ export const ReelCard = ( {
 					type="button"
 					className="pr-reelcard__open pr-reelcard__text"
 					aria-label={ sprintf(
-						/* translators: %s: reel title. */
+						/* translators: %s: the name of a reel, widget or button. */
 						__( 'Edit %s', 'productreels' ),
 						reel.title
 					) }
@@ -229,7 +229,7 @@ export const ReelCard = ( {
 				<div className="pr-reelcard__actions" ref={ more }>
 					<Menu
 						label={ sprintf(
-							/* translators: %s: reel title. */
+							/* translators: %s: a reel title or widget name. */
 							__( 'More actions for %s', 'productreels' ),
 							reel.title
 						) }

@@ -93,7 +93,7 @@ export const ShortcodeChip = ( { code, copied: initial = false, size } ) => {
 				code
 			) }
 		>
-			{ code }
+			<bdi dir="ltr">{ code }</bdi>
 			<span className="pr-shortcode__icon">
 				<Icon name={ copied ? 'check' : 'copy' } size={ 15 } />
 			</span>

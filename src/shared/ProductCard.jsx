@@ -22,7 +22,7 @@
  */
 
 import { useEffect, useRef, useState } from '@wordpress/element';
-import { __, sprintf } from '@wordpress/i18n';
+import { __, _x, sprintf } from '@wordpress/i18n';
 import { ReelIcon } from './ReelIcon';
 
 /**
@@ -302,7 +302,7 @@ export const ProductCard = ( {
 	const named = ( text ) =>
 		sprintf(
 			/* translators: 1: a button's text, e.g. "Add to cart"; 2: product name. */
-			__( '%1$s: %2$s', 'productreels' ),
+			_x( '%1$s: %2$s', 'button text: product name', 'productreels' ),
 			text,
 			product.name
 		);

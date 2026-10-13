@@ -44,9 +44,9 @@ body.productreels-screen {
 	@media screen and (max-width: 782px) {
 		min-height: calc(100vh - 46px);
 	}
-	background: var(--wr-bg-muted);
-	color: var(--wr-fg);
-	font-family: var(--wr-font);
+	background: var(--pr-canvas);
+	color: var(--pr-ink);
+	font-family: var(--pr-font-sans);
 	font-size: 14px;
 	line-height: 1.5;
 	-webkit-font-smoothing: antialiased;
@@ -57,14 +57,13 @@ body.productreels-screen {
 		box-sizing: border-box;
 	}
 
-	/* One focus treatment, applied everywhere, never removed. The 1.1.0
-	   components (any pr-* class) draw --pr-focus-ring instead: this rule's
-	   radius would square off their pills mid-focus. The compact player
-	   draws the storefront player's own ring. */
+	/* A fallback ring for anything focusable without a pr-* class (a link in
+	   running text, a native control): the same 2px brand ring, 2px out, that
+	   --pr-focus-ring draws. The pr-* components draw --pr-focus-ring
+	   themselves; the compact player draws the storefront player's own. */
 	:focus-visible:where(:not([class^='pr-'], [class*=' pr-'], .wr-player-compact *)) {
-		outline: 2px solid var(--wr-ring);
+		outline: 2px solid var(--pr-brand);
 		outline-offset: 2px;
-		border-radius: var(--wr-radius-sm);
 	}
 
 	/**
@@ -81,8 +80,8 @@ body.productreels-screen {
 	 *
 	 * The exclusion sits inside :where() so it adds no specificity: a bare
 	 * :not(.productreels-embed *) counts as a class, and that was enough for the
-	 * `color: inherit` here to beat `.wr-btn--primary` and turn a primary
-	 * button's white label ink-on-blue.
+	 * `color: inherit` here to beat a primary button class and turn its
+	 * white label ink-on-blue.
 	 *
 	 * The reel editor's compact player is storefront markup too, and is left
 	 * out the same way.
@@ -112,17 +111,17 @@ body.productreels-screen {
 	input[type='search']:where(:not([class^='pr-'], [class*=' pr-'])),
 	textarea:where(:not([class^='pr-'], [class*=' pr-'])) {
 		box-shadow: none;
-		border-radius: var(--wr-radius-sm);
+		border-radius: var(--pr-radius-sm);
 		min-height: 0;
 	}
 
 	a:where(:not(.wr-player-compact *)) {
-		color: var(--wr-primary);
+		color: var(--pr-brand);
 		text-decoration: none;
 	}
 
 	a:where(:not(.wr-player-compact *)):hover {
-		color: var(--wr-primary-hover);
+		color: var(--pr-brand-strong);
 	}
 
 	/* The preview's widget title is the embed's own h2, with the owner's
@@ -153,100 +152,9 @@ body.productreels-screen {
 	}
 }
 
-.wr-app__body {
-	flex: 1;
-	padding: 24px 24px 48px;
-}
-
-/* Page header: title, count and actions on one dense line. */
-.wr-page-head {
-	display: flex;
-	flex-wrap: wrap;
-	gap: 16px;
-	align-items: center;
-	justify-content: space-between;
-	padding: 20px 24px;
-	background: var(--wr-bg);
-	border-block-end: 1px solid var(--wr-border);
-}
-
-.wr-page-head__titles {
-	display: flex;
-	flex-direction: column;
-	gap: 2px;
-	min-width: 0;
-}
-
-.wr-page-head__title {
-	display: flex;
-	align-items: center;
-	gap: 10px;
-	font-size: 20px;
-	font-weight: 600;
-	letter-spacing: -0.01em;
-}
-
-.wr-page-head__sub {
-	font-size: 13px;
-	color: var(--wr-fg-muted);
-}
-
-.wr-page-head__actions {
-	display: flex;
-	flex-wrap: wrap;
-	gap: 8px;
-	align-items: center;
-}
-
-.wr-count-chip {
-	padding: 2px 8px;
-	font-size: 12px;
-	font-weight: 500;
-	font-variant-numeric: tabular-nums;
-	color: var(--wr-fg-muted);
-	background: var(--wr-bg-sunken);
-	border-radius: 999px;
-}
-
-/* Section label: 13px uppercase, the app's quietest heading. */
-.wr-section-label {
-	font-size: 13px;
-	font-weight: 600;
-	text-transform: uppercase;
-	letter-spacing: 0.04em;
-	color: var(--wr-fg-muted);
-}
-
-.wr-card {
-	background: var(--wr-bg);
-	border: 1px solid var(--wr-border);
-	border-radius: var(--wr-radius);
-	box-shadow: var(--wr-shadow-sm);
-}
-
-.wr-screen-reader-text {
-	position: absolute;
-	width: 1px;
-	height: 1px;
-	margin: -1px;
-	padding: 0;
-	overflow: hidden;
-	clip-path: inset(50%);
-	white-space: nowrap;
-	border: 0;
-}
-
 @media (max-width: 782px) {
 	#productreels-admin-app {
 		margin-inline-start: -10px;
-	}
-
-	.wr-app__body {
-		padding: 16px 16px 48px;
-	}
-
-	.wr-page-head {
-		padding: 16px;
 	}
 }
 

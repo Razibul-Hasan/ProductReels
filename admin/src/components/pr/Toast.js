@@ -10,6 +10,11 @@
  * toast( message, variant ), success(), error(), loading(), resolve( id,
  * message, variant ) and dismiss( id ). Each of them also takes an options
  * object last: { icon, action: { label, onClick } }.
+ *
+ * Screen readers hear each message through WordPress's own live regions
+ * (wp.a11y.speak; errors assertively). A toast is added to the page already
+ * holding its text, and many screen readers skip a live region that appears
+ * that way, so the pills themselves are not live regions.
  */
 
 import {
@@ -21,6 +26,8 @@ import {
 	useRef,
 	useState,
 } from '@wordpress/element';
+// eslint-disable-next-line import/no-unresolved -- core's wp-a11y, externalised by the build.
+import { speak } from '@wordpress/a11y';
 import { __ } from '@wordpress/i18n';
 import { Icon } from '@shared/Icon';
 import { Button } from './Button';
@@ -35,6 +42,12 @@ const ICONS = {
 };
 
 const cx = ( ...names ) => names.filter( Boolean ).join( ' ' );
+
+const announce = ( message, variant ) => {
+	if ( typeof message === 'string' && message ) {
+		speak( message, variant === 'error' ? 'assertive' : 'polite' );
+	}
+};
 
 export const Toast = ( {
 	icon = 'success',
@@ -98,6 +111,7 @@ export const ToastProvider = ( { children } ) => {
 				...current,
 				{ id, message, variant, ...options },
 			] );
+			announce( message, variant );
 
 			if ( variant !== 'loading' ) {
 				schedule( id );
@@ -117,6 +131,7 @@ export const ToastProvider = ( { children } ) => {
 						: toast
 				)
 			);
+			announce( message, variant );
 			schedule( id );
 		},
 		[ schedule ]
@@ -171,9 +186,7 @@ export const ToastProvider = ( { children } ) => {
 								'success'
 							}
 							busy={ toast.variant === 'loading' }
-							role={
-								toast.variant === 'error' ? 'alert' : 'status'
-							}
+							role="none"
 							action={
 								toast.action && {
 									label: toast.action.label,

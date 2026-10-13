@@ -201,7 +201,7 @@ export const ShopLinks = forwardRef(
 									<IconButton
 										icon="pencil"
 										label={ sprintf(
-											/* translators: %s: button text. */
+											/* translators: %s: the name of a reel, widget or button. */
 											__( 'Edit %s', 'productreels' ),
 											name
 										) }

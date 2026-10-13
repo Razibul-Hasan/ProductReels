@@ -676,7 +676,7 @@ export const WidgetEditor = ( { widgetId, navigate } ) => {
 			{ confirming === 'delete' && (
 				<ConfirmDialog
 					title={ sprintf(
-						/* translators: %s: widget name. */
+						/* translators: %s: a reel title or widget name. */
 						__( 'Delete “%s”?', 'productreels' ),
 						label
 					) }

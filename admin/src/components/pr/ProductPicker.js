@@ -241,7 +241,7 @@ export const ProductPicker = ( {
 						</Button>
 						<span className="pr-t-small pr-muted">
 							{ sprintf(
-								/* translators: 1: products shown, 2: products found. */
+								/* translators: 1: how many are shown, 2: how many there are in all. */
 								__( 'Showing %1$s of %2$s', 'productreels' ),
 								formatNumber( items.length ),
 								formatNumber( total )

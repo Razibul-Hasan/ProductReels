@@ -232,7 +232,9 @@ export const ColorField = ( {
 				<span className="pr-color__swatch">
 					<span style={ { background: value } } />
 				</span>
-				<span className="pr-color__hex pr-t-code">{ hexShown }</span>
+				<span className="pr-color__hex pr-t-code" dir="ltr">
+					{ hexShown }
+				</span>
 				{ opacity && (
 					<span className="pr-color__alpha pr-t-small">
 						{ alpha }%

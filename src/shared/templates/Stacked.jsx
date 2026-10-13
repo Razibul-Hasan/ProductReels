@@ -180,7 +180,7 @@ export const Stacked = ( { reels, styles, onOpen } ) => {
 
 		return {
 			'--prs-layer': layer,
-			'--prs-card-x': `${ side * out * offset }px`,
+			'--prs-card-out': side * out,
 			'--prs-card-r': `${ side * out * FAN_TILT }deg`,
 			'--prs-card-s': String( Math.pow( scale, out ) ),
 			zIndex: visible - layer,
@@ -188,6 +188,7 @@ export const Stacked = ( { reels, styles, onOpen } ) => {
 	};
 
 	const count = ( ( front % total ) + total ) % total;
+	const steps = Math.ceil( ( visible - 1 ) / 2 );
 
 	return (
 		<div
@@ -195,12 +196,15 @@ export const Stacked = ( { reels, styles, onOpen } ) => {
 		>
 			{ /* The deck is as wide as the front card plus the fan on each
 			     side, so the outermost cards never hang over the content
-			     beside the widget. */ }
+			     beside the widget. Where that is wider than the space there
+			     is, the fan closes up to fit (embed.scss). */ }
 			<div
 				ref={ deck }
 				className="prs-deck"
 				style={ {
-					'--prs-fan': `${ Math.ceil( ( visible - 1 ) / 2 ) * offset }px`,
+					'--prs-fan': `${ steps * offset }px`,
+					'--prs-offset': `${ offset }px`,
+					'--prs-fan-steps': Math.max( 1, steps ),
 				} }
 				onPointerDown={ onPointerDown }
 				onPointerMove={ onPointerMove }
@@ -280,7 +284,8 @@ export const Stacked = ( { reels, styles, onOpen } ) => {
 					>
 						<ReelIcon name="chevron-left" size={ 18 } />
 					</button>
-					<span className="prs-stack__count pr-t-caption">
+					{ /* "1 / 5" in every language; in RTL bidi would show "5 / 1". */ }
+					<span className="prs-stack__count pr-t-caption" dir="ltr">
 						{ count + 1 } / { total }
 					</span>
 					<button

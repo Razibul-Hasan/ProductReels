@@ -198,7 +198,7 @@ const TopReels = ( { reels, onOpen, onSeeAll } ) => (
 						className="prs-tile"
 						onClick={ () => onOpen( reel.id ) }
 						aria-label={ sprintf(
-							/* translators: %s: reel title. */
+							/* translators: %s: the name of a reel, widget or button. */
 							__( 'Edit %s', 'productreels' ),
 							reel.title
 						) }
@@ -374,7 +374,7 @@ const WidgetTable = ( {
 										navigate( `#/widgets/${ widget.id }` )
 									}
 									aria-label={ sprintf(
-										/* translators: %s: widget name. */
+										/* translators: %s: the name of a reel, widget or button. */
 										__( 'Edit %s', 'productreels' ),
 										widget.name
 									) }
@@ -383,7 +383,7 @@ const WidgetTable = ( {
 								</Button>
 								<Menu
 									label={ sprintf(
-										/* translators: %s: widget name. */
+										/* translators: %s: a reel title or widget name. */
 										__(
 											'More actions for %s',
 											'productreels'
@@ -795,7 +795,7 @@ export const WidgetsList = ( { navigate, creating = false } ) => {
 			{ confirming && (
 				<ConfirmDialog
 					title={ sprintf(
-						/* translators: %s: widget name. */
+						/* translators: %s: a reel title or widget name. */
 						__( 'Delete “%s”?', 'productreels' ),
 						confirming.name
 					) }

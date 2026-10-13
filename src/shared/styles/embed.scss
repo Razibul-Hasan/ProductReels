@@ -461,7 +461,9 @@
 	}
 }
 
-[dir="rtl"] .prs-arrow .pr-icon {
+/* Directional icons (src/shared/IconSvg.jsx) mirror in right-to-left:
+   carousel and stack arrows, the player's previous/next, "Select options". */
+[dir="rtl"] .pr-icon--flip {
 	transform: scaleX(-1);
 }
 
@@ -502,8 +504,12 @@
 }
 
 /* As wide as the front reel plus the fan on each side; the front reel is in
-   the flow and gives the deck its height. */
+   the flow and gives the deck its height. On a screen narrower than that
+   (a phone), each step out shrinks from the widget's offset to whatever
+   fits, measured against the deck itself, so the page never scrolls
+   sideways. */
 .productreels-embed .prs-deck {
+	container-type: inline-size;
 	width: calc(var(--prs-tile-w) + 2 * var(--prs-fan, 0px));
 	max-width: 100%;
 	height: auto;
@@ -517,7 +523,8 @@
 	width: var(--prs-tile-w);
 	margin-inline-start: calc(var(--prs-tile-w) / -2);
 	transform-origin: 50% 90%;
-	translate: var(--prs-card-x, 0px) 0;
+	--prs-step: min(var(--prs-offset, 0px), max(0px, (100cqi - var(--prs-tile-w)) / (2 * var(--prs-fan-steps, 1))));
+	translate: calc(var(--prs-card-out, 0) * var(--prs-step)) 0;
 	rotate: var(--prs-card-r, 0deg);
 	scale: var(--prs-card-s, 1);
 	transition:

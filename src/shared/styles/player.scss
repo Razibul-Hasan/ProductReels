@@ -229,10 +229,6 @@ body.wr-player-open {
 	box-shadow: var(--pr-focus-ring-studio);
 }
 
-[dir="rtl"] .prs-room.is-horizontal .prs-room__nav .pr-icon {
-	transform: scaleX(-1);
-}
-
 @keyframes prs-fade-in {
 
 	from {

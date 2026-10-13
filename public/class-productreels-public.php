@@ -38,6 +38,16 @@ class Productreels_Public {
 	const HANDLE = 'productreels-public';
 
 	/**
+	 * The public script and its on-demand player chunk, relative to the
+	 * plugin root: the paths WordPress hashes into translation file names.
+	 *
+	 * @since 1.1.0
+	 * @var   string
+	 */
+	const SCRIPT_PATH = 'public/dist/productreels-public.js';
+	const PLAYER_PATH = 'public/dist/productreels-player.js';
+
+	/**
 	 * Whether anything on this request has asked for the bundle.
 	 *
 	 * @since  1.0.0
@@ -143,6 +153,47 @@ class Productreels_Public {
 		);
 
 		wp_style_add_data( self::HANDLE, 'rtl', 'replace' );
+	}
+
+	/**
+	 * Add the player chunk's strings to the public script's translations.
+	 *
+	 * The player is a webpack chunk the public script loads on demand, not a
+	 * registered script, so WordPress never looks for its translation file
+	 * and its labels would stay in English. Its strings ride along with the
+	 * public script's instead: same folder, same locale, the chunk's path
+	 * hashed in place of the script's. The script's own strings win a tie.
+	 *
+	 * @since  1.1.0
+	 * @param  string|false $translations JSON-encoded translation data.
+	 * @param  string       $file         The translation file it came from.
+	 * @param  string       $handle       Script handle.
+	 * @param  string       $domain       Text domain.
+	 * @return string|false
+	 */
+	public function merge_player_translations( $translations, $file, $handle, $domain ) {
+		if ( self::HANDLE !== $handle || 'productreels' !== $domain || ! is_string( $translations ) || ! is_string( $file ) ) {
+			return $translations;
+		}
+
+		$player_file = str_replace( md5( self::SCRIPT_PATH ), md5( self::PLAYER_PATH ), $file );
+
+		if ( $player_file === $file || ! is_readable( $player_file ) ) {
+			return $translations;
+		}
+
+		$own    = json_decode( $translations, true );
+		$player = wp_json_file_decode( $player_file, array( 'associative' => true ) );
+
+		if ( ! isset( $own['locale_data']['messages'], $player['locale_data']['messages'] ) || ! is_array( $player['locale_data']['messages'] ) ) {
+			return $translations;
+		}
+
+		$own['locale_data']['messages'] += $player['locale_data']['messages'];
+
+		$merged = wp_json_encode( $own );
+
+		return $merged ? $merged : $translations;
 	}
 
 	/**

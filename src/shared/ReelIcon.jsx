@@ -9,5 +9,5 @@ import { STOREFRONT_ICONS } from './icons-storefront';
 import { IconSvg } from './IconSvg';
 
 export const ReelIcon = ( { name, ...rest } ) => (
-	<IconSvg markup={ STOREFRONT_ICONS[ name ] } { ...rest } />
+	<IconSvg markup={ STOREFRONT_ICONS[ name ] } name={ name } { ...rest } />
 );

@@ -85,24 +85,6 @@
 	min-height: 0;
 }
 
-/* 1.0.0 dialogs (ui/Modal.js) keep their widths and block layout until their
-   screens are ported. Part 14 removes these. */
-.pr-dialog--sm {
-	width: min(440px, 100%);
-}
-
-.pr-dialog--lg {
-	width: min(860px, 100%);
-}
-
-.pr-dialog--xl {
-	width: min(1120px, 100%);
-}
-
-.pr-dialog__body--legacy {
-	display: block;
-}
-
 .pr-confirm__icon--brand {
 	background: var(--pr-brand-soft);
 	color: var(--pr-brand);
@@ -452,4 +434,19 @@
 	50% {
 		opacity: 0.55;
 	}
+}
+
+/* ---------------------------------------------------------------- RTL */
+
+/* Directional icons (see src/shared/Icon.jsx) mirror in right-to-left. */
+[dir="rtl"] .pr-icon--flip {
+	transform: scaleX(-1);
+}
+
+/* Code reads left to right in every language: shortcodes, colours, paths.
+   The hex field is typed left to right too. */
+code.pr-t-code,
+.pr-colorpop__hex {
+	direction: ltr;
+	unicode-bidi: isolate;
 }
