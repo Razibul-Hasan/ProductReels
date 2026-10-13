@@ -1,14 +1,18 @@
 /**
- * The widget editor — reel picker, live preview, style panel.
+ * The widget editor (the studio).
  *
- * The centre pane renders through the shared WidgetRenderer, the same component
- * the public bundle uses. That is deliberate and load-bearing: if the editor
- * owned its own copy of the render logic, the preview would drift from what
- * visitors actually see, and every style control would become a guess.
+ * A header, a rail of steps, the panel for the open step and a dark stage
+ * with the live preview. The stage renders through the shared WidgetRenderer,
+ * the same component the public bundle uses. That is deliberate and
+ * load-bearing: if the editor owned its own copy of the render logic, the
+ * preview would drift from what visitors actually see, and every style
+ * control would become a guess.
  *
  * Nothing is written until Save. The editor holds the whole widget in local
  * state, so dragging a reel or nudging a slider is instant and costs no
- * request, and the unsaved-changes guard has something real to protect.
+ * request, and the unsaved-changes guard has something real to protect. A
+ * widget started from the Create widget dialog (`#/widgets/draft`) has no
+ * database record until its first save, exactly as in 1.0.0.
  */
 
 import {
@@ -19,90 +23,128 @@ import {
 	useState,
 } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
-import {
-	DndContext,
-	KeyboardSensor,
-	PointerSensor,
-	closestCenter,
-	useSensor,
-	useSensors,
-} from '@dnd-kit/core';
-import {
-	SortableContext,
-	arrayMove,
-	rectSortingStrategy,
-	sortableKeyboardCoordinates,
-	useSortable,
-} from '@dnd-kit/sortable';
-import { CSS } from '@dnd-kit/utilities';
 import { WidgetRenderer } from '@shared/WidgetRenderer';
-import { posterOf } from '@shared/format';
 import { Player } from '@shared/player/Player';
-import { useMediaQuery } from '@shared/hooks/useMediaQuery';
-import { boot, reels as reelsApi, widgets as widgetsApi } from '../api';
+import { boot, widgets as widgetsApi } from '../api';
 import { editorServices } from '../preview-services';
 import {
-	IconCheck,
-	IconChevronLeft,
-	IconChevronRight,
-	IconCopy,
-	IconDesktop,
-	IconDuplicate,
-	IconGear,
-	IconGrip,
-	IconMobile,
-	IconPanel,
-	IconPlay,
-	IconPlus,
-	IconSave,
-	IconTablet,
-	IconTrash,
-	IconUndo,
-	IconVideo,
-} from '../components/icons';
-import { Button, IconButton } from '../components/ui/Button';
-import { EmptyState, Skeleton } from '../components/ui/Feedback';
-import { SearchInput } from '../components/ui/Fields';
-import { ConfirmDialog } from '../components/ui/Modal';
-import { useToasts } from '../components/ui/Toasts';
-import { useDebounced } from '../hooks/use-debounced';
+	Button,
+	ConfirmDialog,
+	DeviceFrame,
+	EmptyState,
+	LAYOUTS,
+	PLACE_STEP,
+	STUDIO_STEPS,
+	Skeleton,
+	Stage,
+	StudioHeader,
+	StudioPanel,
+	StudioRail,
+	StudioShell,
+	useToasts,
+} from '../components/pr';
 import { useUnsavedChanges } from '../hooks/use-unsaved-guard';
-import { ReelEditor } from './ReelEditor';
-import { StylePanel } from './StylePanel';
-import { TitleAppearanceDialog } from './TitleAppearanceDialog';
+import { clearDraft, readDraft } from './CreateWidget';
+import { AdvancedStep } from './editor/AdvancedStep';
+import { CardStep } from './editor/CardStep';
+import { LayoutStep } from './editor/LayoutStep';
+import { LookStep } from './editor/LookStep';
+import { PlaceStep } from './editor/PlaceStep';
+import { PlayerStep } from './editor/PlayerStep';
+import { ReelsStep } from './editor/ReelsStep';
 
-/** How many reels the picker fetches per page. */
-const PICKER_PAGE = 24;
+const PANEL_ID = 'pr-studio-panel';
 
-const DEVICES = [
-	{
-		value: 'desktop',
-		icon: IconDesktop,
-		label: __(
-			'Desktop',
+/** Each step's panel title and one-line description. */
+const STEP_TEXT = {
+	reels: {
+		title: __( 'Reels', 'productreels' ),
+		description: __(
+			'Drag to set the order they appear in.',
 			'productreels'
 		),
-		width: '100%',
 	},
-	{
-		value: 'tablet',
-		icon: IconTablet,
-		label: __(
-			'Tablet',
+	layout: {
+		title: __( 'Layout', 'productreels' ),
+		description: __( 'How reels sit on the page.', 'productreels' ),
+	},
+	look: {
+		title: __( 'Look', 'productreels' ),
+		description: __(
+			'What visitors see before they press play.',
 			'productreels'
 		),
-		width: '768px',
 	},
-	{
-		value: 'mobile',
-		icon: IconMobile,
-		label: __(
-			'Mobile',
+	player: {
+		title: __( 'Player', 'productreels' ),
+		description: __(
+			'What opens when a shopper taps a reel.',
 			'productreels'
 		),
-		width: '390px',
 	},
-];
+	card: {
+		title: __( 'Product card', 'productreels' ),
+		description: __( 'How tagged products appear.', 'productreels' ),
+	},
+	advanced: {
+		title: __( 'Advanced', 'productreels' ),
+		description: __(
+			'Video loading, and a class for your own CSS.',
+			'productreels'
+		),
+	},
+	place: {
+		title: __( 'Place it', 'productreels' ),
+		description: __( 'Put this widget on a page.', 'productreels' ),
+	},
+};
+
+const STEP_IDS = STUDIO_STEPS.map( ( step ) => step.id ).concat(
+	PLACE_STEP.id
+);
+
+/* The last step open in each widget, for this browser tab. */
+
+const STEPS_KEY = 'productreels_editor_steps';
+
+const readSteps = () => {
+	try {
+		return JSON.parse( window.sessionStorage.getItem( STEPS_KEY ) ) || {};
+	} catch ( error ) {
+		return {};
+	}
+};
+
+const rememberStep = ( key, step ) => {
+	try {
+		window.sessionStorage.setItem(
+			STEPS_KEY,
+			JSON.stringify( { ...readSteps(), [ key ]: step } )
+		);
+	} catch ( error ) {
+		// Storage blocked: the step just isn't remembered.
+	}
+};
+
+const OPEN_STEP = 'productreels:open-step';
+
+/**
+ * Open a step of a saved widget's editor: the "Place it" action on the
+ * first-save toast. Goes to the editor if the toast outlived it.
+ *
+ * @param {number} id   The widget.
+ * @param {string} step The step to open.
+ */
+const openStep = ( id, step ) => {
+	rememberStep( String( id ), step );
+	document.dispatchEvent(
+		new window.CustomEvent( OPEN_STEP, { detail: { id, step } } )
+	);
+
+	if ( window.location.hash !== `#/widgets/${ id }` ) {
+		window.location.hash = `#/widgets/${ id }`;
+	}
+};
 
 /**
  * Write a dotted path into a nested object without mutating the original.
@@ -124,171 +166,97 @@ const setPath = ( object, path, value ) => {
 	};
 };
 
-const PickerCard = ( { reel, onAdd } ) => {
-	const poster = posterOf( reel );
+/**
+ * The widget as one string, so "changed" means genuinely different.
+ *
+ * @param {string} widgetName   The name.
+ * @param {Object} widgetStyles The styles.
+ * @param {Array}  reels        The reels, in order.
+ * @return {string} The snapshot.
+ */
+const snapshot = ( widgetName, widgetStyles, reels ) =>
+	JSON.stringify( {
+		widgetName,
+		widgetStyles,
+		ids: reels.map( ( reel ) => reel.id ),
+	} );
 
-	return (
-		<button
-			type="button"
-			className="wr-pick"
-			onClick={ () => onAdd( reel ) }
-		>
-			<span className="wr-pick__frame">
-				{ poster ? (
-					<img
-						src={ poster }
-						alt=""
-						loading="lazy"
-						decoding="async"
-					/>
-				) : (
-					<span className="wr-pick__blank">
-						<IconVideo size={ 18 } />
-					</span>
-				) }
-				<span className="wr-pick__add">
-					<IconPlus size={ 14 } />
-				</span>
-			</span>
-			<span className="wr-pick__title">{ reel.title }</span>
-		</button>
-	);
-};
+/**
+ * What a new widget starts from: the defaults, with the layout and shape
+ * chosen in the Create widget dialog.
+ *
+ * @return {{name: string, styles: Object}} The starting point.
+ */
+const startingPoint = () => {
+	const draft = readDraft() || {};
+	const styles = { ...boot.defaults };
 
-const SortableReel = ( { reel, onRemove, onPreview } ) => {
-	const {
-		attributes,
-		listeners,
-		setNodeRef,
-		transform,
-		transition,
-		isDragging,
-	} = useSortable( { id: reel.id } );
-	const poster = posterOf( reel );
+	if ( LAYOUTS[ draft.template ] ) {
+		styles.template = draft.template;
+	}
 
-	return (
-		<li
-			ref={ setNodeRef }
-			className={ `wr-attached${ isDragging ? ' is-dragging' : '' }` }
-			style={ {
-				transform: CSS.Transform.toString( transform ),
-				transition,
-			} }
-		>
-			<button
-				type="button"
-				className="wr-attached__grip"
-				aria-label={ sprintf(
-					/* translators: %s: reel title. */
-					__(
-						'Reorder %s',
-						'productreels'
-					),
-					reel.title
-				) }
-				{ ...attributes }
-				{ ...listeners }
-			>
-				<IconGrip size={ 14 } />
-			</button>
+	if ( draft.shape === 'rectangle' || draft.shape === 'circle' ) {
+		styles.shape = draft.shape;
+	}
 
-			<span className="wr-attached__frame">
-				{ poster ? (
-					<img src={ poster } alt="" loading="lazy" />
-				) : (
-					<span className="wr-pick__blank">
-						<IconVideo size={ 15 } />
-					</span>
-				) }
-			</span>
-
-			<span className="wr-attached__title">{ reel.title }</span>
-
-			<IconButton
-				icon={ IconPlay }
-				label={ __(
-					'Preview',
-					'productreels'
-				) }
-				size={ 14 }
-				onClick={ ( event ) => onPreview( reel, event.currentTarget ) }
-			/>
-
-			<IconButton
-				icon={ IconTrash }
-				label={ __(
-					'Delete',
-					'productreels'
-				) }
-				tone="danger"
-				size={ 14 }
-				onClick={ () => onRemove( reel.id ) }
-			/>
-		</li>
-	);
+	return { name: draft.name || '', styles };
 };
 
 export const WidgetEditor = ( { widgetId, navigate } ) => {
 	const toasts = useToasts();
 	const isNew = ! widgetId;
+	const [ start ] = useState( () =>
+		isNew ? startingPoint() : { name: '', styles: boot.defaults }
+	);
+	const stepKey = isNew ? 'draft' : String( widgetId );
 
 	const [ loading, setLoading ] = useState( ! isNew );
 	const [ saving, setSaving ] = useState( false );
-	const [ name, setName ] = useState( '' );
-	const [ styles, setStyles ] = useState( () => boot.defaults );
+	const [ name, setName ] = useState( start.name );
+	const [ styles, setStyles ] = useState( start.styles );
 	const [ attached, setAttached ] = useState( [] );
 	const [ savedId, setSavedId ] = useState( widgetId || 0 );
 	const [ device, setDevice ] = useState( 'desktop' );
-	const [ dirty, setDirty ] = useState( false );
-	const [ confirming, setConfirming ] = useState( false );
-	const [ titleOpen, setTitleOpen ] = useState( false );
-	const [ copied, setCopied ] = useState( false );
+	const [ changed, setChanged ] = useState( false );
+	const [ confirming, setConfirming ] = useState( null );
+	const [ deleting, setDeleting ] = useState( false );
 	const [ playing, setPlaying ] = useState( null );
-	const [ duplicating, setDuplicating ] = useState( false );
+	const [ step, setStep ] = useState( () => {
+		const remembered = readSteps()[ stepKey ];
 
-	const [ search, setSearch ] = useState( '' );
-	const [ available, setAvailable ] = useState( [] );
-	const [ picking, setPicking ] = useState( true );
-	const [ pickerPage, setPickerPage ] = useState( 1 );
-	const [ pickerPages, setPickerPages ] = useState( 1 );
-	const [ loadingMore, setLoadingMore ] = useState( false );
-	const [ creating, setCreating ] = useState( false );
-	const [ panelOpen, setPanelOpen ] = useState( false );
-	const [ panelHidden, setPanelHidden ] = useState( false );
+		return STEP_IDS.includes( remembered ) ? remembered : 'reels';
+	} );
+	const [ panelOpen, setPanelOpen ] = useState( true );
 
-	const term = useDebounced( search, 300 );
-	const baseline = useRef( '' );
-	const saved = useRef( { name: '', styles: boot.defaults, attached: [] } );
-	const narrow = useMediaQuery( '(max-width: 1180px)' );
+	const baseline = useRef( snapshot( start.name, start.styles, [] ) );
+	const saved = useRef( {
+		name: start.name,
+		styles: start.styles,
+		attached: [],
+	} );
 
-	useUnsavedChanges(
-		dirty,
-		name.trim() || __( 'Untitled widget', 'productreels' )
-	);
+	// A widget with no record yet is unsaved by definition.
+	const dirty = changed || ! savedId;
+	const label = name.trim() || __( 'Untitled widget', 'productreels' );
+	const clearUnsaved = useUnsavedChanges( dirty, label );
 
-	const sensors = useSensors(
-		useSensor( PointerSensor, { activationConstraint: { distance: 4 } } ),
-		// Space lifts, arrows move, space drops — the whole editor stays keyboard operable.
-		useSensor( KeyboardSensor, {
-			coordinateGetter: sortableKeyboardCoordinates,
-		} )
-	);
-
-	/** Remember the saved shape, so "dirty" means genuinely different. */
-	const snapshot = useCallback(
-		( widgetName, widgetStyles, reels ) =>
-			JSON.stringify( {
-				widgetName,
-				widgetStyles,
-				ids: reels.map( ( reel ) => reel.id ),
-			} ),
-		[]
-	);
+	/** Take a widget as the server returned it as the saved state. */
+	const adopt = useCallback( ( widget ) => {
+		setName( widget.name );
+		setStyles( widget.styles );
+		setAttached( widget.reels );
+		setSavedId( widget.id );
+		saved.current = {
+			name: widget.name,
+			styles: widget.styles,
+			attached: widget.reels,
+		};
+		baseline.current = snapshot( widget.name, widget.styles, widget.reels );
+		setChanged( false );
+	}, [] );
 
 	useEffect( () => {
 		if ( isNew ) {
-			baseline.current = snapshot( '', boot.defaults, [] );
-
 			return undefined;
 		}
 
@@ -297,24 +265,9 @@ export const WidgetEditor = ( { widgetId, navigate } ) => {
 		widgetsApi
 			.get( widgetId )
 			.then( ( widget ) => {
-				if ( cancelled ) {
-					return;
+				if ( ! cancelled ) {
+					adopt( widget );
 				}
-
-				setName( widget.name );
-				setStyles( widget.styles );
-				setAttached( widget.reels );
-				setSavedId( widget.id );
-				saved.current = {
-					name: widget.name,
-					styles: widget.styles,
-					attached: widget.reels,
-				};
-				baseline.current = snapshot(
-					widget.name,
-					widget.styles,
-					widget.reels
-				);
 			} )
 			.catch( ( error ) => toasts.error( error.message ) )
 			.finally( () => {
@@ -326,85 +279,12 @@ export const WidgetEditor = ( { widgetId, navigate } ) => {
 		return () => {
 			cancelled = true;
 		};
-	}, [ widgetId, isNew, snapshot, toasts ] );
+	}, [ widgetId, isNew, adopt, toasts ] );
 
-	// Anything the picker offers must not already be in the widget.
-	const loadPicker = useCallback(
-		( page ) => {
-			return reelsApi.list( {
-				search: term,
-				page,
-				per_page: PICKER_PAGE,
-				orderby: 'id',
-				order: 'DESC',
-			} );
-		},
-		[ term ]
-	);
-
-	useEffect( () => {
-		let cancelled = false;
-
-		setPicking( true );
-
-		loadPicker( 1 )
-			.then( ( page ) => {
-				if ( ! cancelled ) {
-					setAvailable( page.items );
-					setPickerPage( 1 );
-					setPickerPages( page.pages );
-				}
-			} )
-			.catch( () => {
-				if ( ! cancelled ) {
-					setAvailable( [] );
-					setPickerPages( 1 );
-				}
-			} )
-			.finally( () => {
-				if ( ! cancelled ) {
-					setPicking( false );
-				}
-			} );
-
-		return () => {
-			cancelled = true;
-		};
-	}, [ loadPicker ] );
-
-	const loadMore = async () => {
-		const next = pickerPage + 1;
-
-		setLoadingMore( true );
-
-		try {
-			const page = await loadPicker( next );
-
-			setAvailable( ( current ) => {
-				const seen = new Set( current.map( ( reel ) => reel.id ) );
-
-				return current.concat(
-					page.items.filter( ( reel ) => ! seen.has( reel.id ) )
-				);
-			} );
-			setPickerPage( next );
-			setPickerPages( page.pages );
-		} catch ( error ) {
-			toasts.error( error.message );
-		} finally {
-			setLoadingMore( false );
-		}
-	};
-
-	const markDirty = useCallback(
-		( nextName, nextStyles, nextAttached ) => {
-			setDirty(
-				snapshot( nextName, nextStyles, nextAttached ) !==
-					baseline.current
-			);
-		},
-		[ snapshot ]
-	);
+	const markChanged = ( nextName, nextStyles, nextAttached ) =>
+		setChanged(
+			snapshot( nextName, nextStyles, nextAttached ) !== baseline.current
+		);
 
 	/**
 	 * Write one style, or several at once.
@@ -426,44 +306,28 @@ export const WidgetEditor = ( { widgetId, navigate } ) => {
 		);
 
 		setStyles( next );
-		markDirty( name, next, attached );
+		markChanged( name, next, attached );
 	};
 
 	const rename = ( value ) => {
 		setName( value );
-		markDirty( value, styles, attached );
+		markChanged( value, styles, attached );
 	};
 
-	const add = ( reel ) => {
-		const next = [ ...attached, reel ];
-
+	const updateReels = ( next ) => {
 		setAttached( next );
-		markDirty( name, styles, next );
+		markChanged( name, styles, next );
 	};
 
-	const remove = ( id ) => {
-		const next = attached.filter( ( reel ) => reel.id !== id );
+	const canSave = ! saving && ! loading && dirty;
 
-		setAttached( next );
-		markDirty( name, styles, next );
-	};
-
-	const onDragEnd = ( event ) => {
-		const { active, over } = event;
-
-		if ( ! over || active.id === over.id ) {
+	const save = async () => {
+		if ( ! canSave ) {
 			return;
 		}
 
-		const from = attached.findIndex( ( reel ) => reel.id === active.id );
-		const to = attached.findIndex( ( reel ) => reel.id === over.id );
-		const next = arrayMove( attached, from, to );
+		const first = ! savedId;
 
-		setAttached( next );
-		markDirty( name, styles, next );
-	};
-
-	const save = async () => {
 		setSaving( true );
 
 		try {
@@ -472,42 +336,30 @@ export const WidgetEditor = ( { widgetId, navigate } ) => {
 				styles,
 				reel_ids: attached.map( ( reel ) => reel.id ),
 			};
-			const widget =
-				isNew && ! savedId
-					? await widgetsApi.create( payload )
-					: await widgetsApi.update( savedId, payload );
+			const widget = first
+				? await widgetsApi.create( payload )
+				: await widgetsApi.update( savedId, payload );
 
-			setName( widget.name );
-			setStyles( widget.styles );
-			setAttached( widget.reels );
-			setSavedId( widget.id );
-			saved.current = {
-				name: widget.name,
-				styles: widget.styles,
-				attached: widget.reels,
-			};
-			baseline.current = snapshot(
-				widget.name,
-				widget.styles,
-				widget.reels
-			);
-			setDirty( false );
+			adopt( widget );
 
-			toasts.success(
-				isNew && ! savedId
-					? __(
-							'Widget created successfully!',
-							'productreels'
-						)
-					: __(
-							'Changes saved successfully!',
-							'productreels'
-						)
-			);
+			if ( ! first ) {
+				toasts.success( __( 'Widget saved', 'productreels' ) );
 
-			if ( isNew && ! savedId ) {
-				navigate( `#/widgets/${ widget.id }` );
+				return;
 			}
+
+			// The widget exists now: it gets its own address, keeps the step
+			// that was open, and the toast offers the next thing to do.
+			clearDraft();
+			rememberStep( String( widget.id ), step );
+			clearUnsaved();
+			toasts.success( __( 'Widget saved', 'productreels' ), {
+				action: {
+					label: __( 'Place it', 'productreels' ),
+					onClick: () => openStep( widget.id, PLACE_STEP.id ),
+				},
+			} );
+			navigate( `#/widgets/${ widget.id }` );
 		} catch ( error ) {
 			toasts.error( error.message );
 		} finally {
@@ -515,68 +367,86 @@ export const WidgetEditor = ( { widgetId, navigate } ) => {
 		}
 	};
 
+	// Ctrl+S / Cmd+S saves, unless a dialog (the reel sheet) has the screen.
+	const saveRef = useRef( save );
+
+	saveRef.current = save;
+
+	useEffect( () => {
+		const onKeyDown = ( event ) => {
+			if (
+				( event.ctrlKey || event.metaKey ) &&
+				! event.altKey &&
+				! event.shiftKey &&
+				event.key.toLowerCase() === 's'
+			) {
+				event.preventDefault();
+
+				if ( ! document.querySelector( '.pr-overlay' ) ) {
+					saveRef.current();
+				}
+			}
+		};
+
+		document.addEventListener( 'keydown', onKeyDown );
+
+		return () => document.removeEventListener( 'keydown', onKeyDown );
+	}, [] );
+
+	// The first-save toast's "Place it".
+	useEffect( () => {
+		const onOpenStep = ( event ) => {
+			if ( event.detail?.id === savedId ) {
+				setStep( event.detail.step );
+				setPanelOpen( true );
+			}
+		};
+
+		document.addEventListener( OPEN_STEP, onOpenStep );
+
+		return () => document.removeEventListener( OPEN_STEP, onOpenStep );
+	}, [ savedId ] );
+
 	/** Put everything back the way it was at the last save. */
 	const discard = () => {
 		setName( saved.current.name );
 		setStyles( saved.current.styles );
 		setAttached( saved.current.attached );
-		setDirty( false );
-	};
-
-	/**
-	 * A reel created from inside the editor joins the widget straight away —
-	 * that is why someone reached for "Add Reel" here rather than in the library.
-	 *
-	 * @param {Object} reel The reel the editor just created.
-	 */
-	const onReelCreated = ( reel ) => {
-		setCreating( false );
-
-		if ( reel && reel.id ) {
-			add( reel );
-		}
+		setChanged( false );
+		setConfirming( null );
+		toasts.success( __( 'Changes discarded', 'productreels' ), {
+			icon: 'undo',
+		} );
 	};
 
 	const removeWidget = async () => {
+		setDeleting( true );
+
 		try {
 			await widgetsApi.remove( savedId );
-			setDirty( false );
-			toasts.success(
-				__(
-					'Widget deleted successfully!',
-					'productreels'
-				)
-			);
+			clearUnsaved();
+			toasts.success( __( 'Widget deleted', 'productreels' ), {
+				icon: 'trash',
+			} );
 			navigate( '#/widgets' );
 		} catch ( error ) {
 			toasts.error( error.message );
-			setConfirming( false );
+			setDeleting( false );
+			setConfirming( null );
 		}
 	};
 
-	const copyShortcode = async () => {
-		const shortcode = `[productreels id="${ savedId }"]`;
-
+	const duplicateWidget = async () => {
 		try {
-			await window.navigator.clipboard.writeText( shortcode );
+			const copy = await widgetsApi.duplicate( savedId );
+
+			toasts.success( __( 'Widget duplicated', 'productreels' ), {
+				icon: 'duplicate',
+			} );
+			navigate( `#/widgets/${ copy.id }` );
 		} catch ( error ) {
-			const field = document.createElement( 'textarea' );
-
-			field.value = shortcode;
-			document.body.appendChild( field );
-			field.select();
-			document.execCommand( 'copy' );
-			document.body.removeChild( field );
+			toasts.error( error.message );
 		}
-
-		setCopied( true );
-		toasts.success(
-			__(
-				'Copied!',
-				'productreels'
-			)
-		);
-		setTimeout( () => setCopied( false ), 1600 );
 	};
 
 	/**
@@ -591,513 +461,181 @@ export const WidgetEditor = ( { widgetId, navigate } ) => {
 		setPlaying( { index: index < 0 ? 0 : index, from: from || null } );
 	};
 
-	const duplicateWidget = async () => {
-		setDuplicating( true );
+	const selectStep = ( id ) => {
+		if ( id === step ) {
+			setPanelOpen( ! panelOpen );
 
-		try {
-			const copy = await widgetsApi.duplicate( savedId );
-
-			toasts.success(
-				__(
-					'Widget created successfully!',
-					'productreels'
-				)
-			);
-			navigate( `#/widgets/${ copy.id }` );
-		} catch ( error ) {
-			toasts.error( error.message );
-		} finally {
-			setDuplicating( false );
+			return;
 		}
+
+		setStep( id );
+		setPanelOpen( true );
+		rememberStep( savedId ? String( savedId ) : stepKey, id );
 	};
 
-	const attachedIds = useMemo(
-		() => attached.map( ( reel ) => reel.id ),
-		[ attached ]
+	const menuItems = useMemo(
+		() =>
+			savedId > 0
+				? [
+						{
+							icon: 'duplicate',
+							label: __( 'Duplicate', 'productreels' ),
+							hint: changed
+								? __( 'Save first', 'productreels' )
+								: undefined,
+							disabled: changed,
+							onSelect: duplicateWidget,
+						},
+						'-',
+						{
+							icon: 'trash',
+							label: __( 'Delete widget', 'productreels' ),
+							danger: true,
+							onSelect: () => setConfirming( 'delete' ),
+						},
+					]
+				: [],
+		// duplicateWidget only reads savedId.
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+		[ savedId, changed ]
 	);
-	const offerable = available.filter(
-		( reel ) => ! attachedIds.includes( reel.id )
-	);
-	const previewWidth = DEVICES.find(
-		( entry ) => entry.value === device
-	).width;
-	const titleHidden = 'hidden' === styles.widgetTitle.alignment;
+
+	const stepProps = {
+		name,
+		styles,
+		set: setStyle,
+		device,
+		setDevice,
+	};
+
+	let body = null;
+
+	switch ( step ) {
+		case 'reels':
+			body = (
+				<ReelsStep
+					attached={ attached }
+					setAttached={ updateReels }
+					onPreview={ preview }
+				/>
+			);
+			break;
+		case 'layout':
+			body = <LayoutStep { ...stepProps } />;
+			break;
+		case 'look':
+			body = <LookStep { ...stepProps } />;
+			break;
+		case 'player':
+			body = <PlayerStep { ...stepProps } />;
+			break;
+		case 'card':
+			body = <CardStep { ...stepProps } />;
+			break;
+		case 'advanced':
+			body = <AdvancedStep { ...stepProps } />;
+			break;
+		case 'place':
+			body = (
+				<PlaceStep id={ savedId } onSave={ save } saving={ saving } />
+			);
+			break;
+	}
+
+	let stageBody = null;
+
+	if ( loading ) {
+		stageBody = <Skeleton variant="cards" count={ 6 } />;
+	} else if ( attached.length === 0 ) {
+		stageBody = (
+			<EmptyState
+				icon="film"
+				title={ __( 'Add reels to see your widget', 'productreels' ) }
+				description={ __(
+					'Pick reels from your library in the Reels step.',
+					'productreels'
+				) }
+				actions={
+					step !== 'reels' || ! panelOpen ? (
+						<Button
+							icon="film"
+							onClick={ () => {
+								setStep( 'reels' );
+								setPanelOpen( true );
+							} }
+						>
+							{ __( 'Choose reels', 'productreels' ) }
+						</Button>
+					) : null
+				}
+			/>
+		);
+	} else {
+		stageBody = (
+			<WidgetRenderer
+				widget={ { id: savedId, name, reels: attached } }
+				styles={ styles }
+				device={ device }
+				inEditor
+				onOpen={ preview }
+				services={ editorServices }
+			/>
+		);
+	}
+
+	const text = STEP_TEXT[ step ];
 
 	return (
 		<>
-			<div className="wr-page-head wr-editor-head">
-				<div className="wr-editor-head__left">
-					<IconButton
-						icon={ IconChevronLeft }
-						label={ __(
-							'Back',
-							'productreels'
-						) }
-						onClick={ () => navigate( '#/widgets' ) }
-					/>
-					<nav
-						className="wr-crumbs"
-						aria-label={ __(
-							'Breadcrumb',
-							'productreels'
-						) }
-					>
-						<button
-							type="button"
-							className="wr-crumbs__link"
-							onClick={ () => navigate( '#/widgets' ) }
-						>
-							{ __(
-								'All Widgets',
-								'productreels'
-							) }
-						</button>
-						<IconChevronRight size={ 12 } />
-						<span className="wr-crumbs__current">
-							{ savedId > 0
-								? name ||
-									__(
-										'Untitled widget',
-										'productreels'
-									)
-								: __(
-										'Create Widget',
-										'productreels'
-									) }
-						</span>
-					</nav>
-				</div>
-
-				<div className="wr-editor-head__title">
-					<input
-						type="text"
-						className="wr-editor-head__name"
-						value={ name }
-						placeholder={ __(
-							'Enter widget title',
-							'productreels'
-						) }
-						aria-label={ __(
-							'Widget Name',
-							'productreels'
-						) }
-						onChange={ ( event ) => rename( event.target.value ) }
-					/>
-					<IconButton
-						icon={ IconGear }
-						label={
-							titleHidden
-								? __(
-										'Title appearance (not shown on the page)',
-										'productreels'
-									)
-								: __(
-										'Title appearance',
-										'productreels'
-									)
+			<StudioShell
+				panelOpen={ panelOpen }
+				header={
+					<StudioHeader
+						name={ name }
+						onRename={ rename }
+						dirty={ dirty }
+						canDiscard={ changed }
+						id={ savedId }
+						onDiscard={ () =>
+							changed ? setConfirming( 'discard' ) : null
 						}
-						className="wr-editor-head__title-btn"
-						data-hidden={ titleHidden ? 'true' : 'false' }
-						size={ 15 }
-						onClick={ () => setTitleOpen( true ) }
+						menuItems={ menuItems }
+						onSave={ save }
+						saving={ saving }
+						canSave={ canSave }
 					/>
-				</div>
-
-				<div className="wr-page-head__actions">
-					{ dirty && (
-						<IconButton
-							icon={ IconUndo }
-							label={ __(
-								'Discard changes',
-								'productreels'
-							) }
-							onClick={ discard }
-						/>
-					) }
-
-					{ savedId > 0 && (
-						<button
-							type="button"
-							className="wr-shortcode"
-							onClick={ copyShortcode }
-						>
-							<code>{ `[productreels id="${ savedId }"]` }</code>
-							{ copied ? (
-								<IconCheck size={ 13 } />
-							) : (
-								<IconCopy size={ 13 } />
-							) }
-						</button>
-					) }
-
-					{ savedId > 0 && (
-						<IconButton
-							icon={ IconDuplicate }
-							label={ __(
-								'Duplicate',
-								'productreels'
-							) }
-							disabled={ duplicating || dirty }
-							onClick={ duplicateWidget }
-						/>
-					) }
-
-					{ savedId > 0 && (
-						<IconButton
-							icon={ IconTrash }
-							label={ __(
-								'Delete',
-								'productreels'
-							) }
-							tone="danger"
-							onClick={ () => setConfirming( true ) }
-						/>
-					) }
-
-					<IconButton
-						icon={ IconPanel }
-						label={
-							( narrow ? panelOpen : ! panelHidden )
-								? __(
-										'Hide customization',
-										'productreels'
-									)
-								: __(
-										'Show customization',
-										'productreels'
-									)
-						}
-						aria-pressed={
-							( narrow ? panelOpen : ! panelHidden )
-								? 'true'
-								: 'false'
-						}
-						onClick={ () =>
-							narrow
-								? setPanelOpen( ! panelOpen )
-								: setPanelHidden( ! panelHidden )
-						}
+				}
+				rail={
+					<StudioRail
+						current={ step }
+						panelOpen={ panelOpen }
+						reels={ attached.length }
+						panelId={ PANEL_ID }
+						onSelect={ selectStep }
 					/>
-
-					<Button
-						variant="primary"
-						icon={ IconSave }
-						busy={ saving }
-						disabled={ saving || ( ! dirty && savedId > 0 ) }
-						onClick={ save }
-					>
-						{ savedId > 0
-							? __(
-									'Update',
-									'productreels'
-								)
-							: __(
-									'Save',
-									'productreels'
-								) }
-					</Button>
-				</div>
-			</div>
-
-			<div
-				className={ [
-					'wr-editor',
-					panelOpen ? 'is-panel-open' : '',
-					panelHidden ? 'is-panel-hidden' : '',
-				]
-					.filter( Boolean )
-					.join( ' ' ) }
-			>
-				<section
-					className="wr-editor__pane wr-editor__picker"
-					aria-label={ __(
-						'All Reels',
-						'productreels'
-					) }
-				>
-					<header className="wr-editor__pane-head">
-						<h2 className="wr-editor__pane-title">
-							{ __(
-								'All Reels',
-								'productreels'
-							) }
-						</h2>
-						<p className="wr-editor__pane-sub">
-							{ __(
-								'Choose reels to attach in this widget',
-								'productreels'
-							) }
-						</p>
-					</header>
-
-					<div className="wr-editor__pane-tools">
-						<Button
-							className="wr-editor__add-reel"
-							icon={ IconPlus }
-							onClick={ () => setCreating( true ) }
+				}
+				panel={
+					panelOpen && (
+						<StudioPanel
+							id={ PANEL_ID }
+							title={ text.title }
+							description={ text.description }
 						>
-							{ __(
-								'Add Reel',
-								'productreels'
-							) }
-						</Button>
-						<SearchInput
-							value={ search }
-							onChange={ setSearch }
-							placeholder={ __(
-								'Search reels…',
-								'productreels'
-							) }
-						/>
-					</div>
-
-					<div className="wr-editor__pane-body">
-						{ picking && (
-							<div className="wr-pick-grid">
-								{ [ 0, 1, 2, 3 ].map( ( card ) => (
-									<div key={ card } className="wr-pick">
-										<div className="wr-pick__frame wr-skeleton" />
-										<Skeleton width="80%" height={ 11 } />
-									</div>
-								) ) }
-							</div>
-						) }
-
-						{ ! picking && offerable.length === 0 && (
-							<p className="wr-editor__empty">
-								{ __(
-									'No reels are available to add.',
-									'productreels'
-								) }
-							</p>
-						) }
-
-						{ ! picking && offerable.length > 0 && (
-							<div className="wr-pick-grid">
-								{ offerable.map( ( reel ) => (
-									<PickerCard
-										key={ reel.id }
-										reel={ reel }
-										onAdd={ add }
-									/>
-								) ) }
-							</div>
-						) }
-
-						{ ! picking && pickerPage < pickerPages && (
-							<div className="wr-editor__more">
-								<Button
-									size="sm"
-									busy={ loadingMore }
-									disabled={ loadingMore }
-									onClick={ loadMore }
-								>
-									{ __(
-										'Load more',
-										'productreels'
-									) }
-								</Button>
-							</div>
-						) }
-					</div>
-				</section>
-
-				<section
-					className="wr-editor__pane wr-editor__preview"
-					aria-label={ __(
-						'Preview',
-						'productreels'
-					) }
-				>
-					<header className="wr-editor__pane-head wr-editor__preview-head">
-						<div>
-							<h2 className="wr-editor__pane-title">
-								{ __(
-									'Preview',
-									'productreels'
-								) }
-							</h2>
-							<p className="wr-editor__pane-sub">
-								{ __(
-									'This is a representation of how the widget will appear to visitors.',
-									'productreels'
-								) }
-							</p>
-						</div>
-
-						<div
-							className="wr-toggle-group"
-							role="group"
-							aria-label={ __(
-								'Device',
-								'productreels'
-							) }
-						>
-							{ DEVICES.map( ( entry ) => {
-								const Icon = entry.icon;
-
-								return (
-									<button
-										key={ entry.value }
-										type="button"
-										aria-pressed={
-											entry.value === device
-												? 'true'
-												: 'false'
-										}
-										aria-label={ entry.label }
-										className="wr-toggle-group__item"
-										onClick={ () =>
-											setDevice( entry.value )
-										}
-									>
-										<Icon size={ 14 } />
-									</button>
-								);
-							} ) }
-						</div>
-					</header>
-
-					<div className="wr-editor__preview-body">
-						<div className="wr-editor__stage">
-							{ loading && (
-								<div
-									className="wr-editor__stage-inner"
-									style={ { width: previewWidth } }
-								>
-									<Skeleton height={ 260 } radius="10px" />
-								</div>
-							) }
-
-							{ ! loading && attached.length === 0 && (
-								<EmptyState
-									title={ __(
-										'No reels have been added to this widget yet.',
-										'productreels'
-									) }
-									text={ __(
-										'Select some from the list on the left to get started.',
-										'productreels'
-									) }
-								/>
-							) }
-
-							{ ! loading && attached.length > 0 && (
-								<div
-									className="wr-editor__stage-inner"
-									style={ { width: previewWidth } }
-								>
-									<WidgetRenderer
-										widget={ {
-											id: savedId,
-											name,
-											reels: attached,
-										} }
-										styles={ styles }
-										device={ device }
-										inEditor
-										onOpen={ preview }
-										services={ editorServices }
-									/>
-								</div>
-							) }
-						</div>
-
-						{ attached.length > 0 && (
-							<div className="wr-editor__attached">
-								<div className="wr-editor__attached-head">
-									<h3 className="wr-section-label">
-										{ __(
-											'Attached videos',
-											'productreels'
-										) }
-									</h3>
-									<span className="wr-editor__pane-sub">
-										{ __(
-											'These reels will be shown in this reel widget',
-											'productreels'
-										) }
-									</span>
-								</div>
-
-								<DndContext
-									sensors={ sensors }
-									collisionDetection={ closestCenter }
-									onDragEnd={ onDragEnd }
-								>
-									<SortableContext
-										items={ attachedIds }
-										strategy={ rectSortingStrategy }
-									>
-										<ul className="wr-attached-list">
-											{ attached.map( ( reel ) => (
-												<SortableReel
-													key={ reel.id }
-													reel={ reel }
-													onRemove={ remove }
-													onPreview={ preview }
-												/>
-											) ) }
-										</ul>
-									</SortableContext>
-								</DndContext>
-							</div>
-						) }
-					</div>
-				</section>
-
-				<section
-					className="wr-editor__pane wr-editor__style"
-					aria-label={ __(
-						'Customization',
-						'productreels'
-					) }
-				>
-					<header className="wr-editor__pane-head">
-						<h2 className="wr-editor__pane-title">
-							{ __(
-								'Customization',
-								'productreels'
-							) }
-						</h2>
-						<p className="wr-editor__pane-sub">
-							{ __(
-								'Customize your widget however you like',
-								'productreels'
-							) }
-						</p>
-					</header>
-
-					<div className="wr-editor__pane-body">
-						<StylePanel
-							styles={ styles }
-							set={ setStyle }
+							{ body }
+						</StudioPanel>
+					)
+				}
+				stage={
+					<Stage device={ device } onDevice={ setDevice }>
+						<DeviceFrame
 							device={ device }
-							setDevice={ setDevice }
-						/>
-					</div>
-				</section>
-
-				<button
-					type="button"
-					className="wr-editor__panel-toggle"
-					aria-expanded={ panelOpen ? 'true' : 'false' }
-					onClick={ () => setPanelOpen( ! panelOpen ) }
-				>
-					{ __(
-						'Customization',
-						'productreels'
-					) }
-				</button>
-			</div>
-
-			{ creating && (
-				<ReelEditor
-					reelId={ 0 }
-					onClose={ () => setCreating( false ) }
-					onSaved={ onReelCreated }
-				/>
-			) }
+							url={ window.location.host }
+						>
+							{ stageBody }
+						</DeviceFrame>
+					</Stage>
+				}
+			/>
 
 			{ playing && (
 				<Player
@@ -1110,26 +648,45 @@ export const WidgetEditor = ( { widgetId, navigate } ) => {
 				/>
 			) }
 
-			{ titleOpen && (
-				<TitleAppearanceDialog
-					name={ name }
-					styles={ styles }
-					set={ setStyle }
-					onClose={ () => setTitleOpen( false ) }
-				/>
+			{ confirming === 'discard' && (
+				<ConfirmDialog
+					title={ __( 'Discard changes?', 'productreels' ) }
+					confirm={ __( 'Discard changes', 'productreels' ) }
+					cancelLabel={ __( 'Keep editing', 'productreels' ) }
+					icon="alert"
+					onConfirm={ discard }
+					onClose={ () => setConfirming( null ) }
+				>
+					{ savedId
+						? sprintf(
+								/* translators: %s: the widget's name. */
+								__(
+									'Your changes to %s since the last save will be lost.',
+									'productreels'
+								),
+								label
+							)
+						: __(
+								'The widget goes back to the layout and shape you chose when you created it.',
+								'productreels'
+							) }
+				</ConfirmDialog>
 			) }
 
-			{ confirming && (
+			{ confirming === 'delete' && (
 				<ConfirmDialog
-					title={ __(
-						'Are you sure you want to delete this widget?',
-						'productreels'
+					title={ sprintf(
+						/* translators: %s: widget name. */
+						__( 'Delete “%s”?', 'productreels' ),
+						label
 					) }
+					confirm={ __( 'Delete widget', 'productreels' ) }
+					busy={ deleting }
 					onConfirm={ removeWidget }
-					onClose={ () => setConfirming( false ) }
+					onClose={ () => setConfirming( null ) }
 				>
 					{ __(
-						'This widget and its click statistics will be removed. Its reels stay in your library and keep working in any other widget.',
+						'Pages that use its shortcode or block will show nothing. Its reels stay in your library.',
 						'productreels'
 					) }
 				</ConfirmDialog>

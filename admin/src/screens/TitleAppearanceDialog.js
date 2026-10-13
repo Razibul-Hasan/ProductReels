@@ -76,7 +76,7 @@ const SpacingInput = ( { label, value, disabled, onChange } ) => {
 	);
 };
 
-export const TitleAppearanceDialog = ( { name, styles, set, onClose } ) => {
+export const TitleAppearanceFields = ( { name, styles, set } ) => {
 	const title = styles.widgetTitle;
 	const hidden = 'hidden' === title.alignment;
 	const isDefault = Object.keys( DEFAULTS ).every(
@@ -84,236 +84,243 @@ export const TitleAppearanceDialog = ( { name, styles, set, onClose } ) => {
 	);
 
 	return (
-		<Modal
-			title={ __(
-				'Widget title',
-				'productreels'
-			) }
-			size="sm"
-			onClose={ onClose }
-			footer={
-				<>
-					{ ! isDefault && (
-						<Button
-							variant="ghost"
-							icon={ IconReset }
-							className="wr-title-dialog__reset"
-							onClick={ () => set( DEFAULTS ) }
-						>
-							{ __(
-								'Reset',
-								'productreels'
-							) }
-						</Button>
-					) }
-					<Button variant="primary" onClick={ onClose }>
+		<div className="wr-title-dialog">
+			<p className="wr-title-dialog__lede">
+				{ __(
+					'The widget name can sit above the reels on the page. Choose where, or keep it off.',
+					'productreels'
+				) }
+			</p>
+
+			<div
+				className={ [
+					'wr-title-dialog__preview',
+					hidden ? 'wr-title-dialog__preview--off' : '',
+				]
+					.filter( Boolean )
+					.join( ' ' ) }
+				aria-hidden="true"
+			>
+				{ hidden ? (
+					<span className="wr-title-dialog__preview-off">
+						<IconEyeOff size={ 14 } />
 						{ __(
-							'Done',
+							'Title stays off the page',
 							'productreels'
 						) }
-					</Button>
-				</>
-			}
-		>
-			<div className="wr-title-dialog">
-				<p className="wr-title-dialog__lede">
-					{ __(
-						'The widget name can sit above the reels on the page. Choose where, or keep it off.',
-						'productreels'
-					) }
-				</p>
-
-				<div
-					className={ [
-						'wr-title-dialog__preview',
-						hidden ? 'wr-title-dialog__preview--off' : '',
-					]
-						.filter( Boolean )
-						.join( ' ' ) }
-					aria-hidden="true"
-				>
-					{ hidden ? (
-						<span className="wr-title-dialog__preview-off">
-							<IconEyeOff size={ 14 } />
-							{ __(
-								'Title stays off the page',
+					</span>
+				) : (
+					<span
+						className="wr-title-dialog__preview-text"
+						style={ {
+							textAlign: title.alignment,
+							fontSize: `${ title.fontSize }px`,
+							color: title.color,
+							marginTop: `${ title.spacingTop }px`,
+							marginBottom: `${ title.spacingBottom }px`,
+						} }
+					>
+						{ name ||
+							__(
+								'Untitled widget',
 								'productreels'
 							) }
-						</span>
-					) : (
-						<span
-							className="wr-title-dialog__preview-text"
-							style={ {
-								textAlign: title.alignment,
-								fontSize: `${ title.fontSize }px`,
-								color: title.color,
-								marginTop: `${ title.spacingTop }px`,
-								marginBottom: `${ title.spacingBottom }px`,
-							} }
-						>
-							{ name ||
-								__(
-									'Untitled widget',
-									'productreels'
-								) }
-						</span>
-					) }
-					<span className="wr-title-dialog__preview-reels">
-						<i />
-						<i />
-						<i />
-						<i />
 					</span>
-				</div>
+				) }
+				<span className="wr-title-dialog__preview-reels">
+					<i />
+					<i />
+					<i />
+					<i />
+				</span>
+			</div>
 
-				<IconToggleGroup
+			<IconToggleGroup
+				label={ __(
+					'Position',
+					'productreels'
+				) }
+				value={ title.alignment }
+				onChange={ ( value ) =>
+					set( 'widgetTitle.alignment', value )
+				}
+				options={ [
+					{
+						value: 'left',
+						label: __(
+							'Left',
+							'productreels'
+						),
+						icon: IconTextLeft,
+						showLabel: false,
+					},
+					{
+						value: 'center',
+						label: __(
+							'Centre',
+							'productreels'
+						),
+						icon: IconTextCenter,
+						showLabel: false,
+					},
+					{
+						value: 'right',
+						label: __(
+							'Right',
+							'productreels'
+						),
+						icon: IconTextRight,
+						showLabel: false,
+					},
+					{
+						value: 'hidden',
+						label: __(
+							'Hidden',
+							'productreels'
+						),
+						icon: IconEyeOff,
+					},
+				] }
+			/>
+
+			<div
+				className="wr-title-dialog__when-shown"
+				data-disabled={ hidden ? 'true' : 'false' }
+			>
+				<Field
 					label={ __(
-						'Position',
+						'Size',
 						'productreels'
 					) }
-					value={ title.alignment }
-					onChange={ ( value ) =>
-						set( 'widgetTitle.alignment', value )
-					}
-					options={ [
-						{
-							value: 'left',
-							label: __(
-								'Left',
-								'productreels'
-							),
-							icon: IconTextLeft,
-							showLabel: false,
-						},
-						{
-							value: 'center',
-							label: __(
-								'Centre',
-								'productreels'
-							),
-							icon: IconTextCenter,
-							showLabel: false,
-						},
-						{
-							value: 'right',
-							label: __(
-								'Right',
-								'productreels'
-							),
-							icon: IconTextRight,
-							showLabel: false,
-						},
-						{
-							value: 'hidden',
-							label: __(
-								'Hidden',
-								'productreels'
-							),
-							icon: IconEyeOff,
-						},
-					] }
-				/>
-
-				<div
-					className="wr-title-dialog__when-shown"
-					data-disabled={ hidden ? 'true' : 'false' }
 				>
-					<Field
-						label={ __(
-							'Size',
-							'productreels'
-						) }
-					>
-						<div className="wr-slider__row">
+					<div className="wr-slider__row">
+						<input
+							type="range"
+							className="wr-slider__range"
+							min={ SIZE.min }
+							max={ SIZE.max }
+							value={ title.fontSize }
+							disabled={ hidden }
+							aria-label={ __(
+								'Size',
+								'productreels'
+							) }
+							onChange={ ( event ) =>
+								set(
+									'widgetTitle.fontSize',
+									clamp( Number( event.target.value ) )
+								)
+							}
+						/>
+						<span className="wr-title-dialog__size">
 							<input
-								type="range"
-								className="wr-slider__range"
+								type="number"
+								className="wr-slider__number"
 								min={ SIZE.min }
 								max={ SIZE.max }
 								value={ title.fontSize }
 								disabled={ hidden }
 								aria-label={ __(
-									'Size',
+									'Size (px)',
 									'productreels'
 								) }
 								onChange={ ( event ) =>
 									set(
 										'widgetTitle.fontSize',
-										clamp( Number( event.target.value ) )
+										clamp(
+											Number( event.target.value )
+										)
 									)
 								}
 							/>
-							<span className="wr-title-dialog__size">
-								<input
-									type="number"
-									className="wr-slider__number"
-									min={ SIZE.min }
-									max={ SIZE.max }
-									value={ title.fontSize }
-									disabled={ hidden }
-									aria-label={ __(
-										'Size (px)',
-										'productreels'
-									) }
-									onChange={ ( event ) =>
-										set(
-											'widgetTitle.fontSize',
-											clamp(
-												Number( event.target.value )
-											)
-										)
-									}
-								/>
-								<span>px</span>
-							</span>
-						</div>
-					</Field>
+							<span>px</span>
+						</span>
+					</div>
+				</Field>
 
-					<ColorPicker
-						label={ __(
-							'Colour',
-							'productreels'
-						) }
-						value={ title.color }
-						disabled={ hidden }
-						onChange={ ( value ) =>
-							set( 'widgetTitle.color', value )
-						}
-					/>
+				<ColorPicker
+					label={ __(
+						'Colour',
+						'productreels'
+					) }
+					value={ title.color }
+					disabled={ hidden }
+					onChange={ ( value ) =>
+						set( 'widgetTitle.color', value )
+					}
+				/>
 
-					<Field
-						label={ __(
-							'Spacing',
-							'productreels'
-						) }
-					>
-						<div className="wr-title-dialog__spacing">
-							<SpacingInput
-								label={ __(
-									'Top',
-									'productreels'
-								) }
-								value={ title.spacingTop }
-								disabled={ hidden }
-								onChange={ ( value ) =>
-									set( 'widgetTitle.spacingTop', value )
-								}
-							/>
-							<SpacingInput
-								label={ __(
-									'Bottom',
-									'productreels'
-								) }
-								value={ title.spacingBottom }
-								disabled={ hidden }
-								onChange={ ( value ) =>
-									set( 'widgetTitle.spacingBottom', value )
-								}
-							/>
-						</div>
-					</Field>
-				</div>
+				<Field
+					label={ __(
+						'Spacing',
+						'productreels'
+					) }
+				>
+					<div className="wr-title-dialog__spacing">
+						<SpacingInput
+							label={ __(
+								'Top',
+								'productreels'
+							) }
+							value={ title.spacingTop }
+							disabled={ hidden }
+							onChange={ ( value ) =>
+								set( 'widgetTitle.spacingTop', value )
+							}
+						/>
+						<SpacingInput
+							label={ __(
+								'Bottom',
+								'productreels'
+							) }
+							value={ title.spacingBottom }
+							disabled={ hidden }
+							onChange={ ( value ) =>
+								set( 'widgetTitle.spacingBottom', value )
+							}
+						/>
+					</div>
+				</Field>
 			</div>
-		</Modal>
+			{ ! isDefault && (
+				<Button
+					variant="ghost"
+					icon={ IconReset }
+					className="wr-title-dialog__reset"
+					onClick={ () => set( DEFAULTS ) }
+				>
+					{ __(
+						'Reset',
+						'productreels'
+					) }
+				</Button>
+			) }
+		</div>
 	);
 };
+
+/**
+ * The 1.0.0 dialog around the same fields. Since 1.1.0 the fields sit in the
+ * editor's Layout step; nothing opens this any more (part 14 removes it).
+ *
+ * @param {Object}   props         Props.
+ * @param {string}   props.name    The widget name.
+ * @param {Object}   props.styles  The widget styles.
+ * @param {Function} props.set     Style setter.
+ * @param {Function} props.onClose Closes the dialog.
+ * @return {Object} The dialog.
+ */
+export const TitleAppearanceDialog = ( { name, styles, set, onClose } ) => (
+	<Modal
+		title={ __( 'Widget title', 'productreels' ) }
+		size="sm"
+		onClose={ onClose }
+		footer={
+			<Button variant="primary" onClick={ onClose }>
+				{ __( 'Done', 'productreels' ) }
+			</Button>
+		}
+	>
+		<TitleAppearanceFields name={ name } styles={ styles } set={ set } />
+	</Modal>
+);

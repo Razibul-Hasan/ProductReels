@@ -253,7 +253,7 @@ const ButtonColors = ( { label, styles, set, keys } ) => {
 
 /* ------------------------------------------------------------ Thumbnail */
 
-const LayoutSection = ( { styles, set, setDevice } ) => {
+export const LayoutSection = ( { styles, set, setDevice } ) => {
 	const template = styles.template;
 	// Marquee runs edge to edge and popup is pinned to a corner; neither has
 	// anything to align.
@@ -274,12 +274,12 @@ const LayoutSection = ( { styles, set, setDevice } ) => {
 
 	return (
 		<CollapsibleSection
+			defaultOpen
 			title={ __(
 				'Layout',
 				'productreels'
 			) }
 			icon={ IconLayout }
-			defaultOpen
 		>
 			<VisualOptionCards
 				label={ __(
@@ -759,7 +759,7 @@ const LayoutSection = ( { styles, set, setDevice } ) => {
 	);
 };
 
-const ThumbnailSection = ( { styles, set } ) => {
+export const ThumbnailSection = ( { styles, set } ) => {
 	// "Off" is the click behaviour; the old disable flag is cleared with it so
 	// a stored widget can never show "hover" and then not preview.
 	const preview = styles.disablePreview ? 'click' : styles.playBehavior;
@@ -788,6 +788,7 @@ const ThumbnailSection = ( { styles, set } ) => {
 
 	return (
 		<CollapsibleSection
+			defaultOpen
 			title={ __(
 				'Thumbnail',
 				'productreels'
@@ -1047,11 +1048,12 @@ const ThumbnailSection = ( { styles, set } ) => {
 	);
 };
 
-const StylesSection = ( { styles, set, setDevice } ) => {
+export const StylesSection = ( { styles, set, setDevice } ) => {
 	const template = styles.template;
 
 	return (
 		<CollapsibleSection
+			defaultOpen
 			title={ __(
 				'Styles',
 				'productreels'
@@ -1171,8 +1173,9 @@ const StylesSection = ( { styles, set, setDevice } ) => {
 	);
 };
 
-const AdvancedSection = ( { styles, set } ) => (
+export const AdvancedSection = ( { styles, set } ) => (
 	<CollapsibleSection
+			defaultOpen
 		title={ __(
 			'Advanced',
 			'productreels'
@@ -1210,14 +1213,14 @@ const AdvancedSection = ( { styles, set } ) => (
 
 /* --------------------------------------------------------------- Player */
 
-const PlayerAppearanceSection = ( { styles, set } ) => (
+export const PlayerAppearanceSection = ( { styles, set } ) => (
 	<CollapsibleSection
+			defaultOpen
 		title={ __(
 			'Appearance',
 			'productreels'
 		) }
 		icon={ IconImage }
-		defaultOpen
 	>
 		<VisualOptionCards
 			label={ __(
@@ -1273,8 +1276,9 @@ const PlayerAppearanceSection = ( { styles, set } ) => (
 	</CollapsibleSection>
 );
 
-const PlaybackSection = ( { styles, set } ) => (
+export const PlaybackSection = ( { styles, set } ) => (
 	<CollapsibleSection
+			defaultOpen
 		title={ __(
 			'Playback',
 			'productreels'
@@ -1356,8 +1360,9 @@ const PlaybackSection = ( { styles, set } ) => (
 	</CollapsibleSection>
 );
 
-const NavButtonsSection = ( { styles, set } ) => (
+export const NavButtonsSection = ( { styles, set } ) => (
 	<CollapsibleSection
+			defaultOpen
 		title={ __(
 			'Navigation Buttons',
 			'productreels'
@@ -1392,8 +1397,9 @@ const NavButtonsSection = ( { styles, set } ) => (
 	</CollapsibleSection>
 );
 
-const ProductCardSection = ( { styles, set } ) => (
+export const ProductCardSection = ( { styles, set } ) => (
 	<CollapsibleSection
+			defaultOpen
 		title={ __(
 			'Product Card',
 			'productreels'

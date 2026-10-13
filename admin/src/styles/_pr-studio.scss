@@ -1,0 +1,360 @@
+/**
+ * The widget editor (studio) and the layout picker.
+ *
+ * Loaded by _pr-scoped.scss inside #productreels-admin-app. The design's own
+ * pr-studio, pr-rail, pr-panel, pr-stage and pr-device rules are in
+ * pr-admin; this file adds what a real WordPress screen needs: the shell
+ * filling the content area under the admin bar, columns that scroll on their
+ * own, the zoomed device page, and the narrow-screen layouts.
+ */
+
+@use 'sass:list';
+
+/* ------------------------------------------------------- Layout diagrams */
+
+/* Left, top, width, height of each piece, in the order TemplatePicker.js
+   draws them (76 x 54 box). */
+$pr-minis: (
+	grid: (
+		(12, 6, 14, 20),
+		(30, 6, 14, 20),
+		(48, 6, 14, 20),
+		(12, 29, 14, 20),
+		(30, 29, 14, 20),
+		(48, 29, 14, 20),
+	),
+	carousel: (
+		(-6, 10, 16, 30),
+		(15, 10, 16, 30),
+		(33, 10, 16, 30),
+		(51, 10, 16, 30),
+		(69, 10, 16, 30),
+		(31, 45, 14, 3),
+	),
+	marquee: (
+		(-4, 10, 14, 26),
+		(13, 10, 14, 26),
+		(30, 10, 14, 26),
+		(47, 10, 14, 26),
+		(64, 10, 14, 26),
+		(18, 42, 40, 3),
+	),
+	stacked: (
+		(20, 12, 18, 32),
+		(38, 12, 18, 32),
+		(29, 8, 19, 34),
+	),
+	popup: (
+		(8, 6, 60, 42),
+		(14, 12, 30, 3),
+		(14, 19, 22, 3),
+		(50, 22, 13, 22),
+	),
+);
+
+.pr-template__diagram {
+	position: absolute;
+	inset-block-start: 0;
+	inset-inline-start: 0;
+	width: 76px;
+	height: 54px;
+}
+
+.pr-template--tile .pr-template__diagram {
+	inset-block-start: calc(50% - 27px);
+	inset-inline-start: calc(50% - 38px);
+	transform: scale(1.7);
+}
+
+@each $layout, $pieces in $pr-minis {
+	@for $i from 1 through list.length($pieces) {
+		$piece: list.nth($pieces, $i);
+
+		.pr-template__diagram[data-layout='#{$layout}'] .pr-mini:nth-child(#{$i}) {
+			left: #{list.nth($piece, 1)}px;
+			top: #{list.nth($piece, 2)}px;
+			width: #{list.nth($piece, 3)}px;
+			height: #{list.nth($piece, 4)}px;
+		}
+	}
+}
+
+.pr-template__diagram[data-layout='stacked'] .pr-mini:nth-child(1) {
+	transform: rotate(-12deg);
+}
+
+.pr-template__diagram[data-layout='stacked'] .pr-mini:nth-child(2) {
+	transform: rotate(12deg);
+}
+
+.pr-template__diagram[data-layout='popup'] .pr-mini--page {
+	border-radius: 4px;
+}
+
+.pr-templates--tiles {
+	grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
+.pr-template--tile .pr-template__text {
+	align-self: stretch;
+}
+
+@media (max-width: 960px) {
+
+	.pr-templates--tiles {
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+	}
+}
+
+@media (max-width: 600px) {
+
+	.pr-templates--tiles {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+}
+
+/* ------------------------------------------------------ Create widget */
+
+.pr-create {
+	display: flex;
+	flex-direction: column;
+	gap: var(--pr-space-5);
+}
+
+.pr-create__shape {
+	display: flex;
+	align-items: center;
+	gap: var(--pr-space-4);
+}
+
+/* ----------------------------------------------------------------- Shell */
+
+/* The shell fills the content area under the admin bar exactly (core sets
+   the bar's height as a custom property and changes it below 782px). */
+.wr-app--editor {
+	height: calc(100vh - var(--wp-admin--admin-bar--height, 32px));
+	min-height: 0;
+}
+
+.pr-studio {
+	min-height: 0;
+}
+
+.pr-studio[data-panel='closed'] {
+	grid-template-columns: var(--pr-rail-width) minmax(0, 1fr);
+}
+
+/* Header */
+
+.pr-studio__head {
+	min-width: 0;
+}
+
+.pr-studio__head a {
+	text-decoration: none;
+}
+
+.pr-studio__head a.pr-iconbtn {
+	color: var(--pr-ink-muted);
+}
+
+.pr-studio__head a.pr-iconbtn:hover {
+	color: var(--pr-ink);
+}
+
+.pr-studio__crumb {
+	flex: none;
+	border-radius: var(--pr-radius-sm);
+}
+
+a.pr-studio__crumb:hover {
+	color: var(--pr-ink);
+}
+
+a.pr-studio__crumb:focus-visible {
+	outline: none;
+	box-shadow: var(--pr-focus-ring);
+}
+
+.pr-studio__name {
+	min-width: 0;
+	border: 0;
+	background: none;
+	cursor: text;
+	font-family: var(--pr-font-display);
+}
+
+.pr-studio__name:focus-visible {
+	outline: none;
+	box-shadow: var(--pr-focus-ring);
+}
+
+.pr-studio__name-text {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.pr-studio__name-input {
+	width: min(380px, 36vw);
+	height: 40px;
+	margin-inline-start: -4px;
+	font-family: var(--pr-font-display);
+}
+
+.pr-studio__head > .pr-badge {
+	flex: none;
+}
+
+.pr-studio__end {
+	flex: none;
+}
+
+/* Rail and panel scroll on their own. */
+
+.pr-rail {
+	min-height: 0;
+	overflow-y: auto;
+}
+
+.pr-panel {
+	overflow: hidden;
+}
+
+.pr-panel__body > .pr-panel__section:first-child {
+	padding-top: 0;
+	border-top: 0;
+}
+
+/* The 1.0.0 controls the interim steps still use sit flush in a section. */
+.pr-panel__body .wr-collapse {
+	border: 0;
+}
+
+/* ----------------------------------------------------------------- Stage */
+
+.pr-stage__canvas {
+	overflow: auto;
+	align-items: safe center;
+	justify-content: safe center;
+}
+
+.pr-device {
+	flex: none;
+}
+
+.pr-device__spacer {
+	width: 34px;
+	flex: none;
+}
+
+/* The page lays out at the device's width and is zoomed to the frame. */
+.pr-device__page {
+	width: var(--pr-device-width, 1280px);
+	zoom: var(--pr-device-zoom, 1);
+}
+
+.pr-device__cards {
+	display: grid;
+	grid-template-columns: repeat(3, minmax(0, 1fr));
+	gap: var(--pr-space-4);
+}
+
+.pr-device__cards > span {
+	height: 120px;
+	border-radius: 10px;
+	background: var(--pr-surface-sunken);
+}
+
+.pr-skel--lines > span:nth-child(1) {
+	width: 92%;
+}
+
+.pr-skel--lines > span:nth-child(2) {
+	width: 78%;
+}
+
+.pr-skel--lines > span:nth-child(3) {
+	width: 64%;
+}
+
+.pr-device .pr-empty {
+	padding-block: var(--pr-space-8);
+}
+
+/* ------------------------------------------------------- Narrow screens */
+
+/* Under 1100px the stage gives up width first; its padding goes too. */
+@media (max-width: 1100px) {
+
+	.pr-stage__canvas {
+		padding: var(--pr-space-3) var(--pr-space-4) var(--pr-space-5);
+	}
+
+	.pr-studio__divider {
+		display: none;
+	}
+}
+
+/* Under 960px the rail becomes a strip above the panel, the stage moves
+   below it, and the page scrolls as one again. */
+@media (max-width: 960px) {
+
+	.wr-app--editor {
+		height: auto;
+	}
+
+	.pr-studio,
+	.pr-studio[data-panel='closed'] {
+		grid-template-columns: minmax(0, 1fr);
+		grid-template-rows: auto;
+		height: auto;
+	}
+
+	.pr-studio__head {
+		flex-wrap: wrap;
+		height: auto;
+		min-height: var(--pr-appbar-height);
+		padding-block: var(--pr-space-2);
+	}
+
+	.pr-studio__end {
+		margin-inline-start: 0;
+		flex: 1 1 100%;
+		justify-content: flex-end;
+	}
+
+	.pr-rail {
+		flex-direction: row;
+		overflow-x: auto;
+		overflow-y: hidden;
+		border-inline-end: 0;
+		border-bottom: 1px solid var(--pr-line);
+		padding: var(--pr-space-2);
+	}
+
+	.pr-rail__item {
+		flex: none;
+		min-width: 76px;
+	}
+
+	.pr-rail__sep {
+		width: 1px;
+		height: auto;
+		margin: 6px 4px;
+	}
+
+	.pr-panel {
+		overflow: visible;
+		border-inline-end: 0;
+		border-bottom: 1px solid var(--pr-line);
+	}
+
+	.pr-panel__body {
+		overflow: visible;
+	}
+
+	.pr-stage {
+		min-height: 560px;
+	}
+}

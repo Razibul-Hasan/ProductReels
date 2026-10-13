@@ -36,7 +36,14 @@ const ROUTES = {
 		title: __( 'Widgets', 'productreels' ),
 		frame: 'app',
 	},
+	// The Create widget dialog, over Widgets.
 	'widget-new': {
+		section: 'widgets',
+		title: __( 'Create widget', 'productreels' ),
+		frame: 'app',
+	},
+	// A widget started from that dialog, not saved yet.
+	'widget-draft': {
 		section: 'widgets',
 		title: __( 'New widget', 'productreels' ),
 		frame: 'editor',
@@ -68,9 +75,13 @@ const Screen = ( { route, navigate } ) => {
 		case 'reels':
 			return <ReelsLibrary navigate={ navigate } />;
 
-		case 'widget-new':
+		case 'widget-draft':
 			return (
-				<WidgetEditor key="new" widgetId={ 0 } navigate={ navigate } />
+				<WidgetEditor
+					key="draft"
+					widgetId={ 0 }
+					navigate={ navigate }
+				/>
 			);
 
 		case 'widget-edit':
@@ -94,9 +105,17 @@ const Screen = ( { route, navigate } ) => {
 		case 'settings':
 			return <Settings />;
 
+		// Same element type in the same place as `widgets`, so opening and
+		// closing the dialog keeps the list (and its data) mounted.
+		case 'widget-new':
 		case 'widgets':
 		default:
-			return <WidgetsList navigate={ navigate } />;
+			return (
+				<WidgetsList
+					navigate={ navigate }
+					creating={ route.name === 'widget-new' }
+				/>
+			);
 	}
 };
 

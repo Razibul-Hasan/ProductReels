@@ -45,4 +45,18 @@ export { Filmstrip } from './Filmstrip';
 export { ShopLinks, shortUrl } from './ShopLinks';
 export { ProductPicker } from './ProductPicker';
 export { LinkForm, linkDraft, validateLink } from './LinkForm';
+export { TemplatePicker } from './TemplatePicker';
+export {
+	DEVICES,
+	DeviceFrame,
+	DeviceSwitch,
+	PLACE_STEP,
+	PanelSection,
+	STUDIO_STEPS,
+	Stage,
+	StudioHeader,
+	StudioPanel,
+	StudioRail,
+	StudioShell,
+} from './Studio';
 export { portalRoot } from './portal';

@@ -11,9 +11,7 @@
 
 #productreels-admin-app {
 
-	.wr-app--editor {
-		height: calc(100vh - 32px);
-	}
+	/* The editor frame's height is set in styles/_pr-studio.scss (part 07). */
 
 	/*
 	 * Back + breadcrumb | title | actions. The side columns share the leftover
@@ -700,10 +698,6 @@
 	@media (max-width: 860px) {
 		/* One column: the panes stack, so the page scrolls again and only the
 		   picker keeps a scroll box of its own. */
-		.wr-app--editor {
-			height: auto;
-		}
-
 		.wr-editor {
 			grid-template-columns: minmax(0, 1fr);
 		}

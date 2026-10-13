@@ -8,7 +8,12 @@
  * naming what would be lost, rather than through a browser confirm() box.
  */
 
-import { createContext, useContext, useEffect } from '@wordpress/element';
+import {
+	createContext,
+	useCallback,
+	useContext,
+	useEffect,
+} from '@wordpress/element';
 
 export const UnsavedContext = createContext( {
 	setDirty: () => {},
@@ -19,6 +24,7 @@ export const UnsavedContext = createContext( {
  *
  * @param {boolean} dirty Whether there are unsaved changes.
  * @param {string}  label What would be lost, e.g. the widget's name.
+ * @return {Function} Clears the unsaved state straight away.
  */
 export const useUnsavedChanges = ( dirty, label = '' ) => {
 	const { setDirty } = useContext( UnsavedContext );
@@ -29,6 +35,10 @@ export const useUnsavedChanges = ( dirty, label = '' ) => {
 
 	// Leaving the screen takes its draft with it.
 	useEffect( () => () => setDirty( false, '' ), [ setDirty ] );
+
+	// For a screen that navigates straight after saving: clears the shell's
+	// state now, before the hash changes, rather than on the next render.
+	return useCallback( () => setDirty( false, '' ), [ setDirty ] );
 };
 
 /**

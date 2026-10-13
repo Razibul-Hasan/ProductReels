@@ -39,6 +39,7 @@ import {
 import { formatNumber, formatRate } from '../format';
 import { useDebounced } from '../hooks/use-debounced';
 import { ReelEditor } from './ReelEditor';
+import { CreateWidgetDialog } from './CreateWidget';
 
 /** How long a duplicated row stays highlighted. */
 const HIGHLIGHT_MS = 2400;
@@ -475,7 +476,7 @@ const WidgetTable = ( {
 	</div>
 );
 
-export const WidgetsList = ( { navigate } ) => {
+export const WidgetsList = ( { navigate, creating = false } ) => {
 	const toasts = useToasts();
 	const [ search, setSearch ] = useState( '' );
 	const [ items, setItems ] = useState( [] );
@@ -816,6 +817,13 @@ export const WidgetsList = ( { navigate } ) => {
 						setEditingReel( null );
 						loadOverview().catch( () => {} );
 					} }
+				/>
+			) }
+
+			{ creating && (
+				<CreateWidgetDialog
+					navigate={ navigate }
+					onClose={ () => navigate( '#/widgets' ) }
 				/>
 			) }
 

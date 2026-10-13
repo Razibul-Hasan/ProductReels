@@ -31,6 +31,11 @@ export const parseRoute = ( hash ) => {
 			return { name: 'widget-new', id: null, hash: '#/widgets/new' };
 		}
 
+		// An unsaved widget started from the Create widget dialog.
+		if ( parts[ 1 ] === 'draft' ) {
+			return { name: 'widget-draft', id: null, hash: '#/widgets/draft' };
+		}
+
 		if ( parts[ 1 ] && /^\d+$/.test( parts[ 1 ] ) ) {
 			const id = Number( parts[ 1 ] );
 
