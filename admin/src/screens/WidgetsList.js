@@ -32,6 +32,7 @@ import {
 	SearchField,
 	ShortcodeChip,
 	Skeleton,
+	SortHeader,
 	StepGuide,
 	copyText,
 	useToasts,
@@ -243,42 +244,6 @@ const TopReels = ( { reels, onOpen, onSeeAll } ) => (
 		</ol>
 	</section>
 );
-
-const SortHeader = ( { column, label, sort, onSort, numeric = false } ) => {
-	const active = sort.column === column;
-	let ariaSort = 'none';
-
-	if ( active ) {
-		ariaSort = sort.direction === 'asc' ? 'ascending' : 'descending';
-	}
-
-	return (
-		<th
-			scope="col"
-			aria-sort={ ariaSort }
-			className={ numeric ? 'num' : '' }
-		>
-			<button
-				type="button"
-				className="pr-sort pr-t-label"
-				data-active={ active ? 'true' : undefined }
-				onClick={ () => onSort( column ) }
-			>
-				{ label }
-				{ active && (
-					<Icon
-						name={
-							sort.direction === 'asc'
-								? 'chevron-up'
-								: 'chevron-down'
-						}
-						size={ 14 }
-					/>
-				) }
-			</button>
-		</th>
-	);
-};
 
 const WidgetTable = ( {
 	items,

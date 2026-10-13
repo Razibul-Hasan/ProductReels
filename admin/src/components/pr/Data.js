@@ -40,7 +40,11 @@ export const MetricBand = ( { items = [] } ) => (
 );
 
 export const BarCell = ( { value, max, label } ) => {
-	const share = max ? Math.max( 4, Math.round( ( value / max ) * 100 ) ) : 0;
+	// A small value still shows a sliver; zero shows none.
+	const share =
+		max && value > 0
+			? Math.max( 4, Math.round( ( value / max ) * 100 ) )
+			: 0;
 
 	return (
 		<span className="pr-bar">

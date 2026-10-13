@@ -27,6 +27,7 @@ export { ColorField } from './ColorField';
 export { RangeField } from './RangeField';
 export { SettingRow, SettingsCard } from './Settings';
 export { BarCell, EmptyState, MetricBand, ReelStack, Skeleton } from './Data';
+export { SortHeader } from './SortHeader';
 export { ConfirmDialog, Dialog } from './Dialog';
 export { StepGuide } from './StepGuide';
 export {

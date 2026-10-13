@@ -1,54 +1,56 @@
 /**
- * The statistics screen.
+ * Statistics: one widget's numbers, all time.
  *
- * Lifetime totals for one widget: three tiles, then a reel table and a
- * button table, both sortable by any column. No chart — five numbers a
- * store owner can compare at a glance beat a chart that needs a legend.
+ * Three totals, the widget's reels ranked by views and its buttons ranked by
+ * clicks. The numbers are 1.0.0's, from GET /widgets/:id/stats: a reel's
+ * views are its lifetime views (every widget and the single-reel shortcode),
+ * clicks are this widget's own. Both tables still sort on the client by any
+ * column, as in 1.0.0; views and clicks rank first by default.
+ *
+ * The buttons table lists every click counter the widget holds, as 1.0.0
+ * did: custom buttons, and product cards (whose clicks are counted too).
  */
 
 import { useCallback, useEffect, useMemo, useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
-import { posterOf } from '@shared/format';
 import { widgets as widgetsApi } from '../api';
 import {
-	IconChevronDown,
-	IconEdit,
-	IconExternal,
-	IconVideo,
-} from '../components/icons';
-import { Button } from '../components/ui/Button';
-import { EmptyState, Skeleton } from '../components/ui/Feedback';
-import {
-	Button as PrButton,
+	Badge,
+	BarCell,
+	Button,
+	EmptyState,
+	MetricBand,
+	Notice,
+	PLACE_STEP,
 	PageHeader,
+	ReelCover,
 	ShortcodeChip,
+	Skeleton,
+	SortHeader,
+	shortUrl,
 } from '../components/pr';
+import { formatNumber, formatRate } from '../format';
+import { ReelEditor } from './ReelEditor';
+import { openStep } from './editor/step-memory';
 
-const locale = () => document.documentElement.lang || undefined;
-
-const formatNumber = ( value ) =>
-	new Intl.NumberFormat( locale() ).format( Number( value ) || 0 );
-
-const formatPercent = ( value ) =>
-	new Intl.NumberFormat( locale(), {
-		style: 'percent',
-		maximumFractionDigits: 2,
-	} ).format( ( Number( value ) || 0 ) / 100 );
-
-/**
- * Sort a list by a column, numbers numerically and text by locale.
- *
- * @param {Array}  items     The rows.
- * @param {string} column    The key to sort by.
- * @param {string} direction 'asc' or 'desc'.
- * @return {Array} A sorted copy.
- */
-const sortBy = ( items, column, direction ) => {
-	const sign = direction === 'asc' ? 1 : -1;
-	const collator = new Intl.Collator( locale(), {
+const collator = () =>
+	new Intl.Collator( document.documentElement.lang || undefined, {
 		sensitivity: 'base',
 		numeric: true,
 	} );
+
+/**
+ * A sorted copy: numbers numerically, text by the admin's locale.
+ *
+ * @param {Array}  items          The rows.
+ * @param {Object} sort           The sort.
+ * @param {string} sort.column    The key to sort by.
+ * @param {string} sort.direction 'asc' or 'desc'.
+ * @return {Array} The rows in order.
+ */
+const sortRows = ( items, { column, direction } ) => {
+	const sign = direction === 'asc' ? 1 : -1;
+	const compare = collator().compare;
 
 	return [ ...items ].sort( ( a, b ) => {
 		const left = a[ column ];
@@ -58,132 +60,490 @@ const sortBy = ( items, column, direction ) => {
 			return ( left - right ) * sign;
 		}
 
-		return (
-			collator.compare( String( left || '' ), String( right || '' ) ) *
-			sign
-		);
+		return compare( String( left || '' ), String( right || '' ) ) * sign;
 	} );
 };
 
-const useSort = ( initialColumn, initialDirection = 'desc' ) => {
+const TEXT_COLUMNS = [ 'title', 'buttonText', 'campaignName' ];
+
+const useSort = ( initial ) => {
 	const [ sort, setSort ] = useState( {
-		column: initialColumn,
-		direction: initialDirection,
+		column: initial,
+		direction: 'desc',
 	} );
 
 	const toggle = ( column ) =>
-		setSort( ( current ) =>
-			current.column === column
-				? {
-						column,
-						direction: current.direction === 'asc' ? 'desc' : 'asc',
-					}
-				: {
-						column,
-						direction:
-							column === 'title' ||
-							column === 'reelTitle' ||
-							column === 'buttonText'
-								? 'asc'
-								: 'desc',
-					}
-		);
+		setSort( ( current ) => {
+			if ( current.column === column ) {
+				return {
+					column,
+					direction: current.direction === 'asc' ? 'desc' : 'asc',
+				};
+			}
+
+			return {
+				column,
+				direction: TEXT_COLUMNS.includes( column ) ? 'asc' : 'desc',
+			};
+		} );
 
 	return [ sort, toggle ];
 };
 
-const SortHeader = ( { column, label, sort, onSort, numeric = false } ) => {
-	const active = sort.column === column;
-	let ariaSort = 'none';
+const REEL_SORT_TEXT = {
+	title: __( 'Sorted by title', 'productreels' ),
+	view_count: __( 'Sorted by views', 'productreels' ),
+	click_count: __( 'Sorted by clicks', 'productreels' ),
+	ctr: __( 'Sorted by click rate', 'productreels' ),
+};
 
-	if ( active ) {
-		ariaSort = sort.direction === 'asc' ? 'ascending' : 'descending';
-	}
+const shortcodeOf = ( id ) => `[productreels id="${ id }"]`;
+
+const Totals = ( { totals } ) => {
+	const placeholder = <span className="pr-metric__ph" aria-hidden="true" />;
 
 	return (
-		<th
-			scope="col"
-			aria-sort={ ariaSort }
-			className={ numeric ? 'wr-table__num' : '' }
-		>
-			<button
-				type="button"
-				className={ `wr-sort${ active ? ' is-active' : '' }${
-					active && sort.direction === 'asc' ? ' is-asc' : ''
-				}` }
-				onClick={ () => onSort( column ) }
-			>
-				{ label }
-				<IconChevronDown size={ 12 } />
-			</button>
-		</th>
+		<MetricBand
+			items={ [
+				{
+					label: __( 'Views', 'productreels' ),
+					icon: 'eye',
+					value: totals ? formatNumber( totals.views ) : placeholder,
+					hint: __(
+						'Counted after one second of playback',
+						'productreels'
+					),
+				},
+				{
+					label: __( 'Clicks', 'productreels' ),
+					icon: 'click',
+					value: totals ? formatNumber( totals.clicks ) : placeholder,
+					hint: __( 'Buttons and product cards', 'productreels' ),
+				},
+				{
+					label: __( 'Click rate', 'productreels' ),
+					icon: 'percent',
+					value: totals
+						? formatRate( totals.clicks, totals.views )
+						: placeholder,
+					hint: __( 'Clicks per view', 'productreels' ),
+				},
+			] }
+		/>
 	);
 };
 
-const Tile = ( { label, value, hint, loading } ) => (
-	<div className="wr-tile">
-		<span className="wr-tile__label">{ label }</span>
-		{ loading ? (
-			<Skeleton width={ 96 } height={ 30 } />
-		) : (
-			<span className="wr-tile__value">{ value }</span>
-		) }
-		{ hint && <span className="wr-tile__hint">{ hint }</span> }
+const TableHead = ( { id, title, aside } ) => (
+	<div className="pr-tablehead">
+		<h2 id={ id } className="pr-t-title">
+			{ title }
+		</h2>
+		{ aside && <span className="pr-t-small pr-muted">{ aside }</span> }
 	</div>
+);
+
+const ReelsTable = ( { reels, covers, sort, onSort, onOpen } ) => {
+	const top = Math.max( 0, ...reels.map( ( reel ) => reel.view_count ) );
+
+	return (
+		<section
+			className="pr-tablewrap pr-stats__table pr-stats__reels"
+			aria-labelledby="pr-stats-reels"
+		>
+			<TableHead
+				id="pr-stats-reels"
+				title={ __( 'Reels', 'productreels' ) }
+				aside={ REEL_SORT_TEXT[ sort.column ] }
+			/>
+			<table className="pr-table">
+				<thead>
+					<tr className="pr-t-label">
+						<SortHeader
+							column="title"
+							label={ __( 'Reel', 'productreels' ) }
+							sort={ sort }
+							onSort={ onSort }
+						/>
+						<SortHeader
+							column="view_count"
+							label={ __( 'Views', 'productreels' ) }
+							sort={ sort }
+							onSort={ onSort }
+							numeric
+						/>
+						<SortHeader
+							column="click_count"
+							label={ __( 'Clicks', 'productreels' ) }
+							sort={ sort }
+							onSort={ onSort }
+							numeric
+						/>
+						<SortHeader
+							column="ctr"
+							label={ __( 'Click rate', 'productreels' ) }
+							sort={ sort }
+							onSort={ onSort }
+							numeric
+						/>
+					</tr>
+				</thead>
+				<tbody>
+					{ reels.map( ( reel ) => (
+						<tr key={ reel.reel_id }>
+							<td>
+								<div className="pr-wname">
+									<span className="pr-reelrow__thumb">
+										<ReelCover
+											reel={ {
+												thumbnail: reel.thumbnail,
+												file: covers[ reel.reel_id ],
+											} }
+										/>
+									</span>
+									<button
+										type="button"
+										className="pr-stats__open pr-t-body-strong"
+										onClick={ () => onOpen( reel.reel_id ) }
+									>
+										{ reel.title }
+									</button>
+								</div>
+							</td>
+							<td className="num">
+								<BarCell
+									value={ reel.view_count }
+									max={ top }
+								/>
+							</td>
+							<td className="num pr-t-body">
+								{ formatNumber( reel.click_count ) }
+							</td>
+							<td className="num pr-t-body">
+								{ formatRate(
+									reel.click_count,
+									reel.view_count
+								) }
+							</td>
+						</tr>
+					) ) }
+				</tbody>
+			</table>
+		</section>
+	);
+};
+
+/**
+ * Which reel a counter sits on, so two "Shop now" buttons can be told apart.
+ *
+ * @param {Object}  button    A stats button row.
+ * @param {boolean} isProduct Whether it is a product card.
+ * @return {string} The caption.
+ */
+const whereText = ( button, isProduct ) =>
+	isProduct
+		? sprintf(
+				/* translators: %s: reel title. */
+				__( 'Product card in %s', 'productreels' ),
+				button.reelTitle
+			)
+		: sprintf(
+				/* translators: %s: reel title. */
+				__( 'In %s', 'productreels' ),
+				button.reelTitle
+			);
+
+const ButtonsTable = ( { buttons, products, sort, onSort } ) => {
+	const top = Math.max(
+		0,
+		...buttons.map( ( button ) => button.clickCount )
+	);
+	const hasProducts = buttons.some( ( button ) =>
+		products.has( button.btn_uuid )
+	);
+
+	return (
+		<section
+			className="pr-tablewrap pr-stats__table pr-stats__buttons"
+			aria-labelledby="pr-stats-buttons"
+		>
+			<TableHead
+				id="pr-stats-buttons"
+				title={ __( 'Buttons', 'productreels' ) }
+				aside={
+					hasProducts
+						? __(
+								'Buttons and product cards across this widget’s reels',
+								'productreels'
+							)
+						: __(
+								'Custom buttons across this widget’s reels',
+								'productreels'
+							)
+				}
+			/>
+			<table className="pr-table">
+				<thead>
+					<tr className="pr-t-label">
+						<SortHeader
+							column="buttonText"
+							label={ __( 'Button text', 'productreels' ) }
+							sort={ sort }
+							onSort={ onSort }
+						/>
+						<SortHeader
+							column="campaignName"
+							label={ __( 'Campaign', 'productreels' ) }
+							sort={ sort }
+							onSort={ onSort }
+						/>
+						<th scope="col">{ __( 'Link', 'productreels' ) }</th>
+						<SortHeader
+							column="clickCount"
+							label={ __( 'Clicks', 'productreels' ) }
+							sort={ sort }
+							onSort={ onSort }
+							numeric
+						/>
+					</tr>
+				</thead>
+				<tbody>
+					{ buttons.map( ( button ) => (
+						<tr key={ button.btn_uuid }>
+							<td>
+								<span className="pr-stats__button">
+									<span className="pr-t-body-strong">
+										{ button.buttonText }
+									</span>
+									{ button.reelTitle && (
+										<span className="pr-t-caption pr-muted">
+											{ whereText(
+												button,
+												products.has( button.btn_uuid )
+											) }
+										</span>
+									) }
+								</span>
+							</td>
+							<td>
+								{ button.campaignName ? (
+									<Badge tone="brand">
+										{ button.campaignName }
+									</Badge>
+								) : (
+									<span className="pr-t-body pr-muted">
+										{ __( 'No campaign', 'productreels' ) }
+									</span>
+								) }
+							</td>
+							<td className="pr-t-body">
+								{ button.buttonUrl ? (
+									<a
+										className="pr-stats__link"
+										href={ button.buttonUrl }
+										title={ button.buttonUrl }
+										target="_blank"
+										rel="noopener noreferrer"
+									>
+										{ shortUrl( button.buttonUrl ) }
+										<span className="pr-sr">
+											{ __(
+												'(opens in a new tab)',
+												'productreels'
+											) }
+										</span>
+									</a>
+								) : (
+									<span className="pr-muted">—</span>
+								) }
+							</td>
+							<td className="num">
+								<BarCell
+									value={ button.clickCount }
+									max={ top }
+								/>
+							</td>
+						</tr>
+					) ) }
+				</tbody>
+			</table>
+		</section>
+	);
+};
+
+const Loading = () => (
+	<section className="pr-tablewrap pr-stats__table pr-stats__reels">
+		<TableHead title={ __( 'Reels', 'productreels' ) } />
+		<Skeleton
+			count={ 4 }
+			label={ __( 'Loading statistics…', 'productreels' ) }
+		/>
+	</section>
 );
 
 export const Statistics = ( { widgetId, navigate } ) => {
 	const [ widget, setWidget ] = useState( null );
 	const [ stats, setStats ] = useState( null );
-	const [ error, setError ] = useState( '' );
+	const [ error, setError ] = useState( null );
+	const [ editingReel, setEditingReel ] = useState( null );
 	const [ reelSort, toggleReelSort ] = useSort( 'view_count' );
 	const [ buttonSort, toggleButtonSort ] = useSort( 'clickCount' );
 
-	const load = useCallback( async () => {
-		setError( '' );
+	const load = useCallback(
+		async ( { quiet = false } = {} ) => {
+			if ( ! quiet ) {
+				setError( null );
+				setStats( null );
+			}
 
-		try {
-			const [ full, report ] = await Promise.all( [
-				widgetsApi.get( widgetId ),
-				widgetsApi.stats( widgetId ),
-			] );
+			try {
+				const [ full, report ] = await Promise.all( [
+					widgetsApi.get( widgetId ),
+					widgetsApi.stats( widgetId ),
+				] );
 
-			setWidget( full );
-			setStats( report );
-		} catch ( requestError ) {
-			setError( requestError.message );
-		}
-	}, [ widgetId ] );
+				setWidget( full );
+				setStats( report );
+			} catch ( requestError ) {
+				if ( ! quiet ) {
+					setError( requestError );
+				}
+			}
+		},
+		[ widgetId ]
+	);
 
 	useEffect( () => {
 		load();
 	}, [ load ] );
 
+	// Covers and link types come from the widget's own reels: the stats rows
+	// carry only the stored thumbnail, and click rows don't store a type.
+	const { covers, products } = useMemo( () => {
+		const files = {};
+		const productIds = new Set();
+
+		( widget?.reels || [] ).forEach( ( reel ) => {
+			files[ reel.id ] = reel.files?.[ 0 ] || null;
+			( reel.links || [] ).forEach( ( link ) => {
+				if ( link.btn_type === 'product' ) {
+					productIds.add( link.btn_uuid );
+				}
+			} );
+		} );
+
+		return { covers: files, products: productIds };
+	}, [ widget ] );
+
 	const reels = useMemo(
-		() =>
-			stats
-				? sortBy( stats.reels, reelSort.column, reelSort.direction )
-				: [],
+		() => ( stats ? sortRows( stats.reels, reelSort ) : [] ),
 		[ stats, reelSort ]
 	);
 	const buttons = useMemo(
-		() =>
-			stats
-				? sortBy(
-						stats.buttons,
-						buttonSort.column,
-						buttonSort.direction
-					)
-				: [],
+		() => ( stats ? sortRows( stats.buttons, buttonSort ) : [] ),
 		[ stats, buttonSort ]
 	);
 
-	const loading = ! stats && error === '';
-	const empty =
-		stats && stats.totals.views === 0 && stats.totals.clicks === 0;
+	const notFound = error?.status === 404;
+	const editWidget = () => navigate( `#/widgets/${ widgetId }` );
+
+	let body;
+
+	if ( error ) {
+		body = (
+			<Notice
+				tone="danger"
+				title={
+					notFound
+						? __( 'This widget no longer exists.', 'productreels' )
+						: __( 'Couldn’t load the statistics.', 'productreels' )
+				}
+				actions={
+					notFound ? (
+						<Button
+							size="sm"
+							onClick={ () => navigate( '#/widgets' ) }
+						>
+							{ __( 'Back to widgets', 'productreels' ) }
+						</Button>
+					) : (
+						<Button size="sm" onClick={ () => load() }>
+							{ __( 'Try again', 'productreels' ) }
+						</Button>
+					)
+				}
+			>
+				{ notFound ? null : error.message }
+			</Notice>
+		);
+	} else if ( ! stats ) {
+		body = (
+			<>
+				<Totals totals={ null } />
+				<Loading />
+			</>
+		);
+	} else if ( stats.totals.views === 0 && stats.totals.clicks === 0 ) {
+		body = (
+			<EmptyState
+				panel
+				icon="chart"
+				title={ __( 'No stats yet', 'productreels' ) }
+				description={ __(
+					'Place the widget on a page. Numbers appear once visitors watch and tap.',
+					'productreels'
+				) }
+				actions={
+					<>
+						<Button
+							variant="primary"
+							icon={ PLACE_STEP.icon }
+							onClick={ () =>
+								openStep( widgetId, PLACE_STEP.id )
+							}
+						>
+							{ PLACE_STEP.label }
+						</Button>
+						<Button icon="pencil" onClick={ editWidget }>
+							{ __( 'Edit widget', 'productreels' ) }
+						</Button>
+					</>
+				}
+			/>
+		);
+	} else {
+		body = (
+			<>
+				<Totals totals={ stats.totals } />
+				{ reels.length > 0 && (
+					<ReelsTable
+						reels={ reels }
+						covers={ covers }
+						sort={ reelSort }
+						onSort={ toggleReelSort }
+						onOpen={ setEditingReel }
+					/>
+				) }
+				{ buttons.length > 0 ? (
+					<ButtonsTable
+						buttons={ buttons }
+						products={ products }
+						sort={ buttonSort }
+						onSort={ toggleButtonSort }
+					/>
+				) : (
+					<p className="pr-stats__none pr-t-body pr-muted">
+						{ __(
+							'No button or product card has been clicked yet.',
+							'productreels'
+						) }
+					</p>
+				) }
+			</>
+		);
+	}
 
 	return (
-		<>
+		<div className="pr-stats">
 			<PageHeader
 				title={ __( 'Statistics', 'productreels' ) }
 				back={ __( 'Back to widgets', 'productreels' ) }
@@ -196,427 +556,33 @@ export const Statistics = ( { widgetId, navigate } ) => {
 								widget.name ||
 									__( 'Untitled widget', 'productreels' )
 							)
-						: null
+						: // Hold the line while loading, so the page doesn't jump.
+							! error && '\u00a0'
 				}
 				actions={
-					<>
-						<ShortcodeChip
-							code={ `[productreels id="${ widgetId }"]` }
-						/>
-						<PrButton
-							icon="pencil"
-							onClick={ () =>
-								navigate( `#/widgets/${ widgetId }` )
-							}
-						>
-							{ __( 'Edit widget', 'productreels' ) }
-						</PrButton>
-					</>
+					notFound ? null : (
+						<>
+							<ShortcodeChip code={ shortcodeOf( widgetId ) } />
+							<Button icon="pencil" onClick={ editWidget }>
+								{ __( 'Edit widget', 'productreels' ) }
+							</Button>
+						</>
+					)
 				}
 			/>
 
-			<div className="wr-app__body">
-				{ error !== '' && (
-					<div className="wr-card wr-error-card">
-						<p>{ error }</p>
-						<Button onClick={ load }>
-							{ __(
-								'Continue',
-								'productreels'
-							) }
-						</Button>
-					</div>
-				) }
+			{ body }
 
-				{ error === '' && (
-					<div className="wr-tiles">
-						<Tile
-							label={ __(
-								'Total Views',
-								'productreels'
-							) }
-							value={
-								stats ? formatNumber( stats.totals.views ) : ''
-							}
-							loading={ loading }
-							hint={ __(
-								'Counted after a second of playback.',
-								'productreels'
-							) }
-						/>
-						<Tile
-							label={ __(
-								'Total Clicks',
-								'productreels'
-							) }
-							value={
-								stats ? formatNumber( stats.totals.clicks ) : ''
-							}
-							loading={ loading }
-							hint={ __(
-								'Buttons and product cards.',
-								'productreels'
-							) }
-						/>
-						<Tile
-							label={ __(
-								'CTR',
-								'productreels'
-							) }
-							value={
-								stats ? formatPercent( stats.totals.ctr ) : ''
-							}
-							loading={ loading }
-							hint={ __(
-								'Clicks per view.',
-								'productreels'
-							) }
-						/>
-					</div>
-				) }
-
-				{ error === '' && empty && (
-					<div className="wr-card">
-						<EmptyState
-							title={ __(
-								'No stats available for this widget yet.',
-								'productreels'
-							) }
-							text={ __(
-								'Place the widget on a page and numbers will start to appear once visitors watch and tap.',
-								'productreels'
-							) }
-							action={
-								<Button
-									variant="primary"
-									icon={ IconEdit }
-									onClick={ () =>
-										navigate( `#/widgets/${ widgetId }` )
-									}
-								>
-									{ __(
-										'Edit',
-										'productreels'
-									) }
-								</Button>
-							}
-						/>
-					</div>
-				) }
-
-				{ error === '' && ! empty && (
-					<>
-						<section className="wr-card wr-table-card">
-							<header className="wr-card__head">
-								<h2 className="wr-section-label">
-									{ __(
-										'Reel performance',
-										'productreels'
-									) }
-								</h2>
-							</header>
-							<table className="wr-table wr-table--stats">
-								<thead>
-									<tr>
-										<th scope="col">
-											<span className="wr-screen-reader-text">
-												{ __(
-													'Thumbnail',
-													'productreels'
-												) }
-											</span>
-										</th>
-										<SortHeader
-											column="title"
-											label={ __(
-												'Reel Title',
-												'productreels'
-											) }
-											sort={ reelSort }
-											onSort={ toggleReelSort }
-										/>
-										<SortHeader
-											column="view_count"
-											label={ __(
-												'Views',
-												'productreels'
-											) }
-											sort={ reelSort }
-											onSort={ toggleReelSort }
-											numeric
-										/>
-										<SortHeader
-											column="click_count"
-											label={ __(
-												'Clicks',
-												'productreels'
-											) }
-											sort={ reelSort }
-											onSort={ toggleReelSort }
-											numeric
-										/>
-										<SortHeader
-											column="ctr"
-											label={ __(
-												'CTR',
-												'productreels'
-											) }
-											sort={ reelSort }
-											onSort={ toggleReelSort }
-											numeric
-										/>
-									</tr>
-								</thead>
-								<tbody>
-									{ loading
-										? [ 0, 1, 2 ].map( ( row ) => (
-												<tr
-													key={ row }
-													className="wr-table__row"
-												>
-													<td>
-														<Skeleton
-															width={ 28 }
-															height={ 44 }
-															radius="6px"
-														/>
-													</td>
-													<td>
-														<Skeleton
-															width="60%"
-															height={ 14 }
-														/>
-													</td>
-													<td>
-														<Skeleton
-															width={ 40 }
-															height={ 14 }
-														/>
-													</td>
-													<td>
-														<Skeleton
-															width={ 40 }
-															height={ 14 }
-														/>
-													</td>
-													<td>
-														<Skeleton
-															width={ 48 }
-															height={ 14 }
-														/>
-													</td>
-												</tr>
-											) )
-										: reels.map( ( reel ) => {
-												const poster = posterOf( reel );
-
-												return (
-													<tr
-														key={ reel.reel_id }
-														className="wr-table__row"
-													>
-														<td className="wr-table__thumb-cell">
-															<span className="wr-table__thumb">
-																{ poster ? (
-																	<img
-																		src={
-																			poster
-																		}
-																		alt=""
-																		loading="lazy"
-																	/>
-																) : (
-																	<IconVideo
-																		size={
-																			14
-																		}
-																	/>
-																) }
-															</span>
-														</td>
-														<td>{ reel.title }</td>
-														<td className="wr-table__num">
-															{ formatNumber(
-																reel.view_count
-															) }
-														</td>
-														<td className="wr-table__num">
-															{ formatNumber(
-																reel.click_count
-															) }
-														</td>
-														<td className="wr-table__num">
-															{ formatPercent(
-																reel.ctr
-															) }
-														</td>
-													</tr>
-												);
-											} ) }
-								</tbody>
-							</table>
-						</section>
-
-						<section className="wr-card wr-table-card">
-							<header className="wr-card__head">
-								<h2 className="wr-section-label">
-									{ __(
-										'Button performance',
-										'productreels'
-									) }
-								</h2>
-							</header>
-							{ ! loading && buttons.length === 0 ? (
-								<p className="wr-card__empty">
-									{ __(
-										'No button has been clicked yet.',
-										'productreels'
-									) }
-								</p>
-							) : (
-								<table className="wr-table wr-table--stats">
-									<thead>
-										<tr>
-											<SortHeader
-												column="reelTitle"
-												label={ __(
-													'Reel Title',
-													'productreels'
-												) }
-												sort={ buttonSort }
-												onSort={ toggleButtonSort }
-											/>
-											<SortHeader
-												column="buttonText"
-												label={ __(
-													'Button Text',
-													'productreels'
-												) }
-												sort={ buttonSort }
-												onSort={ toggleButtonSort }
-											/>
-											<SortHeader
-												column="campaignName"
-												label={ __(
-													'Campaign Name',
-													'productreels'
-												) }
-												sort={ buttonSort }
-												onSort={ toggleButtonSort }
-											/>
-											<th scope="col">
-												{ __(
-													'Url',
-													'productreels'
-												) }
-											</th>
-											<SortHeader
-												column="clickCount"
-												label={ __(
-													'Clicks',
-													'productreels'
-												) }
-												sort={ buttonSort }
-												onSort={ toggleButtonSort }
-												numeric
-											/>
-										</tr>
-									</thead>
-									<tbody>
-										{ loading
-											? [ 0, 1 ].map( ( row ) => (
-													<tr
-														key={ row }
-														className="wr-table__row"
-													>
-														<td>
-															<Skeleton
-																width="60%"
-																height={ 14 }
-															/>
-														</td>
-														<td>
-															<Skeleton
-																width="50%"
-																height={ 14 }
-															/>
-														</td>
-														<td>
-															<Skeleton
-																width="50%"
-																height={ 14 }
-															/>
-														</td>
-														<td>
-															<Skeleton
-																width="70%"
-																height={ 14 }
-															/>
-														</td>
-														<td>
-															<Skeleton
-																width={ 40 }
-																height={ 14 }
-															/>
-														</td>
-													</tr>
-												) )
-											: buttons.map( ( button ) => (
-													<tr
-														key={ button.btn_uuid }
-														className="wr-table__row"
-													>
-														<td>
-															{ button.reelTitle }
-														</td>
-														<td>
-															{
-																button.buttonText
-															}
-														</td>
-														<td className="wr-table__muted">
-															{ button.campaignName ||
-																'—' }
-														</td>
-														<td className="wr-table__url">
-															{ button.buttonUrl ? (
-																<a
-																	href={
-																		button.buttonUrl
-																	}
-																	target="_blank"
-																	rel="noopener noreferrer"
-																>
-																	<span>
-																		{ button.buttonUrl.replace(
-																			/^https?:\/\//,
-																			''
-																		) }
-																	</span>
-																	<IconExternal
-																		size={
-																			12
-																		}
-																	/>
-																</a>
-															) : (
-																'—'
-															) }
-														</td>
-														<td className="wr-table__num">
-															{ formatNumber(
-																button.clickCount
-															) }
-														</td>
-													</tr>
-												) ) }
-									</tbody>
-								</table>
-							) }
-						</section>
-					</>
-				) }
-			</div>
-		</>
+			{ editingReel !== null && (
+				<ReelEditor
+					reelId={ editingReel }
+					onClose={ () => setEditingReel( null ) }
+					onSaved={ () => {
+						setEditingReel( null );
+						load( { quiet: true } );
+					} }
+				/>
+			) }
+		</div>
 	);
 };

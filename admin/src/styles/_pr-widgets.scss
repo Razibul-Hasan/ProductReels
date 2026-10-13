@@ -120,17 +120,17 @@
 	overflow-x: auto;
 }
 
-.pr-widgettable .pr-sort {
+.pr-table .pr-sort {
 	color: var(--pr-ink-muted);
 	border-radius: var(--pr-radius-xs);
 }
 
-.pr-widgettable .pr-sort[data-active="true"],
-.pr-widgettable .pr-sort:hover {
+.pr-table .pr-sort[data-active="true"],
+.pr-table .pr-sort:hover {
 	color: var(--pr-ink);
 }
 
-.pr-widgettable .pr-sort:focus-visible {
+.pr-table .pr-sort:focus-visible {
 	outline: none;
 	box-shadow: var(--pr-focus-ring);
 }

@@ -1,0 +1,84 @@
+/**
+ * Statistics: the page rhythm, the reel title that opens the reel editor,
+ * the buttons table's caption and link, and the loading table.
+ *
+ * Loaded inside #productreels-admin-app by _pr-scoped.scss. Tokens only.
+ */
+
+.pr-stats {
+	display: flex;
+	flex-direction: column;
+	gap: var(--pr-space-6);
+}
+
+.pr-stats__table {
+	overflow-x: auto;
+}
+
+.pr-stats__table .pr-table td {
+	white-space: nowrap;
+}
+
+.pr-stats__reels .pr-table td:first-child {
+	width: 100%;
+	white-space: normal;
+}
+
+/* Clicks and click rate get the room the design gives them. */
+.pr-stats__reels .pr-table th:nth-child(3) {
+	min-width: 100px;
+}
+
+.pr-stats__reels .pr-table th:nth-child(4) {
+	min-width: 132px;
+}
+
+/* The reel title: a button that reads as the row's name. */
+.pr-stats__open {
+	border: 0;
+	padding: 0;
+	background: none;
+	color: var(--pr-ink);
+	text-align: start;
+	cursor: pointer;
+	border-radius: var(--pr-radius-xs);
+}
+
+.pr-stats__open:hover {
+	color: var(--pr-brand);
+}
+
+.pr-stats__open:focus-visible,
+.pr-stats__link:focus-visible {
+	outline: none;
+	box-shadow: var(--pr-focus-ring);
+}
+
+.pr-stats__button {
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+}
+
+.pr-stats__link {
+	color: var(--pr-ink-muted);
+	text-decoration: none;
+	border-radius: var(--pr-radius-xs);
+}
+
+.pr-stats__link:hover {
+	color: var(--pr-brand);
+	text-decoration: underline;
+	text-underline-offset: 2px;
+}
+
+.pr-stats__none {
+	margin: 0;
+	padding-inline: var(--pr-space-5);
+}
+
+/* Loading rows sit inside the panel, so they drop their own edge. */
+.pr-stats__table .pr-skeleton--rows {
+	border: 0;
+	border-radius: 0;
+}

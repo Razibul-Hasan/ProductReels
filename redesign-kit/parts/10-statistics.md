@@ -24,9 +24,9 @@ Rebuild a widget's Statistics page: totals, reels ranked, buttons ranked.
 
 ## Done when
 
-- [ ] Matches `ScreenStatistics.png` at 1440px.
-- [ ] Numbers match 1.0.0 for the same widget.
-- [ ] Empty, loading and error states render.
+- [x] Matches `ScreenStatistics.png` at 1440px. (Two deliberate differences: the sorted column shows its chevron, and each button row names its reel; see PROGRESS.md.)
+- [x] Numbers match 1.0.0 for the same widget. (Same unchanged `GET /widgets/:id/stats`; views and clicks print as before, click rate to one decimal. The local site has no widgets, so this was checked on mocked rows, not real ones.)
+- [x] Empty, loading and error states render.
 
 ## Hand-off
 

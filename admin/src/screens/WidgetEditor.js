@@ -52,6 +52,12 @@ import { LookStep } from './editor/LookStep';
 import { PlaceStep } from './editor/PlaceStep';
 import { PlayerStep } from './editor/PlayerStep';
 import { ReelsStep } from './editor/ReelsStep';
+import {
+	OPEN_STEP,
+	openStep,
+	readSteps,
+	rememberStep,
+} from './editor/step-memory';
 
 const PANEL_ID = 'pr-studio-panel';
 
@@ -102,49 +108,6 @@ const STEP_TEXT = {
 const STEP_IDS = STUDIO_STEPS.map( ( step ) => step.id ).concat(
 	PLACE_STEP.id
 );
-
-/* The last step open in each widget, for this browser tab. */
-
-const STEPS_KEY = 'productreels_editor_steps';
-
-const readSteps = () => {
-	try {
-		return JSON.parse( window.sessionStorage.getItem( STEPS_KEY ) ) || {};
-	} catch ( error ) {
-		return {};
-	}
-};
-
-const rememberStep = ( key, step ) => {
-	try {
-		window.sessionStorage.setItem(
-			STEPS_KEY,
-			JSON.stringify( { ...readSteps(), [ key ]: step } )
-		);
-	} catch ( error ) {
-		// Storage blocked: the step just isn't remembered.
-	}
-};
-
-const OPEN_STEP = 'productreels:open-step';
-
-/**
- * Open a step of a saved widget's editor: the "Place it" action on the
- * first-save toast. Goes to the editor if the toast outlived it.
- *
- * @param {number} id   The widget.
- * @param {string} step The step to open.
- */
-const openStep = ( id, step ) => {
-	rememberStep( String( id ), step );
-	document.dispatchEvent(
-		new window.CustomEvent( OPEN_STEP, { detail: { id, step } } )
-	);
-
-	if ( window.location.hash !== `#/widgets/${ id }` ) {
-		window.location.hash = `#/widgets/${ id }`;
-	}
-};
 
 /**
  * Write a dotted path into a nested object without mutating the original.
