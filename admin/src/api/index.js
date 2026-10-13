@@ -32,6 +32,7 @@ export const reels = {
 
 export const products = {
 	search: ( params ) => getList( '/products', params ),
+	batch: ( ids ) => get( '/products/batch', { ids } ),
 };
 
 export const settings = {

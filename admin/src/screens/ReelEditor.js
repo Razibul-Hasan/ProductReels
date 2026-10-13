@@ -1,611 +1,170 @@
 /**
- * The reel editor: media on the left, everything about the reel on the right.
+ * The reel sheet: add or edit one reel.
  *
- * All four sources produce the same file shape, so the rest of the editor — and
- * the whole player — never has to care where a video came from.
+ * A wide dialog. On the left the reel in the storefront player, compact and
+ * live: every change to the form shows there at once. On the right, top to
+ * bottom: Video (where the clips come from, their order), Title, Cover (a
+ * frame from the video or any image) and Shop this reel (tagged products and
+ * buttons, each picked in a dialog over the sheet).
+ *
+ * The saved payload is 1.0.0's: { title, thumbnail, links, files }, with the
+ * same file and link shapes, through the same REST calls. A reel still needs
+ * a video and a product or button; Save stays enabled and the footer says
+ * what's missing, and Save moves focus to the first gap. A picked frame is
+ * captured and uploaded to the media library only when the reel is saved.
+ *
+ * Opened from Reels (Add reel, a card), Widgets (Add reel, top reels, the
+ * first-run guide) and the widget editor. Props: `reelId` (0 or missing for
+ * a new reel), `onClose`, `onSaved( reel )`.
  */
 
-import apiFetch from '@wordpress/api-fetch';
-import { useEffect, useRef, useState } from '@wordpress/element';
-import { __, _n, _x, sprintf } from '@wordpress/i18n';
-import { boot, reels as reelsApi } from '../api';
+import { useEffect, useMemo, useRef, useState } from '@wordpress/element';
+import { __, _n, sprintf } from '@wordpress/i18n';
+import { formatClock } from '@shared/format';
+import { CompactPlayer } from '@shared/player/CompactPlayer';
+import { Icon } from '@shared/Icon';
+import { boot, products as productsApi, reels as reelsApi } from '../api';
 import {
-	IconCamera,
-	IconChevronDown,
-	IconChevronRight,
-	IconClose,
-	IconEdit,
-	IconGrip,
-	IconImage,
-	IconLink,
-	IconPlus,
-	IconSpinner,
-	IconTag,
-	IconTrash,
-	IconUpload,
-	IconVideo,
-} from '../components/icons';
-import { Button, IconButton } from '../components/ui/Button';
-import { Notice } from '../components/ui/Feedback';
-import { TextField } from '../components/ui/Fields';
-import { Modal } from '../components/ui/Modal';
-import { useToasts } from '../components/ui/Toasts';
-import { useDismiss } from '../hooks/use-dismiss';
-import { LinkDialog, uuid } from './LinkDialog';
-import { PosterCapture } from './PosterCapture';
+	Button,
+	ConfirmDialog,
+	Dialog,
+	Filmstrip,
+	LinkForm,
+	Notice,
+	ProductPicker,
+	ShopLinks,
+	Skeleton,
+	SourcePicker,
+	TextField,
+	VideoList,
+	linkDraft,
+	useToasts,
+	validateLink,
+} from '../components/pr';
+import { formatNumber } from '../format';
+import {
+	VIDEO_TYPES,
+	fileLabel,
+	formatSize,
+	frameGrabber,
+	isAllowedVideo,
+	libraryFile,
+	openImageFrame,
+	openVideoFrame,
+	saveFrame,
+	uploadMedia,
+} from '../media';
+import { editorServices } from '../preview-services';
+import { uuid } from '../uuid';
 
-const SAFARI_SAFE = [ 'video/mp4', 'video/webm' ];
+const TITLE_ID = 'pr-reel-title';
 
-const SOURCE_LABELS = {
-	native: __(
-		'Media Library',
-		'productreels'
-	),
-	hosted: __(
-		'Video URL',
-		'productreels'
-	),
-	vimeo: 'Vimeo',
-	youtube: 'YouTube',
+const SOURCE_META = {
+	native: { icon: 'success', label: __( 'Uploaded', 'productreels' ) },
+	youtube: { icon: 'youtube', label: __( 'YouTube Shorts', 'productreels' ) },
+	vimeo: { icon: 'video', label: __( 'Vimeo', 'productreels' ) },
+	hosted: { icon: 'link', label: __( 'Video link', 'productreels' ) },
 };
 
-/**
- * Something readable to call a file: its name for a real file, the provider
- * and id for an embed.
- *
- * @param {Object} file The file.
- * @return {string} The label.
- */
-const fileLabel = ( file ) => {
-	if ( file.source === 'youtube' || file.source === 'vimeo' ) {
-		return `${ SOURCE_LABELS[ file.source ] } · ${ file.provider_id }`;
-	}
+const isEmbed = ( file ) =>
+	file.source === 'youtube' || file.source === 'vimeo';
 
-	try {
-		const path = new URL( file.url ).pathname;
-
-		return decodeURIComponent( path.split( '/' ).pop() || file.url );
-	} catch ( error ) {
-		return file.url;
-	}
-};
-
-/** The reel-shaped illustration the empty dropzone carries. */
-const DropArt = () => (
-	<svg
-		className="wr-dropzone__art"
-		width="96"
-		height="84"
-		viewBox="0 0 96 84"
-		fill="none"
-		aria-hidden="true"
-		focusable="false"
-	>
-		<rect
-			x="6"
-			y="16"
-			width="30"
-			height="52"
-			rx="6"
-			fill="currentColor"
-			opacity=".12"
-		/>
-		<rect
-			x="60"
-			y="16"
-			width="30"
-			height="52"
-			rx="6"
-			fill="currentColor"
-			opacity=".12"
-		/>
-		<rect
-			x="31"
-			y="6"
-			width="34"
-			height="62"
-			rx="7"
-			fill="var(--wr-bg)"
-			stroke="currentColor"
-			strokeWidth="1.6"
-		/>
-		<path
-			d="M48 24v20M40 32l8-8 8 8"
-			stroke="currentColor"
-			strokeWidth="2"
-			strokeLinecap="round"
-			strokeLinejoin="round"
-		/>
-		<path
-			d="M36 76h24"
-			stroke="currentColor"
-			strokeWidth="1.6"
-			strokeLinecap="round"
-			opacity=".5"
-		/>
-	</svg>
-);
+const snapshot = ( title, thumbnail, files, links ) =>
+	JSON.stringify( { title, thumbnail, files, links } );
 
 /**
- * A small source tile inside the empty dropzone.
- *
- * @param {Object}   props         Props.
- * @param {Function} props.icon    Icon component.
- * @param {string}   props.label   Source name.
- * @param {string}   props.hint    One line on what it accepts.
- * @param {Function} props.onClick Click handler.
- * @return {Object} The tile.
- */
-const SourceTile = ( { icon: Icon, label, hint, onClick } ) => (
-	<button type="button" className="wr-source-tile" onClick={ onClick }>
-		<span className="wr-source-tile__icon">
-			<Icon size={ 16 } />
-		</span>
-		<span className="wr-source-tile__text">
-			<span className="wr-source-tile__label">{ label }</span>
-			<span className="wr-source-tile__hint">{ hint }</span>
-		</span>
-	</button>
-);
-
-/**
- * The provider or origin of a file, as a pill.
+ * The clip's cover in the list: its poster, else its first frame.
  *
  * @param {Object} props        Props.
- * @param {string} props.source The file's source key.
- * @return {Object} The badge.
+ * @param {string} props.src    The video URL, for a first frame.
+ * @param {string} props.poster The poster URL, if there is one.
  */
-const SourceBadge = ( { source } ) => (
-	<span className={ `wr-badge wr-badge--${ source }` }>
-		{ SOURCE_LABELS[ source ] || source }
-	</span>
-);
+const VideoThumb = ( { src, poster } ) => {
+	if ( poster ) {
+		return <img src={ poster } alt="" loading="lazy" />;
+	}
 
-const SOURCES = [
-	{
-		value: 'library',
-		label: __(
-			'Choose from Media',
-			'productreels'
-		),
-		icon: IconImage,
-	},
-	{ value: 'vimeo', label: 'Vimeo', icon: IconVideo },
-	{ value: 'youtube', label: 'YouTube Shorts', icon: IconVideo },
-	{
-		value: 'hosted',
-		label: __(
-			'Url',
-			'productreels'
-		),
-		icon: IconLink,
-	},
-];
+	if ( src ) {
+		return (
+			<video
+				src={ `${ src }#t=0.1` }
+				preload="metadata"
+				muted
+				playsInline
+				tabIndex={ -1 }
+				aria-hidden="true"
+			/>
+		);
+	}
 
-const URL_SOURCE_COPY = {
-	vimeo: {
-		placeholder: 'https://vimeo.com/123456789',
-		invalid: __(
-			'Enter a valid Vimeo video URL.',
-			'productreels'
-		),
-		help: __(
-			'Paste one URL per line to add several at once.',
-			'productreels'
-		),
-	},
-	youtube: {
-		placeholder: 'https://www.youtube.com/shorts/…',
-		invalid: __(
-			'Enter a valid YouTube Shorts URL.',
-			'productreels'
-		),
-		help: __(
-			'Paste one URL per line to add several at once.',
-			'productreels'
-		),
-	},
-	hosted: {
-		placeholder: 'https://cdn.example.com/reel.mp4',
-		invalid: __(
-			'Enter a valid video URL.',
-			'productreels'
-		),
-		help: __(
-			'For smooth playback across all browsers, use MP4 video URLs.',
-			'productreels'
-		),
-	},
+	return null;
 };
 
 /**
- * The poster WordPress knows for a video attachment, if it has a real one.
+ * Why some files were not added.
  *
- * A video with a featured image reports it as `image`; one without reports
- * the generic file-type icon there instead, which is no poster at all.
- *
- * @param {Object} item The attachment, as the media frame serialises it.
- * @return {string} The poster URL, or an empty string.
+ * @param {string[]} names The refused file names.
+ * @return {string} The message, or an empty string.
  */
-const attachmentPoster = ( item ) => {
-	const src = item.image?.src || '';
-
-	if (
-		! src ||
-		src === item.icon ||
-		src.includes( '/wp-includes/images/' )
-	) {
+const refusedMessage = ( names ) => {
+	if ( names.length === 0 ) {
 		return '';
 	}
 
-	return src;
-};
-
-/**
- * Open the WordPress media frame, restricted to video.
- *
- * @param {Function} onPicked Receives the selected attachments.
- */
-const openMediaFrame = ( onPicked ) => {
-	const frame = window.wp.media( {
-		title: __(
-			'Add Videos',
-			'productreels'
-		),
-		library: { type: 'video' },
-		button: {
-			text: __(
-				'Add Videos',
+	if ( names.length === 1 ) {
+		return sprintf(
+			/* translators: %s: file name. */
+			__(
+				'“%s” is not an MP4 or WebM video. Convert it, or choose another file.',
 				'productreels'
 			),
-		},
-		multiple: true,
-	} );
-
-	frame.on( 'select', () => {
-		onPicked(
-			frame
-				.state()
-				.get( 'selection' )
-				.map( ( item ) => item.toJSON() )
-				.map( ( item ) => ( {
-					file_uuid: uuid(),
-					wp_media_id: item.id,
-					url: item.url,
-					mime_type: item.mime || 'video/mp4',
-					source: 'native',
-					provider_id: '',
-					poster_url: attachmentPoster( item ),
-					duration: 0,
-				} ) )
+			names[ 0 ]
 		);
-	} );
+	}
 
-	frame.open();
-};
-
-/**
- * Open the media frame for a still image, used to pick a poster.
- *
- * @param {Function} onPicked Receives the selected attachment.
- */
-const openPosterFrame = ( onPicked ) => {
-	const frame = window.wp.media( {
-		title: __(
-			'Choose from Media',
+	return sprintf(
+		/* translators: %s: number of files. */
+		_n(
+			'%s file is not an MP4 or WebM video and was not added.',
+			'%s files are not MP4 or WebM videos and were not added.',
+			names.length,
 			'productreels'
 		),
-		library: { type: 'image' },
-		button: {
-			text: __(
-				'Choose from Media',
-				'productreels'
-			),
-		},
-		multiple: false,
-	} );
-
-	frame.on( 'select', () => {
-		const item = frame.state().get( 'selection' ).first().toJSON();
-
-		onPicked( item.url );
-	} );
-
-	frame.open();
-};
-
-const SourcePicker = ( { onPick } ) => {
-	const [ open, setOpen ] = useState( false );
-	const ref = useRef( null );
-
-	useDismiss( ref, open, () => setOpen( false ) );
-
-	return (
-		<div className="wr-source" ref={ ref }>
-			<Button
-				variant="secondary"
-				icon={ IconPlus }
-				aria-haspopup="menu"
-				aria-expanded={ open ? 'true' : 'false' }
-				onClick={ () => setOpen( ! open ) }
-			>
-				{ __(
-					'Add Videos',
-					'productreels'
-				) }
-				<IconChevronDown size={ 13 } />
-			</Button>
-			{ open && (
-				<div className="wr-source__menu" role="menu">
-					{ SOURCES.map( ( source ) => {
-						const Icon = source.icon;
-
-						return (
-							<button
-								key={ source.value }
-								type="button"
-								role="menuitem"
-								className="wr-select__option"
-								onClick={ () => {
-									setOpen( false );
-									onPick( source.value );
-								} }
-							>
-								<span className="wr-source__item">
-									<Icon size={ 15 } />
-									{ source.label }
-								</span>
-							</button>
-						);
-					} ) }
-				</div>
-			) }
-		</div>
+		formatNumber( names.length )
 	);
 };
-
-const UrlSourcePanel = ( { source, onAdd, onClose } ) => {
-	const copy = URL_SOURCE_COPY[ source ];
-	const [ text, setText ] = useState( '' );
-	const [ rows, setRows ] = useState( [] );
-	const [ checking, setChecking ] = useState( false );
-
-	const verify = async () => {
-		const urls = text
-			.split( /\n+/ )
-			.map( ( line ) => line.trim() )
-			.filter( Boolean );
-
-		if ( urls.length === 0 ) {
-			return;
-		}
-
-		setChecking( true );
-
-		const results = await Promise.all(
-			urls.map( async ( url ) => {
-				try {
-					const result = await reelsApi.validateUrl( url, source );
-
-					// A Vimeo box must not quietly accept a YouTube link.
-					if ( source !== 'hosted' && result.source !== source ) {
-						return { url, ok: false };
-					}
-
-					return { url, ok: true, result };
-				} catch ( error ) {
-					return { url, ok: false };
-				}
-			} )
-		);
-
-		setRows( results );
-		setChecking( false );
-	};
-
-	const accept = () => {
-		onAdd(
-			rows
-				.filter( ( row ) => row.ok )
-				.map( ( row ) => ( {
-					file_uuid: uuid(),
-					wp_media_id: 0,
-					url: row.url,
-					mime_type: row.result.mime_type,
-					source: row.result.source,
-					provider_id: row.result.provider_id,
-					poster_url: row.result.poster_url,
-					duration: row.result.duration,
-				} ) )
-		);
-	};
-
-	const good = rows.filter( ( row ) => row.ok ).length;
-
-	return (
-		<Modal
-			title={ SOURCES.find( ( entry ) => entry.value === source ).label }
-			onClose={ onClose }
-			footer={
-				<>
-					<Button variant="ghost" onClick={ onClose }>
-						{ __(
-							'Cancel',
-							'productreels'
-						) }
-					</Button>
-					{ rows.length === 0 ? (
-						<Button
-							variant="primary"
-							busy={ checking }
-							disabled={ checking }
-							onClick={ verify }
-						>
-							{ __(
-								'Continue',
-								'productreels'
-							) }
-						</Button>
-					) : (
-						<Button
-							variant="primary"
-							disabled={ good === 0 }
-							onClick={ accept }
-						>
-							{ __(
-								'Add Videos',
-								'productreels'
-							) }
-						</Button>
-					) }
-				</>
-			}
-		>
-			<div className="wr-form">
-				<div className="wr-field">
-					<label className="wr-field__label" htmlFor="wr-url-source">
-						{ __(
-							'Url',
-							'productreels'
-						) }
-					</label>
-					<textarea
-						id="wr-url-source"
-						className="wr-input wr-textarea"
-						rows="4"
-						spellCheck="false"
-						placeholder={ copy.placeholder }
-						value={ text }
-						onChange={ ( event ) => {
-							setText( event.target.value );
-							setRows( [] );
-						} }
-					/>
-					<span className="wr-field__help">{ copy.help }</span>
-				</div>
-
-				{ rows.length > 0 && (
-					<ul className="wr-url-rows">
-						{ rows.map( ( row ) => (
-							<li
-								key={ row.url }
-								className={ `wr-url-row${
-									row.ok ? '' : ' is-bad'
-								}` }
-							>
-								{ row.ok && row.result.poster_url ? (
-									<img
-										className="wr-url-row__thumb"
-										src={ row.result.poster_url }
-										alt=""
-									/>
-								) : (
-									<span className="wr-url-row__thumb wr-url-row__thumb--empty">
-										<IconVideo size={ 15 } />
-									</span>
-								) }
-								<span className="wr-url-row__text">
-									<span className="wr-url-row__url">
-										{ row.url }
-									</span>
-									{ ! row.ok && (
-										<span className="wr-field__error">
-											{ copy.invalid }
-										</span>
-									) }
-								</span>
-							</li>
-						) ) }
-					</ul>
-				) }
-			</div>
-		</Modal>
-	);
-};
-
-const LinkChip = ( { link, index, onEdit, onRemove, onMove } ) => (
-	<li
-		className="wr-chip"
-		draggable
-		onDragStart={ ( event ) =>
-			event.dataTransfer.setData( 'text/plain', String( index ) )
-		}
-		onDragOver={ ( event ) => event.preventDefault() }
-		onDrop={ ( event ) => {
-			event.preventDefault();
-			onMove(
-				Number( event.dataTransfer.getData( 'text/plain' ) ),
-				index
-			);
-		} }
-	>
-		<span className="wr-chip__grip" aria-hidden="true">
-			<IconGrip size={ 14 } />
-		</span>
-		{ link.btn_type === 'product' ? (
-			<IconTag size={ 14 } />
-		) : (
-			<IconLink size={ 14 } />
-		) }
-		<span className="wr-chip__text">
-			{ link.buttonText ||
-				__(
-					'Button Text',
-					'productreels'
-				) }
-		</span>
-		{ link.campaignName && (
-			<span className="wr-chip__campaign">{ link.campaignName }</span>
-		) }
-		<span className="wr-chip__tools">
-			<IconButton
-				icon={ IconChevronDown }
-				label={ __(
-					'Move down',
-					'productreels'
-				) }
-				size={ 13 }
-				onClick={ () => onMove( index, index + 1 ) }
-			/>
-			{ link.btn_type === 'custom' && (
-				<IconButton
-					icon={ IconEdit }
-					label={ __(
-						'Edit',
-						'productreels'
-					) }
-					size={ 13 }
-					onClick={ onEdit }
-				/>
-			) }
-			<IconButton
-				icon={ IconClose }
-				label={ __(
-					'Delete',
-					'productreels'
-				) }
-				size={ 13 }
-				onClick={ onRemove }
-			/>
-		</span>
-	</li>
-);
 
 export const ReelEditor = ( { reelId, onClose, onSaved } ) => {
 	const toasts = useToasts();
 	const isNew = ! reelId;
+	const wooActive = !! boot.hasWoo;
 
 	const [ loading, setLoading ] = useState( ! isNew );
-	const [ saving, setSaving ] = useState( false );
+	const [ loadFailed, setLoadFailed ] = useState( false );
+	const [ attempt, setAttempt ] = useState( 0 );
 	const [ title, setTitle ] = useState( '' );
 	const [ thumbnail, setThumbnail ] = useState( '' );
 	const [ files, setFiles ] = useState( [] );
 	const [ links, setLinks ] = useState( [] );
-	const [ urlSource, setUrlSource ] = useState( '' );
-	const [ linkDialog, setLinkDialog ] = useState( null );
-	const [ capturing, setCapturing ] = useState( false );
-	const [ dropping, setDropping ] = useState( false );
-	const [ uploading, setUploading ] = useState( false );
+	const [ viewCount, setViewCount ] = useState( 0 );
+	const [ pick, setPick ] = useState( null );
+	const [ uploads, setUploads ] = useState( [] );
+	const [ sizes, setSizes ] = useState( {} );
+	const [ adding, setAdding ] = useState( false );
+	const [ uploadError, setUploadError ] = useState( '' );
+	const [ productCache, setProductCache ] = useState( {} );
+	const [ tagging, setTagging ] = useState( null );
+	const [ button, setButton ] = useState( null );
+	const [ discarding, setDiscarding ] = useState( false );
+	const [ saving, setSaving ] = useState( false );
+
+	const initial = useRef( snapshot( '', '', [], [] ) );
+	const aborts = useRef( new Map() );
+	const sourceRef = useRef( null );
+	const tagRef = useRef( null );
+	const focusAfter = useRef( null );
+
+	/* ---------------------------------------------------------- loading */
 
 	useEffect( () => {
 		if ( isNew ) {
@@ -614,6 +173,9 @@ export const ReelEditor = ( { reelId, onClose, onSaved } ) => {
 
 		let cancelled = false;
 
+		setLoading( true );
+		setLoadFailed( false );
+
 		reelsApi
 			.get( reelId )
 			.then( ( reel ) => {
@@ -621,14 +183,26 @@ export const ReelEditor = ( { reelId, onClose, onSaved } ) => {
 					return;
 				}
 
-				setTitle( reel.title );
-				setThumbnail( reel.thumbnail );
-				setFiles( reel.files );
-				setLinks( reel.links );
+				const nextFiles = reel.files || [];
+				const nextLinks = Array.isArray( reel.links ) ? reel.links : [];
+
+				setTitle( reel.title || '' );
+				setThumbnail( reel.thumbnail || '' );
+				setFiles( nextFiles );
+				setLinks( nextLinks );
+				setViewCount( reel.view_count || 0 );
+				initial.current = snapshot(
+					reel.title || '',
+					reel.thumbnail || '',
+					nextFiles,
+					nextLinks
+				);
+				setLoading( false );
+				focusAfter.current = 'title';
 			} )
-			.catch( ( error ) => toasts.error( error.message ) )
-			.finally( () => {
+			.catch( () => {
 				if ( ! cancelled ) {
+					setLoadFailed( true );
 					setLoading( false );
 				}
 			} );
@@ -636,77 +210,183 @@ export const ReelEditor = ( { reelId, onClose, onSaved } ) => {
 		return () => {
 			cancelled = true;
 		};
-	}, [ reelId, isNew, toasts ] );
+	}, [ reelId, isNew, attempt ] );
 
-	const addFiles = ( incoming ) => {
-		setFiles( ( current ) => [ ...current, ...incoming ] );
-		setUrlSource( '' );
-	};
+	// The dialog focuses its first control on open; a new reel starts at its
+	// video, a loaded one at its title.
+	useEffect( () => {
+		if ( isNew ) {
+			focusAfter.current = 'source';
+		}
+	}, [ isNew ] );
 
-	const pickSource = ( source ) => {
-		if ( source === 'library' ) {
-			openMediaFrame( addFiles );
+	useEffect( () => {
+		const want = focusAfter.current;
 
+		if ( ! want ) {
 			return;
 		}
 
-		setUrlSource( source );
+		focusAfter.current = null;
+
+		const { activeElement } = document;
+		let node = null;
+
+		if ( want === 'title' ) {
+			node = document.getElementById( TITLE_ID );
+		} else if ( want === 'source' ) {
+			node = sourceRef.current?.querySelector(
+				'[role="radio"][tabindex="0"]'
+			);
+		} else if ( ! activeElement || activeElement === document.body ) {
+			// Only when the control that had focus has just gone: an upload
+			// finishing in the background must not pull focus away.
+			node = document.querySelector( '.pr-reelsheet .pr-sheet__more' );
+		}
+
+		node?.focus();
+	} );
+
+	// Uploads still running when the sheet closes are cancelled.
+	useEffect( () => () => aborts.current.forEach( ( abort ) => abort() ), [] );
+
+	/* ----------------------------------------------------------- videos */
+
+	const addFiles = ( incoming, bytes = {} ) => {
+		if ( incoming.length === 0 ) {
+			return;
+		}
+
+		setFiles( ( current ) => [ ...current, ...incoming ] );
+		setSizes( ( current ) => ( { ...current, ...bytes } ) );
+		setAdding( false );
+		// The picker closes; if focus was in it, it lands on its button.
+		focusAfter.current = 'more';
 	};
 
-	/**
-	 * Upload dropped files straight into the media library.
-	 *
-	 * @param {FileList|File[]} dropped The dropped files.
-	 */
-	const uploadDropped = async ( dropped ) => {
-		const videos = Array.from( dropped ).filter( ( file ) =>
-			file.type.startsWith( 'video/' )
+	const chooseLibrary = () =>
+		openVideoFrame( ( { items, rejected } ) => {
+			const bytes = {};
+
+			items.forEach( ( item ) => {
+				bytes[ item.file.file_uuid ] = item.size;
+			} );
+			setUploadError( refusedMessage( rejected ) );
+			addFiles(
+				items.map( ( item ) => item.file ),
+				bytes
+			);
+		} );
+
+	const uploadFiles = ( list ) => {
+		const all = Array.from( list || [] );
+		const allowed = all.filter( isAllowedVideo );
+
+		setUploadError(
+			refusedMessage(
+				all
+					.filter( ( file ) => ! isAllowedVideo( file ) )
+					.map( ( file ) => file.name )
+			)
 		);
 
-		if ( videos.length === 0 ) {
-			return;
-		}
+		allowed.forEach( ( file ) => {
+			const key = uuid();
+			const preview = URL.createObjectURL( file );
 
-		setUploading( true );
+			setUploads( ( current ) => [
+				...current,
+				{ key, name: file.name, progress: 0, preview },
+			] );
 
-		for ( const file of videos ) {
-			try {
-				const body = new FormData();
+			const { promise, abort } = uploadMedia( file, ( progress ) =>
+				setUploads( ( current ) =>
+					current.map( ( entry ) =>
+						entry.key === key ? { ...entry, progress } : entry
+					)
+				)
+			);
 
-				body.append( 'file', file, file.name );
+			aborts.current.set( key, abort );
 
-				const media = await apiFetch( {
-					path: '/wp/v2/media',
-					method: 'POST',
-					body,
+			promise
+				.then( ( media ) => {
+					const entry = libraryFile( media );
+
+					addFiles( [ entry ], { [ entry.file_uuid ]: file.size } );
+				} )
+				.catch( ( error ) => {
+					if ( error.message !== 'aborted' ) {
+						toasts.error(
+							sprintf(
+								/* translators: 1: file name, 2: what went wrong. */
+								__(
+									'“%1$s” did not upload. %2$s',
+									'productreels'
+								),
+								file.name,
+								error.message
+							)
+						);
+					}
+				} )
+				.finally( () => {
+					aborts.current.delete( key );
+					URL.revokeObjectURL( preview );
+					setUploads( ( current ) =>
+						current.filter( ( entry ) => entry.key !== key )
+					);
 				} );
-
-				addFiles( [
-					{
-						file_uuid: uuid(),
-						wp_media_id: media.id,
-						url: media.source_url,
-						mime_type: media.mime_type,
-						source: 'native',
-						provider_id: '',
-						poster_url: '',
-						duration: 0,
-					},
-				] );
-			} catch ( error ) {
-				toasts.error( error.message );
-			}
-		}
-
-		setUploading( false );
+		} );
 	};
 
-	const moveFile = ( from, to ) => {
-		if ( from === to || to < 0 || to >= files.length ) {
-			return;
+	// Same rules as 1.0.0: the server must recognise every link, and a
+	// YouTube or Vimeo box only takes its own provider's links.
+	const addLinks = async ( source, urls ) => {
+		const results = await Promise.all(
+			urls.map( async ( url ) => {
+				try {
+					const result = await reelsApi.validateUrl( url, source );
+
+					if ( source !== 'hosted' && result.source !== source ) {
+						return null;
+					}
+
+					return { url, result };
+				} catch ( error ) {
+					return null;
+				}
+			} )
+		);
+
+		const refused = results
+			.map( ( row, index ) => ( row ? -1 : index ) )
+			.filter( ( index ) => index >= 0 );
+
+		if ( refused.length === 0 ) {
+			addFiles(
+				results.map( ( { url, result } ) => ( {
+					file_uuid: uuid(),
+					wp_media_id: 0,
+					url,
+					mime_type: result.mime_type,
+					source: result.source,
+					provider_id: result.provider_id,
+					poster_url: result.poster_url,
+					duration: result.duration,
+				} ) )
+			);
 		}
 
+		return refused;
+	};
+
+	const moveFile = ( from, to ) =>
 		setFiles( ( current ) => {
+			if ( to < 0 || to >= current.length ) {
+				return current;
+			}
+
 			const next = [ ...current ];
 			const [ moved ] = next.splice( from, 1 );
 
@@ -714,14 +394,99 @@ export const ReelEditor = ( { reelId, onClose, onSaved } ) => {
 
 			return next;
 		} );
-	};
 
-	const moveLink = ( from, to ) => {
-		if ( from === to || to < 0 || to >= links.length ) {
+	const removeRow = ( index ) => {
+		if ( index < files.length ) {
+			if ( files.length + uploads.length === 1 ) {
+				focusAfter.current = 'source';
+			}
+
+			setFiles( files.filter( ( entry, at ) => at !== index ) );
+
 			return;
 		}
 
+		const upload = uploads[ index - files.length ];
+
+		aborts.current.get( upload?.key )?.();
+	};
+
+	/* ------------------------------------------------------------ cover */
+
+	const captureFile = files.find(
+		( file ) => file.source === 'native' || file.source === 'hosted'
+	);
+	const captureSrc = captureFile ? captureFile.url : '';
+	const provider =
+		! captureFile && files[ 0 ] && isEmbed( files[ 0 ] )
+			? files[ 0 ].source
+			: null;
+	// A picked frame belongs to the clip it came from: it stays the cover
+	// when the clips are reordered, and goes only with that clip.
+	useEffect( () => {
+		if ( pick && ! files.some( ( file ) => file.url === pick.src ) ) {
+			setPick( null );
+		}
+	}, [ files, pick ] );
+
+	let cover = { kind: 'first' };
+
+	if ( pick && pick.src === captureSrc ) {
+		cover = { kind: 'frame', time: pick.time };
+	} else if ( pick || thumbnail ) {
+		cover = { kind: 'image' };
+	}
+
+	const coverSrc = pick
+		? pick.preview
+		: thumbnail || ( files[ 0 ] && files[ 0 ].poster_url ) || '';
+
+	/* ------------------------------------------------------------ links */
+
+	const productIds = links
+		.filter( ( link ) => link.btn_type === 'product' )
+		.map( ( link ) => Number( link.product_id ) );
+	const missingIds = productIds.filter( ( id ) => ! ( id in productCache ) );
+	const missingKey = missingIds.join( ',' );
+
+	useEffect( () => {
+		if ( ! wooActive || missingKey === '' ) {
+			return undefined;
+		}
+
+		let cancelled = false;
+		const ids = missingKey.split( ',' ).map( Number );
+
+		productsApi
+			.batch( ids )
+			.then( ( list ) => {
+				if ( cancelled ) {
+					return;
+				}
+
+				const found = {};
+
+				ids.forEach( ( id ) => {
+					found[ id ] = null;
+				} );
+				( list || [] ).forEach( ( product ) => {
+					found[ Number( product.id ) ] = product;
+				} );
+				setProductCache( ( current ) => ( { ...current, ...found } ) );
+			} )
+			.catch( () => {} );
+
+		return () => {
+			cancelled = true;
+		};
+	}, [ missingKey, wooActive ] );
+
+	const moveLink = ( from, to ) =>
 		setLinks( ( current ) => {
+			if ( to < 0 || to >= current.length ) {
+				return current;
+			}
+
 			const next = [ ...current ];
 			const [ moved ] = next.splice( from, 1 );
 
@@ -729,33 +494,176 @@ export const ReelEditor = ( { reelId, onClose, onSaved } ) => {
 
 			return next;
 		} );
+
+	const openTagging = () => {
+		const chosen = new Map();
+
+		links
+			.filter( ( link ) => link.btn_type === 'product' )
+			.forEach( ( link ) => {
+				const id = Number( link.product_id );
+
+				chosen.set(
+					id,
+					productCache[ id ] || { id, name: link.buttonText }
+				);
+			} );
+
+		setTagging( { chosen, before: chosen.size } );
 	};
 
-	const risky = files
-		.filter(
-			( file ) => file.source !== 'youtube' && file.source !== 'vimeo'
-		)
-		.filter( ( file ) => ! SAFARI_SAFE.includes( file.mime_type ) ).length;
+	const toggleProduct = ( product ) =>
+		setTagging( ( current ) => {
+			const chosen = new Map( current.chosen );
 
-	// A reel with nothing to play, or nothing to click, is not worth keeping:
-	// the first missing piece blocks Save and names itself in the footer.
-	let blocker = '';
+			if ( chosen.has( product.id ) ) {
+				chosen.delete( product.id );
+			} else {
+				chosen.set( product.id, product );
+			}
 
-	if ( files.length === 0 ) {
-		blocker = __(
-			'Add at least one video to save this reel.',
+			return { ...current, chosen };
+		} );
+
+	// Products still ticked keep their link (and its btn_uuid, so their clicks
+	// keep counting); unticked ones go; new ones join at the end.
+	const confirmTagging = () => {
+		const { chosen } = tagging;
+		const known = {};
+
+		chosen.forEach( ( product, id ) => {
+			if ( product.price_html !== undefined ) {
+				known[ id ] = product;
+			}
+		} );
+
+		setProductCache( ( current ) => ( { ...current, ...known } ) );
+		setLinks( ( current ) => {
+			const kept = current.filter(
+				( link ) =>
+					link.btn_type !== 'product' ||
+					chosen.has( Number( link.product_id ) )
+			);
+			const have = new Set(
+				kept
+					.filter( ( link ) => link.btn_type === 'product' )
+					.map( ( link ) => Number( link.product_id ) )
+			);
+			const added = Array.from( chosen.values() )
+				.filter( ( product ) => ! have.has( product.id ) )
+				.map( ( product ) => ( {
+					btn_type: 'product',
+					btn_uuid: uuid(),
+					product_id: product.id,
+					buttonText: product.name,
+				} ) );
+
+			return [ ...kept, ...added ];
+		} );
+		setTagging( null );
+	};
+
+	const openButton = ( link = null ) =>
+		setButton( { link, draft: linkDraft( link ), errors: {} } );
+
+	const confirmButton = () => {
+		const errors = validateLink( button.draft );
+
+		if ( Object.keys( errors ).length > 0 ) {
+			setButton( { ...button, errors } );
+			window.requestAnimationFrame( () =>
+				document
+					.querySelector( '.pr-linkdialog [aria-invalid="true"]' )
+					?.focus()
+			);
+
+			return;
+		}
+
+		const { draft, link } = button;
+		const next = {
+			btn_type: 'custom',
+			// An edit keeps the original key so its click history survives.
+			btn_uuid: link?.btn_uuid || uuid(),
+			buttonText: draft.buttonText.trim(),
+			buttonUrl: draft.buttonUrl.trim(),
+			openInNewTab: draft.openInNewTab,
+			campaignName: draft.campaignName.trim(),
+			customClass: draft.customClass.trim(),
+		};
+
+		setLinks( ( current ) =>
+			link
+				? current.map( ( entry ) =>
+						entry.btn_uuid === link.btn_uuid ? next : entry
+					)
+				: [ ...current, next ]
+		);
+		setButton( null );
+	};
+
+	/* ------------------------------------------------------ save, close */
+
+	const dirty =
+		snapshot( title, thumbnail, files, links ) !== initial.current ||
+		pick !== null ||
+		uploads.length > 0;
+
+	let missing = '';
+
+	if ( files.length === 0 && links.length === 0 ) {
+		missing = __(
+			'Add a video and a product or button to save this reel.',
 			'productreels'
 		);
+	} else if ( files.length === 0 ) {
+		missing = __( 'Add a video to save this reel.', 'productreels' );
 	} else if ( links.length === 0 ) {
-		blocker = __(
-			'Add at least one link to save this reel.',
+		missing = __(
+			'Add a product or button to save this reel.',
 			'productreels'
 		);
 	}
 
+	let note = isNew
+		? ''
+		: __(
+				'Changes show up in every widget that uses this reel.',
+				'productreels'
+			);
+	let noteTone;
+
+	if ( uploads.length > 0 ) {
+		note = __(
+			'Wait for the upload to finish to save this reel.',
+			'productreels'
+		);
+		noteTone = 'warn';
+	} else if ( missing && ! loading && ! loadFailed ) {
+		note = missing;
+		noteTone = 'warn';
+	}
+
+	// With no clips the source picker is always on screen.
+	const focusFirstProblem = () => {
+		if ( files.length === 0 ) {
+			sourceRef.current
+				?.querySelector( '[role="radio"][tabindex="0"]' )
+				?.focus();
+
+			return;
+		}
+
+		tagRef.current?.focus();
+	};
+
 	const save = async () => {
-		if ( blocker ) {
-			toasts.error( blocker );
+		if ( loading || loadFailed || uploads.length > 0 ) {
+			return;
+		}
+
+		if ( missing ) {
+			focusFirstProblem();
 
 			return;
 		}
@@ -763,686 +671,505 @@ export const ReelEditor = ( { reelId, onClose, onSaved } ) => {
 		setSaving( true );
 
 		try {
-			const payload = { title, thumbnail, links, files };
-			let saved;
+			let coverUrl = thumbnail;
 
-			if ( isNew ) {
-				saved = await reelsApi.create( payload );
-				toasts.success(
-					__(
-						'Reel created successfully!',
-						'productreels'
-					)
-				);
-			} else {
-				saved = await reelsApi.update( reelId, payload );
-				toasts.success(
-					__(
-						'Reel updated successfully!',
-						'productreels'
-					)
-				);
+			if ( pick ) {
+				const grab = frameGrabber( pick.src );
+
+				try {
+					coverUrl = await saveFrame( await grab.grab( pick.time ) );
+				} catch ( error ) {
+					throw new Error(
+						__(
+							'The cover frame could not be saved. Upload a cover image instead.',
+							'productreels'
+						)
+					);
+				} finally {
+					grab.destroy();
+				}
 			}
 
+			const payload = { title, thumbnail: coverUrl, links, files };
+			const saved = isNew
+				? await reelsApi.create( payload )
+				: await reelsApi.update( reelId, payload );
+
+			toasts.success( __( 'Reel saved', 'productreels' ) );
 			onSaved( saved );
 		} catch ( error ) {
 			toasts.error( error.message );
-		} finally {
 			setSaving( false );
 		}
 	};
 
-	const capturable = files.find(
-		( file ) => file.source === 'native' || file.source === 'hosted'
-	);
-	const lead = files[ 0 ] || null;
-	const leadPlayable =
-		lead && ( lead.source === 'native' || lead.source === 'hosted' );
-	const leadPoster = thumbnail || ( lead && lead.poster_url ) || '';
+	const requestClose = () => {
+		if ( saving ) {
+			return;
+		}
 
-	const dragHandlers = {
-		onDragOver: ( event ) => {
-			event.preventDefault();
-			setDropping( true );
-		},
-		onDragLeave: () => setDropping( false ),
-		onDrop: ( event ) => {
-			event.preventDefault();
-			setDropping( false );
-			uploadDropped( event.dataTransfer.files );
-		},
+		if ( dirty ) {
+			setDiscarding( true );
+		} else {
+			onClose();
+		}
 	};
+
+	/* ----------------------------------------------------------- render */
+
+	const previewStyles = useMemo(
+		() => ( { ...( boot.defaults || {} ), playWithSound: false } ),
+		[]
+	);
+	const previewReel = useMemo(
+		() => ( {
+			id: reelId || 0,
+			title,
+			thumbnail: pick ? pick.preview : thumbnail,
+			links,
+			files,
+			view_count: viewCount,
+		} ),
+		[ reelId, title, pick, thumbnail, links, files, viewCount ]
+	);
+
+	const rows = [
+		...files.map( ( file ) => {
+			const meta = SOURCE_META[ file.source ] || SOURCE_META.hosted;
+			let text = meta.label;
+
+			if ( file.source === 'native' && sizes[ file.file_uuid ] ) {
+				text = sprintf(
+					/* translators: %s: file size, like 8.4 MB. */
+					__( 'Uploaded, %s', 'productreels' ),
+					formatSize( sizes[ file.file_uuid ] )
+				);
+			} else if ( file.duration > 0 ) {
+				text = `${ meta.label }, ${ formatClock( file.duration ) }`;
+			}
+
+			return {
+				key: file.file_uuid,
+				name: fileLabel( file ),
+				thumb: (
+					<VideoThumb
+						poster={ file.poster_url }
+						src={ isEmbed( file ) ? '' : file.url }
+					/>
+				),
+				icon: meta.icon,
+				meta: text,
+			};
+		} ),
+		...uploads.map( ( upload ) => ( {
+			key: upload.key,
+			name: upload.name,
+			thumb: <VideoThumb src={ upload.preview } />,
+			progress: upload.progress,
+			meta: sprintf(
+				/* translators: %s: percentage uploaded, a whole number. */
+				__( 'Uploading, %s%%', 'productreels' ),
+				upload.progress
+			),
+		} ) ),
+	];
+
+	// 1.0.0 warned about formats Safari may not play; uploads now only take
+	// MP4 and WebM, but older reels and links can still hold others.
+	const risky = files.filter(
+		( file ) =>
+			! isEmbed( file ) && ! VIDEO_TYPES.includes( file.mime_type )
+	).length;
+
+	const products = {};
+
+	productIds.forEach( ( id ) => {
+		products[ id ] = productCache[ id ];
+	} );
+
+	let form;
+
+	if ( loading ) {
+		form = (
+			<div className="pr-sheet__form">
+				<Skeleton
+					count={ 4 }
+					label={ __( 'Loading reel…', 'productreels' ) }
+				/>
+			</div>
+		);
+	} else if ( loadFailed ) {
+		form = (
+			<div className="pr-sheet__form">
+				<Notice
+					tone="danger"
+					title={ __(
+						"This reel couldn't be loaded",
+						'productreels'
+					) }
+					actions={
+						<Button
+							size="sm"
+							onClick={ () => setAttempt( attempt + 1 ) }
+						>
+							{ __( 'Try again', 'productreels' ) }
+						</Button>
+					}
+				>
+					{ __(
+						'Check your connection, then try again.',
+						'productreels'
+					) }
+				</Notice>
+			</div>
+		);
+	} else {
+		form = (
+			<div className="pr-sheet__form">
+				<section
+					className="pr-sheet__section"
+					aria-labelledby="pr-reel-video"
+				>
+					<div className="pr-sheet__sechead">
+						<h3 className="pr-t-heading" id="pr-reel-video">
+							{ __( 'Video', 'productreels' ) }
+						</h3>
+						{ files.length > 0 && (
+							<span className="pr-t-small pr-muted">
+								{ sprintf(
+									/* translators: %s: number of clips. */
+									_n(
+										'%s clip',
+										'%s clips',
+										files.length,
+										'productreels'
+									),
+									formatNumber( files.length )
+								) }
+							</span>
+						) }
+					</div>
+					{ rows.length > 0 && (
+						<VideoList
+							items={ rows }
+							onMove={ moveFile }
+							onRemove={ removeRow }
+						/>
+					) }
+					{ risky > 0 && (
+						<Notice tone="warn">
+							{ sprintf(
+								/* translators: %s: number of videos. */
+								_n(
+									'%s video may not play on iPhones and Macs. MP4 (H.264) plays everywhere.',
+									'%s videos may not play on iPhones and Macs. MP4 (H.264) plays everywhere.',
+									risky,
+									'productreels'
+								),
+								formatNumber( risky )
+							) }
+						</Notice>
+					) }
+					{ rows.length === 0 || adding ? (
+						<SourcePicker
+							focusRef={ sourceRef }
+							uploadError={ uploadError }
+							onChooseLibrary={ chooseLibrary }
+							onDropFiles={ uploadFiles }
+							onAddLinks={ addLinks }
+						/>
+					) : (
+						<Button
+							size="sm"
+							variant="ghost"
+							icon="plus"
+							className="pr-sheet__more"
+							onClick={ () => {
+								focusAfter.current = 'source';
+								setAdding( true );
+							} }
+						>
+							{ __( 'Add another video', 'productreels' ) }
+						</Button>
+					) }
+				</section>
+
+				<section className="pr-sheet__section">
+					<TextField
+						id={ TITLE_ID }
+						label={ __( 'Title', 'productreels' ) }
+						placeholder={ __( 'Untitled reel', 'productreels' ) }
+						help={ __(
+							'Shown on the thumbnail when the reel has no product or button.',
+							'productreels'
+						) }
+						value={ title }
+						onChange={ ( event ) => setTitle( event.target.value ) }
+					/>
+				</section>
+
+				<section
+					className="pr-sheet__section"
+					aria-labelledby="pr-reel-cover"
+				>
+					<div className="pr-sheet__sechead">
+						<h3 className="pr-t-heading" id="pr-reel-cover">
+							{ __( 'Cover', 'productreels' ) }
+						</h3>
+					</div>
+					<Filmstrip
+						src={ captureSrc }
+						provider={ provider }
+						cover={ cover }
+						coverSrc={ coverSrc }
+						onPick={ ( time, preview ) =>
+							setPick( { time, preview, src: captureSrc } )
+						}
+						onUploadImage={ () =>
+							openImageFrame( ( url ) => {
+								setPick( null );
+								setThumbnail( url );
+							} )
+						}
+						onUseFirstFrame={ () => {
+							setPick( null );
+							setThumbnail( '' );
+						} }
+					/>
+				</section>
+
+				<section
+					className="pr-sheet__section"
+					aria-labelledby="pr-reel-shop"
+				>
+					<div className="pr-sheet__sechead">
+						<h3 className="pr-t-heading" id="pr-reel-shop">
+							{ __( 'Shop this reel', 'productreels' ) }
+						</h3>
+						<span className="pr-t-small pr-muted">
+							{ __( 'Shown over the video', 'productreels' ) }
+						</span>
+					</div>
+					<ShopLinks
+						ref={ tagRef }
+						links={ links }
+						products={ products }
+						wooActive={ wooActive }
+						onTag={ openTagging }
+						onAddButton={ () => openButton() }
+						onEdit={ openButton }
+						onRemove={ ( index ) =>
+							setLinks(
+								links.filter( ( entry, at ) => at !== index )
+							)
+						}
+						onMove={ moveLink }
+					/>
+				</section>
+			</div>
+		);
+	}
+
+	const tagCount = tagging ? tagging.chosen.size : 0;
+	let tagLabel = sprintf(
+		/* translators: %s: number of products. */
+		_n( 'Tag %s product', 'Tag %s products', tagCount, 'productreels' ),
+		formatNumber( tagCount )
+	);
+
+	if ( tagging && tagCount === 0 && tagging.before > 0 ) {
+		tagLabel = __( 'Remove product tags', 'productreels' );
+	}
 
 	return (
 		<>
-			<Modal
-				size="xl"
+			<Dialog
+				size="wide"
+				className="pr-reelsheet"
 				title={
 					isNew
-						? __(
-								'Add Reel',
-								'productreels'
-							)
-						: __(
-								'Edit reel',
-								'productreels'
-							)
+						? __( 'Add reel', 'productreels' )
+						: __( 'Edit reel', 'productreels' )
 				}
-				onClose={ onClose }
+				description={ __(
+					'One vertical video and the products it sells.',
+					'productreels'
+				) }
+				body={ false }
+				dismissible={ ! saving }
+				onClose={ requestClose }
+				note={ note }
+				noteTone={ noteTone }
 				footer={
 					<>
-						<span
-							className={ `wr-modal__foot-note${
-								blocker ? ' is-blocking' : ''
-							}` }
-						>
-							{ blocker
-								? blocker
-								: sprintf(
-										/* translators: 1: number of videos, 2: number of links. */
-										_x(
-											'%1$s · %2$s',
-											'reel media and link counts',
-											'productreels'
-										),
-										sprintf(
-											/* translators: %d: number of videos. */
-											_n(
-												'%d video',
-												'%d videos',
-												files.length,
-												'productreels'
-											),
-											files.length
-										),
-										sprintf(
-											/* translators: %d: number of links. */
-											_n(
-												'%d link',
-												'%d links',
-												links.length,
-												'productreels'
-											),
-											links.length
-										)
-									) }
-						</span>
-						<Button
-							variant="ghost"
-							onClick={ onClose }
-							disabled={ saving }
-						>
-							{ __(
-								'Cancel',
-								'productreels'
-							) }
+						<Button onClick={ requestClose } disabled={ saving }>
+							{ __( 'Cancel', 'productreels' ) }
 						</Button>
 						<Button
 							variant="primary"
+							icon="check"
 							busy={ saving }
-							disabled={ saving || loading || blocker !== '' }
+							disabled={ loading || loadFailed }
 							onClick={ save }
 						>
-							{ isNew
-								? __(
-										'Save',
-										'productreels'
-									)
-								: __(
-										'Update',
-										'productreels'
-									) }
+							{ __( 'Save reel', 'productreels' ) }
 						</Button>
 					</>
 				}
 			>
-				{ loading ? (
-					<p className="wr-field__help">
-						<IconSpinner size={ 15 } />
-					</p>
-				) : (
-					<div className="wr-reel-editor">
-						<div
-							className={ `wr-reel-editor__media${
-								dropping ? ' is-over' : ''
-							}` }
-							{ ...dragHandlers }
-						>
-							<div className="wr-reel-editor__bar">
-								<span className="wr-section-label">
-									{ __(
-										'Video',
-										'productreels'
-									) }
-								</span>
-								{ files.length > 0 && (
-									<SourcePicker onPick={ pickSource } />
-								) }
-							</div>
-
-							{ files.length === 0 && (
-								<div
-									className={ `wr-dropzone wr-dropzone--hero${
-										dropping ? ' is-over' : ''
-									}` }
-								>
-									<button
-										type="button"
-										className="wr-dropzone__hit"
-										onClick={ () =>
-											pickSource( 'library' )
-										}
-									>
-										{ uploading ? (
-											<IconSpinner size={ 28 } />
-										) : (
-											<DropArt />
-										) }
-										<span className="wr-dropzone__title">
-											{ uploading
-												? __(
-														'Uploading…',
-														'productreels'
-													)
-												: __(
-														'Add Videos',
-														'productreels'
-													) }
-										</span>
-										<span className="wr-dropzone__text">
-											{ __(
-												'Click or drag and drop files here',
-												'productreels'
-											) }
-										</span>
-									</button>
-
-									<div className="wr-source-tiles">
-										<SourceTile
-											icon={ IconUpload }
-											label={ __(
-												'Media Library',
-												'productreels'
-											) }
-											hint={ __(
-												'MP4 or WebM from this site',
-												'productreels'
-											) }
-											onClick={ () =>
-												pickSource( 'library' )
-											}
-										/>
-										<SourceTile
-											icon={ IconVideo }
-											label="Vimeo"
-											hint={ __(
-												'Paste video links',
-												'productreels'
-											) }
-											onClick={ () =>
-												pickSource( 'vimeo' )
-											}
-										/>
-										<SourceTile
-											icon={ IconVideo }
-											label="YouTube Shorts"
-											hint={ __(
-												'Paste Shorts links',
-												'productreels'
-											) }
-											onClick={ () =>
-												pickSource( 'youtube' )
-											}
-										/>
-										<SourceTile
-											icon={ IconLink }
-											label={ __(
-												'Video URL',
-												'productreels'
-											) }
-											hint={ __(
-												'Hosted MP4 or WebM',
-												'productreels'
-											) }
-											onClick={ () =>
-												pickSource( 'hosted' )
-											}
-										/>
-									</div>
-								</div>
-							) }
-
-							{ files.length > 0 && (
-								<div className="wr-media-stage">
-									<div className="wr-media-stage__preview">
-										{ leadPlayable && (
-											<video
-												key={ lead.file_uuid }
-												className="wr-media-stage__video"
-												src={ lead.url }
-												poster={
-													leadPoster || undefined
-												}
-												controls
-												muted
-												playsInline
-												preload="metadata"
-											/>
-										) }
-										{ ! leadPlayable && leadPoster && (
-											<img
-												className="wr-media-stage__img"
-												src={ leadPoster }
-												alt=""
-											/>
-										) }
-										{ ! leadPlayable && ! leadPoster && (
-											<span className="wr-media-stage__blank">
-												<IconVideo size={ 28 } />
-											</span>
-										) }
-										<span className="wr-media-stage__badge">
-											<SourceBadge
-												source={ lead.source }
-											/>
-										</span>
-									</div>
-
-									<div className="wr-media-stage__side">
-										<ul className="wr-file-list">
-											{ files.map( ( file, index ) => (
-												<li
-													key={ file.file_uuid }
-													className={ `wr-file-row${
-														index === 0
-															? ' is-lead'
-															: ''
-													}` }
-												>
-													{ file.poster_url ? (
-														<img
-															className="wr-file-row__thumb"
-															src={
-																file.poster_url
-															}
-															alt=""
-														/>
-													) : (
-														<span className="wr-file-row__thumb wr-file-row__thumb--empty">
-															<IconVideo
-																size={ 15 }
-															/>
-														</span>
-													) }
-													<span className="wr-file-row__text">
-														<span className="wr-file-row__name">
-															{ fileLabel(
-																file
-															) }
-														</span>
-														<span className="wr-file-row__meta">
-															<SourceBadge
-																source={
-																	file.source
-																}
-															/>
-															{ file.duration >
-																0 && (
-																<span>
-																	{
-																		file.duration
-																	}
-																	s
-																</span>
-															) }
-														</span>
-													</span>
-													<span className="wr-file-row__tools">
-														<IconButton
-															icon={
-																IconChevronDown
-															}
-															label={ __(
-																'Move down',
-																'productreels'
-															) }
-															size={ 13 }
-															disabled={
-																index ===
-																files.length - 1
-															}
-															onClick={ () =>
-																moveFile(
-																	index,
-																	index + 1
-																)
-															}
-														/>
-														<IconButton
-															icon={ IconTrash }
-															label={ __(
-																'Delete',
-																'productreels'
-															) }
-															tone="danger"
-															size={ 14 }
-															onClick={ () =>
-																setFiles(
-																	files.filter(
-																		(
-																			entry,
-																			at
-																		) =>
-																			at !==
-																			index
-																	)
-																)
-															}
-														/>
-													</span>
-												</li>
-											) ) }
-										</ul>
-
-										<div
-											className={ `wr-dropzone wr-dropzone--compact${
-												dropping ? ' is-over' : ''
-											}` }
-										>
-											<button
-												type="button"
-												className="wr-dropzone__hit"
-												onClick={ () =>
-													pickSource( 'library' )
-												}
-											>
-												{ uploading ? (
-													<IconSpinner size={ 16 } />
-												) : (
-													<IconPlus size={ 16 } />
-												) }
-												<span>
-													{ uploading
-														? __(
-																'Uploading…',
-																'productreels'
-															)
-														: __(
-																'Add more videos, or drop them here',
-																'productreels'
-															) }
-												</span>
-											</button>
-										</div>
-
-										{ risky > 0 && (
-											<Notice tone="warning">
-												{ sprintf(
-													/* translators: %d: number of videos that may not play on Safari. */
-													_n(
-														'%d video may not play reliably on iOS/macOS Safari. Recommended format: MP4 (H.264/AAC).',
-														'%d video(s) may not play reliably on iOS/macOS Safari. Recommended format: MP4 (H.264/AAC).',
-														risky,
-														'productreels'
-													),
-													risky
-												) }
-											</Notice>
-										) }
-									</div>
-								</div>
+				<div className="pr-sheet">
+					<div className="pr-sheet__preview">
+						<div className="pr-sheet__player">
+							{ ! loading && ! loadFailed ? (
+								<CompactPlayer
+									reel={ previewReel }
+									styles={ previewStyles }
+									services={ editorServices }
+									label={ __( 'Preview', 'productreels' ) }
+								/>
+							) : (
+								<span className="pr-sheet__blank" />
 							) }
 						</div>
-
-						<div className="wr-reel-editor__meta">
-							<TextField
-								label={ __(
-									'Reel Title',
-									'productreels'
-								) }
-								placeholder={ __(
-									'Enter reel title',
-									'productreels'
-								) }
-								value={ title }
-								onChange={ setTitle }
-							/>
-
-							<div className="wr-poster-card">
-								<div className="wr-reel-editor__bar">
-									<span className="wr-section-label">
-										{ __(
-											'Thumbnail',
-											'productreels'
-										) }
-									</span>
-									{ thumbnail && (
-										<Button
-											size="sm"
-											variant="ghost"
-											onClick={ () => setThumbnail( '' ) }
-										>
-											{ __(
-												'Clear',
-												'productreels'
-											) }
-										</Button>
-									) }
-								</div>
-
-								<div className="wr-poster-card__row">
-									<button
-										type="button"
-										className={ `wr-poster-card__frame${
-											thumbnail ? ' has-image' : ''
-										}` }
-										aria-label={ __(
-											'Choose from Media',
-											'productreels'
-										) }
-										onClick={ () =>
-											openPosterFrame( setThumbnail )
-										}
-									>
-										{ thumbnail ? (
-											<img src={ thumbnail } alt="" />
-										) : (
-											<>
-												<IconImage size={ 22 } />
-												<span>
-													{ __(
-														'Upload',
-														'productreels'
-													) }
-												</span>
-											</>
-										) }
-									</button>
-
-									<div className="wr-poster-card__tools">
-										<Button
-											size="sm"
-											icon={ IconImage }
-											onClick={ () =>
-												openPosterFrame( setThumbnail )
-											}
-										>
-											{ __(
-												'Choose from Media',
-												'productreels'
-											) }
-										</Button>
-										<Button
-											size="sm"
-											icon={ IconCamera }
-											disabled={ ! capturable }
-											onClick={ () =>
-												setCapturing( true )
-											}
-										>
-											{ __(
-												'Capture frame',
-												'productreels'
-											) }
-										</Button>
-										<p className="wr-field__help">
-											{ __(
-												'Shown before the video plays. Without one, the first frame is used.',
-												'productreels'
-											) }
-										</p>
-									</div>
-								</div>
-							</div>
-
-							<div className="wr-reel-editor__links">
-								<div className="wr-reel-editor__bar">
-									<span className="wr-section-label">
-										{ __(
-											'Links',
-											'productreels'
-										) }
-									</span>
-									{ links.length > 0 && (
-										<span className="wr-count-chip">
-											{ links.length }
-										</span>
-									) }
-								</div>
-
-								<div className="wr-link-actions">
-									<Button
-										className="wr-btn--outline"
-										icon={ IconLink }
-										onClick={ () =>
-											setLinkDialog( {
-												editing: null,
-												tab: 'custom',
-											} )
-										}
-									>
-										{ __(
-											'Add Custom Link',
-											'productreels'
-										) }
-										<IconChevronRight
-											size={ 13 }
-											className="wr-btn__end"
-										/>
-									</Button>
-									<Button
-										className="wr-btn--outline"
-										icon={ IconTag }
-										disabled={ ! boot.hasWoo }
-										onClick={ () =>
-											setLinkDialog( {
-												editing: null,
-												tab: 'product',
-											} )
-										}
-									>
-										{ __(
-											'Tag Products',
-											'productreels'
-										) }
-										<IconChevronRight
-											size={ 13 }
-											className="wr-btn__end"
-										/>
-									</Button>
-								</div>
-
-								{ ! boot.hasWoo && (
-									<p className="wr-field__help">
-										{ __(
-											'Product tagging needs WooCommerce to be active.',
-											'productreels'
-										) }
-									</p>
-								) }
-
-								{ links.length === 0 ? (
-									<p className="wr-field__help">
-										{ __(
-											'Add a button or tag a product and it appears over the video in the player.',
-											'productreels'
-										) }
-									</p>
-								) : (
-									<ul className="wr-chips">
-										{ links.map( ( link, index ) => (
-											<LinkChip
-												key={ link.btn_uuid }
-												link={ link }
-												index={ index }
-												onMove={ moveLink }
-												onEdit={ () =>
-													setLinkDialog( {
-														editing: link,
-														tab: 'custom',
-													} )
-												}
-												onRemove={ () =>
-													setLinks(
-														links.filter(
-															( entry ) =>
-																entry.btn_uuid !==
-																link.btn_uuid
-														)
-													)
-												}
-											/>
-										) ) }
-									</ul>
-								) }
-							</div>
-						</div>
+						<span className="pr-sheet__previewcap pr-t-caption">
+							<Icon name="eye" size={ 14 } />
+							{ __(
+								'How it looks when it opens',
+								'productreels'
+							) }
+						</span>
 					</div>
-				) }
-			</Modal>
+					{ form }
+				</div>
+			</Dialog>
 
-			{ urlSource !== '' && (
-				<UrlSourcePanel
-					source={ urlSource }
-					onAdd={ addFiles }
-					onClose={ () => setUrlSource( '' ) }
-				/>
+			{ tagging && (
+				<Dialog
+					size="md"
+					className="pr-tagdialog"
+					title={ __( 'Tag products', 'productreels' ) }
+					description={ __(
+						'Their cards appear over the video in the player.',
+						'productreels'
+					) }
+					onClose={ () => setTagging( null ) }
+					note={
+						wooActive
+							? sprintf(
+									/* translators: %s: number of products. */
+									_n(
+										'%s selected',
+										'%s selected',
+										tagCount,
+										'productreels'
+									),
+									formatNumber( tagCount )
+								)
+							: undefined
+					}
+					footer={
+						wooActive ? (
+							<>
+								<Button onClick={ () => setTagging( null ) }>
+									{ __( 'Cancel', 'productreels' ) }
+								</Button>
+								<Button
+									variant="primary"
+									icon="tag"
+									disabled={
+										tagCount === 0 && tagging.before === 0
+									}
+									onClick={ confirmTagging }
+								>
+									{ tagLabel }
+								</Button>
+							</>
+						) : (
+							<Button onClick={ () => setTagging( null ) }>
+								{ __( 'Close', 'productreels' ) }
+							</Button>
+						)
+					}
+				>
+					<ProductPicker
+						chosen={ tagging.chosen }
+						onToggle={ toggleProduct }
+						wooActive={ wooActive }
+						pluginsUrl={ boot.pluginsUrl }
+					/>
+				</Dialog>
 			) }
 
-			{ linkDialog && (
-				<LinkDialog
-					editing={ linkDialog.editing }
-					initialTab={ linkDialog.tab }
-					onClose={ () => setLinkDialog( null ) }
-					onAdd={ ( incoming ) => {
-						setLinks( ( current ) => {
-							const byUuid = new Map(
-								current.map( ( link ) => [
-									link.btn_uuid,
-									link,
-								] )
-							);
+			{ button && (
+				<Dialog
+					size="md"
+					className="pr-linkdialog"
+					title={
+						button.link
+							? __( 'Edit button', 'productreels' )
+							: __( 'Add a button', 'productreels' )
+					}
+					description={ __(
+						'Shown over the video. Opens any link and counts its clicks.',
+						'productreels'
+					) }
+					onClose={ () => setButton( null ) }
+					footer={
+						<>
+							<Button onClick={ () => setButton( null ) }>
+								{ __( 'Cancel', 'productreels' ) }
+							</Button>
+							<Button
+								variant="primary"
+								icon="check"
+								onClick={ confirmButton }
+							>
+								{ button.link
+									? __( 'Save button', 'productreels' )
+									: __( 'Add button', 'productreels' ) }
+							</Button>
+						</>
+					}
+				>
+					<LinkForm
+						draft={ button.draft }
+						errors={ button.errors }
+						onChange={ ( draft ) => {
+							const errors = {};
 
-							incoming.forEach( ( link ) =>
-								byUuid.set( link.btn_uuid, link )
-							);
-
-							return Array.from( byUuid.values() );
-						} );
-						setLinkDialog( null );
-					} }
-				/>
+							// A fixed field loses its error as soon as it is fixed.
+							Object.keys( button.errors ).forEach( ( key ) => {
+								if ( validateLink( draft )[ key ] ) {
+									errors[ key ] = button.errors[ key ];
+								}
+							} );
+							setButton( { ...button, draft, errors } );
+						} }
+					/>
+				</Dialog>
 			) }
 
-			{ capturing && capturable && (
-				<PosterCapture
-					src={ capturable.url }
-					onClose={ () => setCapturing( false ) }
-					onCaptured={ ( url ) => {
-						setThumbnail( url );
-						setCapturing( false );
+			{ discarding && (
+				<ConfirmDialog
+					tone="danger"
+					icon="alert"
+					title={ __(
+						'Discard changes to this reel?',
+						'productreels'
+					) }
+					confirm={ __( 'Discard', 'productreels' ) }
+					cancelLabel={ __( 'Keep editing', 'productreels' ) }
+					onClose={ () => setDiscarding( false ) }
+					onConfirm={ () => {
+						setDiscarding( false );
+						onClose();
 					} }
-				/>
+				>
+					{ __(
+						'What you changed since opening it will not be saved.',
+						'productreels'
+					) }
+				</ConfirmDialog>
 			) }
 		</>
 	);

@@ -59,8 +59,9 @@ body.productreels-screen {
 
 	/* One focus treatment, applied everywhere, never removed. The 1.1.0
 	   components (any pr-* class) draw --pr-focus-ring instead: this rule's
-	   radius would square off their pills mid-focus. */
-	:focus-visible:where(:not([class^='pr-'], [class*=' pr-'])) {
+	   radius would square off their pills mid-focus. The compact player
+	   draws the storefront player's own ring. */
+	:focus-visible:where(:not([class^='pr-'], [class*=' pr-'], .wr-player-compact *)) {
 		outline: 2px solid var(--wr-ring);
 		outline-offset: 2px;
 		border-radius: var(--wr-radius-sm);
@@ -82,15 +83,18 @@ body.productreels-screen {
 	 * :not(.productreels-embed *) counts as a class, and that was enough for the
 	 * `color: inherit` here to beat `.wr-btn--primary` and turn a primary
 	 * button's white label ink-on-blue.
+	 *
+	 * The reel editor's compact player is storefront markup too, and is left
+	 * out the same way.
 	 */
-	button:where(:not(.productreels-embed *)) {
+	button:where(:not(.productreels-embed *, .wr-player-compact *)) {
 		margin: 0;
 		font: inherit;
 		color: inherit;
 		cursor: pointer;
 	}
 
-	button[disabled]:where(:not(.productreels-embed *)) {
+	button[disabled]:where(:not(.productreels-embed *, .wr-player-compact *)) {
 		cursor: not-allowed;
 	}
 
@@ -112,21 +116,21 @@ body.productreels-screen {
 		min-height: 0;
 	}
 
-	a {
+	a:where(:not(.wr-player-compact *)) {
 		color: var(--wr-primary);
 		text-decoration: none;
 	}
 
-	a:hover {
+	a:where(:not(.wr-player-compact *)):hover {
 		color: var(--wr-primary-hover);
 	}
 
 	/* The preview's widget title is the embed's own h2, with the owner's
 	   margins on it; the reset keeps its hands off anything in the embed. */
-	h1:where(:not(.productreels-embed *)),
-	h2:where(:not(.productreels-embed *)),
-	h3:where(:not(.productreels-embed *)),
-	p:where(:not(.productreels-embed *)) {
+	h1:where(:not(.productreels-embed *, .wr-player-compact *)),
+	h2:where(:not(.productreels-embed *, .wr-player-compact *)),
+	h3:where(:not(.productreels-embed *, .wr-player-compact *)),
+	p:where(:not(.productreels-embed *, .wr-player-compact *)) {
 		margin: 0;
 		padding: 0;
 		font-weight: inherit;

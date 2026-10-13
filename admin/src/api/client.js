@@ -10,8 +10,14 @@ import { __ } from '@wordpress/i18n';
 
 export const boot = window.productreelsAdmin || {};
 
-if ( boot.nonce ) {
-	apiFetch.use( apiFetch.createNonceMiddleware( boot.nonce ) );
+// Kept so a request made outside apiFetch (an upload that reports progress)
+// sends the same nonce, refreshed if apiFetch has renewed it.
+export const nonceMiddleware = boot.nonce
+	? apiFetch.createNonceMiddleware( boot.nonce )
+	: null;
+
+if ( nonceMiddleware ) {
+	apiFetch.use( nonceMiddleware );
 }
 
 if ( boot.restUrl ) {

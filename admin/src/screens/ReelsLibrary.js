@@ -259,42 +259,52 @@ export const ReelsLibrary = () => {
 		}
 	}, [ term ] );
 
-	/** Start over from the first page: a new search or filter, or after a change. */
-	const load = useCallback( async () => {
-		const request = ++latest.current;
+	/**
+	 * Start over from the first page: a new search or filter, or after a change.
+	 * `quiet` keeps the cards on screen until the new page arrives, so the card
+	 * that opened the reel editor is still there to take focus back.
+	 */
+	const load = useCallback(
+		async ( { quiet = false } = {} ) => {
+			const request = ++latest.current;
 
-		setLoading( true );
-		setError( '' );
-
-		try {
-			const [ first ] = await Promise.all( [
-				fetchPage( 1 ),
-				loadCounts(),
-			] );
-
-			if ( request !== latest.current ) {
-				return;
+			if ( quiet !== true ) {
+				setLoading( true );
 			}
 
-			setItems( first.items );
-			setTotal( first.total );
-			setPage( 1 );
-			setPages( first.pages );
-			setSelected( ( current ) =>
-				current.filter( ( id ) =>
-					first.items.some( ( reel ) => reel.id === id )
-				)
-			);
-		} catch ( requestError ) {
-			if ( request === latest.current ) {
-				setError( requestError.message );
+			setError( '' );
+
+			try {
+				const [ first ] = await Promise.all( [
+					fetchPage( 1 ),
+					loadCounts(),
+				] );
+
+				if ( request !== latest.current ) {
+					return;
+				}
+
+				setItems( first.items );
+				setTotal( first.total );
+				setPage( 1 );
+				setPages( first.pages );
+				setSelected( ( current ) =>
+					current.filter( ( id ) =>
+						first.items.some( ( reel ) => reel.id === id )
+					)
+				);
+			} catch ( requestError ) {
+				if ( request === latest.current ) {
+					setError( requestError.message );
+				}
+			} finally {
+				if ( request === latest.current ) {
+					setLoading( false );
+				}
 			}
-		} finally {
-			if ( request === latest.current ) {
-				setLoading( false );
-			}
-		}
-	}, [ fetchPage, loadCounts ] );
+		},
+		[ fetchPage, loadCounts ]
+	);
 
 	useEffect( () => {
 		load();
@@ -700,7 +710,7 @@ export const ReelsLibrary = () => {
 					onClose={ () => setEditing( null ) }
 					onSaved={ async () => {
 						setEditing( null );
-						await load();
+						await load( { quiet: true } );
 					} }
 				/>
 			) }

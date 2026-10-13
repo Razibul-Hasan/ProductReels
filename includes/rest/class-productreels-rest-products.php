@@ -108,6 +108,10 @@ class Productreels_Rest_Products extends Productreels_Rest_Controller {
 	/**
 	 * Search products to tag on a reel.
 	 *
+	 * Since 1.1.0 a search matches the SKU as well as the name, through the
+	 * same product search WooCommerce's own admin uses, and each item carries
+	 * its `sku`.
+	 *
 	 * @since  1.0.0
 	 * @param  WP_REST_Request $request The request.
 	 * @return WP_REST_Response The response.
@@ -117,20 +121,34 @@ class Productreels_Rest_Products extends Productreels_Rest_Controller {
 			return $this->empty_list();
 		}
 
-		$results = wc_get_products(
-			array(
-				'status'   => 'publish',
-				'limit'    => (int) $request->get_param( 'per_page' ),
-				'page'     => (int) $request->get_param( 'page' ),
-				's'        => (string) $request->get_param( 'search' ),
-				'paginate' => true,
-			)
+		$search = (string) $request->get_param( 'search' );
+		$args   = array(
+			'status'   => 'publish',
+			'limit'    => (int) $request->get_param( 'per_page' ),
+			'page'     => (int) $request->get_param( 'page' ),
+			'paginate' => true,
 		);
+
+		if ( '' !== $search ) {
+			$ids = $this->search_ids( $search );
+
+			if ( null === $ids ) {
+				$args['s'] = $search;
+			} elseif ( empty( $ids ) ) {
+				return $this->empty_list();
+			} else {
+				$args['include'] = $ids;
+			}
+		}
+
+		$results = wc_get_products( $args );
 
 		$items = array();
 
 		foreach ( $results->products as $product ) {
-			$items[] = $this->present( $product );
+			$item        = $this->present( $product );
+			$item['sku'] = (string) $product->get_sku();
+			$items[]     = $item;
 		}
 
 		$response = rest_ensure_response( $items );
@@ -185,6 +203,29 @@ class Productreels_Rest_Products extends Productreels_Rest_Controller {
 		set_transient( $cache_key, $items, self::BATCH_CACHE );
 
 		return rest_ensure_response( $items );
+	}
+
+	/**
+	 * Ids of the products whose name, description or SKU match a search.
+	 *
+	 * @since  1.1.0
+	 * @access private
+	 * @param  string $search The search term.
+	 * @return int[]|null The ids, or null when the product data store can't
+	 *                    search (the caller falls back to a title search).
+	 */
+	private function search_ids( $search ) {
+		try {
+			$store = WC_Data_Store::load( 'product' );
+		} catch ( Exception $e ) {
+			return null;
+		}
+
+		if ( ! is_callable( array( $store, 'search_products' ) ) ) {
+			return null;
+		}
+
+		return array_values( array_filter( array_map( 'absint', (array) $store->search_products( wc_clean( $search ), '', false, false ) ) ) );
 	}
 
 	/**

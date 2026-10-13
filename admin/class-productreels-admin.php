@@ -355,13 +355,15 @@ class Productreels_Admin {
 	private function bootstrap() {
 		return array_merge(
 			array(
-				'restUrl'  => esc_url_raw( rest_url() ),
-				'nonce'    => wp_create_nonce( 'wp_rest' ),
-				'defaults' => Productreels_Settings::default_styles(),
-				'settings' => Productreels_Settings::all(),
-				'version'  => PRODUCTREELS_VERSION,
-				'logoUrl'  => PRODUCTREELS_URL . 'admin/images/logo.png',
-				'title'    => $this->title_parts,
+				'restUrl'    => esc_url_raw( rest_url() ),
+				'nonce'      => wp_create_nonce( 'wp_rest' ),
+				'defaults'   => Productreels_Settings::default_styles(),
+				'settings'   => Productreels_Settings::all(),
+				'version'    => PRODUCTREELS_VERSION,
+				'logoUrl'    => PRODUCTREELS_URL . 'admin/images/logo.png',
+				'title'      => $this->title_parts,
+				// The reel editor's "WooCommerce is turned off" notice links here.
+				'pluginsUrl' => current_user_can( 'activate_plugins' ) ? esc_url_raw( admin_url( 'plugins.php' ) ) : '',
 			),
 			Productreels_WooCommerce::bootstrap()
 		);

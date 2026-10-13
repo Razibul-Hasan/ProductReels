@@ -11,9 +11,14 @@
  * fades in a beat later, and the foot with its title and product rises
  * last. Closing runs the first two in reverse. Between reels the track
  * slides and nothing else moves, so a swipe is only ever a swipe.
+ *
+ * The compact player (CompactPlayer.jsx, the reel editor's preview) renders
+ * the same slide inline, so it shares the variables and resets below and
+ * gets a stage of its own at the end of the file.
  */
 
-.wr-portal-root {
+.wr-portal-root,
+.wr-player-compact {
 	--wr-p-fg: #ffffff;
 	--wr-p-muted: rgb(255 255 255 / 0.66);
 	--wr-p-ink-text: #1a1a1a;
@@ -50,7 +55,7 @@
  * single-class button below, silently stripping their backgrounds — which is
  * exactly what happened. :where() keeps the scope and drops the weight.
  */
-:where(.wr-portal-root) button {
+:where(.wr-portal-root, .wr-player-compact) button {
 	margin: 0;
 	padding: 0;
 	font: inherit;
@@ -61,31 +66,31 @@
 	-webkit-tap-highlight-color: transparent;
 }
 
-:where(.wr-portal-root) a {
+:where(.wr-portal-root, .wr-player-compact) a {
 	color: inherit;
 	-webkit-tap-highlight-color: transparent;
 }
 
-:where(.wr-portal-root) :focus-visible {
+:where(.wr-portal-root, .wr-player-compact) :focus-visible {
 	outline: 2px solid #fff;
 	outline-offset: 3px;
 }
 
 /* No ring for a click; a theme's blanket `:focus` outline must not draw
    around a control the visitor just pressed with the mouse. */
-:where(.wr-portal-root) :focus:not(:focus-visible) {
+:where(.wr-portal-root, .wr-player-compact) :focus:not(:focus-visible) {
 	outline: 0;
 }
 
 /* The controls sit inside a pill with 2px of air: the ring goes just inside
    the disc, where it cannot cross the pill's edge. */
-:where(.wr-portal-root) .wr-player__ctl:focus-visible {
+:where(.wr-portal-root, .wr-player-compact) .wr-player__ctl:focus-visible {
 	outline-offset: -2px;
 }
 
-:where(.wr-portal-root) img,
-:where(.wr-portal-root) video,
-:where(.wr-portal-root) iframe {
+:where(.wr-portal-root, .wr-player-compact) img,
+:where(.wr-portal-root, .wr-player-compact) video,
+:where(.wr-portal-root, .wr-player-compact) iframe {
 	display: block;
 	max-width: 100%;
 	border: 0;
@@ -1325,9 +1330,42 @@ body.wr-player-open {
 @media (prefers-reduced-motion: reduce) {
 	.wr-portal-root *,
 	.wr-portal-root *::before,
-	.wr-portal-root *::after {
+	.wr-portal-root *::after,
+	.wr-player-compact *,
+	.wr-player-compact *::before,
+	.wr-player-compact *::after {
 		animation-duration: 0.01ms !important;
 		animation-delay: 0s !important;
 		transition-duration: 0.01ms !important;
 	}
+}
+
+/* --------------------------------------------------------- Compact player */
+
+/* Inline, so it takes the width its parent gives it and stays in the flow;
+   the fixed portal root's stacking is not wanted here. */
+.wr-player-compact {
+	z-index: auto;
+	width: 100%;
+}
+
+.wr-player-compact__stage {
+	position: relative;
+	width: 100%;
+	aspect-ratio: 9 / 16;
+	overflow: hidden;
+	background: #000;
+	border-radius: 20px;
+	box-shadow:
+		0 0 0 1px rgb(255 255 255 / 0.1),
+		0 24px 64px -24px rgb(0 0 0 / 0.8);
+	user-select: none;
+	-webkit-user-select: none;
+}
+
+/* Its toast stays on the stage instead of the viewport's bottom edge. */
+.wr-player-compact .wr-player__toast {
+	position: absolute;
+	inset-block-end: calc(var(--wr-p-bar-h) + 12px);
+	max-width: calc(100% - 24px);
 }

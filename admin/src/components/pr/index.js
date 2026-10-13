@@ -39,4 +39,10 @@ export {
 	reelMenuItems,
 	widgetsLabel,
 } from './ReelCard';
+export { SourcePicker } from './SourcePicker';
+export { VideoList } from './VideoList';
+export { Filmstrip } from './Filmstrip';
+export { ShopLinks, shortUrl } from './ShopLinks';
+export { ProductPicker } from './ProductPicker';
+export { LinkForm, linkDraft, validateLink } from './LinkForm';
 export { portalRoot } from './portal';

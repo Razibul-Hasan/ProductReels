@@ -22,4 +22,5 @@
 	@include meta.load-css('pr-shell');
 	@include meta.load-css('pr-widgets');
 	@include meta.load-css('pr-reels');
+	@include meta.load-css('pr-reel-editor');
 }

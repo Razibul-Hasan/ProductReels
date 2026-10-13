@@ -1,0 +1,217 @@
+/**
+ * The reel sheet (screens/ReelEditor.js) and its pickers: what the design
+ * CSS leaves to the real thing. Real images and videos where the mockups
+ * drew posters, the sheet's height and scrolling, prices from WooCommerce,
+ * and the narrow-screen layout.
+ *
+ * Loaded inside #productreels-admin-app by _pr-scoped.scss. Tokens only.
+ */
+
+/* ---------------------------------------------------------------- Sheet */
+
+/* A steady height: the sheet doesn't grow and shrink as sections fill, and
+   only the form column scrolls. */
+.pr-reelsheet {
+	height: min(900px, calc(100vh - 2 * var(--pr-space-8)));
+}
+
+.pr-sheet {
+	border-top: 1px solid var(--pr-line);
+}
+
+.pr-sheet__preview {
+	overflow: auto;
+}
+
+.pr-sheet__player {
+	flex: none;
+	width: 236px;
+}
+
+/* The player is laid out at a phone's width and scaled down to the column,
+   so its buttons and cards keep the proportions shoppers see on a phone
+   instead of crowding a 236px frame. */
+.pr-sheet__player .wr-player-compact {
+	width: 360px;
+	zoom: calc(236 / 360);
+}
+
+.pr-sheet__blank {
+	display: block;
+	aspect-ratio: 9 / 16;
+	border-radius: var(--pr-radius-lg);
+	background: var(--pr-studio-raised);
+}
+
+.pr-sheet__more {
+	align-self: flex-start;
+}
+
+/* The compact player is storefront markup inside an admin dialog, and the
+   design's admin link colour (`:where(.pr-app, .pr-portal) a`, loaded here at
+   app strength) out-ranks its single-class links. Its links get back the
+   colours player.scss gives them. */
+.wr-player-compact a {
+	color: inherit;
+}
+
+.wr-player-compact .wr-cta,
+.wr-player-compact .wr-product__btn {
+	color: var(--wr-p-ink-text);
+}
+
+.wr-player-compact .wr-product--classic .wr-product__btn,
+.wr-player-compact .wr-product__btn--done {
+	color: var(--wr-p-fg);
+}
+
+/* Every real picture fills the frame the design gives it. */
+.pr-video__thumb,
+.pr-film__cover,
+.pr-film__frame,
+.pr-prow__thumb {
+	background: var(--pr-surface-sunken);
+}
+
+.pr-video__thumb > img,
+.pr-video__thumb > video,
+.pr-film__frame > img,
+.pr-film__cover > img,
+.pr-attach__thumb > img,
+.pr-prow__thumb > img {
+	display: block;
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+}
+
+.pr-video__meta--source .pr-icon {
+	color: var(--pr-ink-muted);
+}
+
+/* ---------------------------------------------------------------- Video */
+
+.pr-drop__actions {
+	margin-top: var(--pr-space-2);
+	justify-content: center;
+}
+
+.pr-source__links {
+	gap: var(--pr-space-3);
+}
+
+/* ---------------------------------------------------------- Filmstrip */
+
+.pr-film__strip {
+	cursor: ew-resize;
+	touch-action: none;
+	user-select: none;
+	-webkit-user-select: none;
+}
+
+.pr-film__strip:focus-visible {
+	outline: none;
+	box-shadow: var(--pr-focus-ring);
+}
+
+/* The playhead follows the pointer exactly; only the dimming eases. */
+.pr-film__frame {
+	transition: opacity 0.12s ease-out;
+}
+
+.pr-film__buttons {
+	gap: var(--pr-space-2);
+}
+
+/* ------------------------------------------------------ Shop this reel */
+
+.pr-attached {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.pr-attach {
+	margin: 0;
+}
+
+.pr-attach__thumb {
+	overflow: hidden;
+}
+
+/* WooCommerce's price markup: the regular price struck through and muted,
+   the sale price in --pr-spark (sale prices are "live"). */
+.pr-price del {
+	color: var(--pr-ink-muted);
+}
+
+.pr-price ins {
+	text-decoration: none;
+	color: var(--pr-spark);
+}
+
+/* ------------------------------------------------------------- Pickers */
+
+/* Room above the first field, so its focus ring isn't clipped by the
+   scrolling body. */
+.pr-tagdialog .pr-dialog__body,
+.pr-linkdialog .pr-dialog__body {
+	padding-top: var(--pr-space-1);
+}
+
+.pr-plist__empty {
+	padding: var(--pr-space-4) 0;
+}
+
+.pr-picker__more {
+	gap: var(--pr-space-3);
+}
+
+.pr-prow {
+	margin: 0;
+}
+
+/* --------------------------------------------------------- Narrow screens */
+
+/* Below the dialog's width the preview sits above the form and the whole
+   sheet scrolls. */
+@media (max-width: 900px) {
+
+	.pr-reelsheet {
+		height: auto;
+	}
+
+	.pr-sheet {
+		grid-template-columns: minmax(0, 1fr);
+		overflow: auto;
+	}
+
+	.pr-sheet__preview {
+		overflow: visible;
+		padding: var(--pr-space-5);
+	}
+
+	.pr-sheet__player {
+		width: 180px;
+	}
+
+	.pr-sheet__player .wr-player-compact {
+		zoom: calc(180 / 360);
+	}
+
+	.pr-sheet__form {
+		overflow: visible;
+	}
+}
+
+@media (max-width: 600px) {
+
+	.pr-linkopts,
+	.pr-fieldgrid {
+		grid-template-columns: minmax(0, 1fr);
+	}
+
+	.pr-film__row {
+		align-items: flex-start;
+	}
+}

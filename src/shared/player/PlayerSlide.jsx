@@ -5,6 +5,10 @@
  * a swipe reveals what is coming without three videos buffering at once.
  * The tap layer that toggles playback ignores a click that travelled, so the
  * end of a swipe never pauses the reel it just arrived on.
+ *
+ * `standby` keeps an active slide on its poster, with the play mark, until
+ * the first tap: the compact preview uses it so no video (and no provider
+ * SDK) loads before someone asks for it.
  */
 
 import { forwardRef, useRef } from '@wordpress/element';
@@ -27,6 +31,7 @@ export const PlayerSlide = forwardRef(
 		{
 			slot,
 			active,
+			standby = false,
 			styles,
 			muted,
 			playing,
@@ -45,6 +50,7 @@ export const PlayerSlide = forwardRef(
 		const { reel, file, fileIndex, fileCount } = slot;
 		const poster = posterOf( reel ) || ( file && file.poster_url ) || '';
 		const Provider = file ? providerFor( file ) : null;
+		const live = active && ! standby && !! Provider;
 		// Product links only mean something with WooCommerce there to sell them.
 		const links = ( reel.links || [] ).filter(
 			( link ) => link.btn_type !== 'product' || services.hasWoo
@@ -84,7 +90,7 @@ export const PlayerSlide = forwardRef(
 				aria-hidden={ active ? undefined : 'true' }
 			>
 				<div className="wr-player__media">
-					{ active && Provider && (
+					{ live && (
 						<Provider
 							ref={ providerRef }
 							file={ file }
@@ -97,7 +103,7 @@ export const PlayerSlide = forwardRef(
 							onReady={ onReady }
 						/>
 					) }
-					{ ! ( active && Provider ) && poster && (
+					{ ! live && poster && (
 						<img
 							className="wr-player__poster"
 							src={ poster }
@@ -105,7 +111,7 @@ export const PlayerSlide = forwardRef(
 							decoding="async"
 						/>
 					) }
-					{ ! ( active && Provider ) && ! poster && (
+					{ ! live && ! poster && (
 						<span
 							className="wr-player__poster wr-player__poster--blank"
 							aria-hidden="true"
@@ -118,7 +124,7 @@ export const PlayerSlide = forwardRef(
 						type="button"
 						className="wr-player__tap"
 						aria-label={
-							playing
+							playing && ! standby
 								? __(
 										'Pause',
 										'productreels'
@@ -131,7 +137,7 @@ export const PlayerSlide = forwardRef(
 						onPointerDown={ onPointerDown }
 						onClick={ onClick }
 					>
-						{ ! playing && file && <BigPlay /> }
+						{ ( standby || ! playing ) && file && <BigPlay /> }
 					</button>
 				) }
 
