@@ -2,10 +2,10 @@
  * The one portal root for dialogs, menus, popovers, tooltips and toasts.
  *
  * It carries `pr-portal`, so tokens and type apply, and it lives inside
- * #productreels-admin-app rather than on <body>: the 1.0.0 screens that still
- * render inside dialogs are styled under that id, and would lose every rule
- * outside it. Everything in here is position: fixed, so where it sits in the
- * tree changes nothing on screen.
+ * #productreels-admin-app rather than on <body>: the app's scoped styles
+ * (pr-scoped, the base resets) all sit under that id, so a dialog's contents
+ * look the same as the screen behind it. Everything in here is
+ * position: fixed, so where it sits in the tree changes nothing on screen.
  *
  * The root also tracks the app's horizontal bounds as --pr-app-start and
  * --pr-app-end, so toasts and floating bars centre on the app rather than on a

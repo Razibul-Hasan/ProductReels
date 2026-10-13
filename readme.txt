@@ -4,7 +4,7 @@ Tags: shoppable video, woocommerce, product video, video reels, ugc
 Requires at least: 6.6
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 1.0.0
+Stable tag: 1.1.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -84,7 +84,7 @@ Use them to highlight categories, collections, product groups or campaigns.
 * **Fullscreen reels player** – Swipe, scroll or use keyboard navigation between videos.
 * **Video sources** – WordPress Media Library, self-hosted MP4/WebM, YouTube Shorts and Vimeo.
 * **Live visual editor** – Customize widgets and preview changes before publishing.
-* **Video analytics** – Track views, clicks and click-through rate.
+* **Video analytics** – Track views, clicks and click rate.
 * **Reusable widgets** – Create a widget once and display it in multiple places.
 * **WooCommerce product tagging** – Connect reels with products and product cards.
 * **Custom CTA buttons** – Link reels to products, pages or external destinations.
@@ -130,22 +130,15 @@ The popup can appear immediately, after a delay or after the visitor scrolls dow
 
 Create and customize your reel widgets from a visual editor.
 
-The editor includes:
+Start by naming the widget and choosing its layout and reel shape. The editor then walks through its steps beside a live preview for desktop, tablet and mobile:
 
-* Reel selection
-* Live widget preview
-* Drag-and-drop reel ordering
-* Responsive controls
-* Reel shape and size
-* Spacing and gaps
-* Borders and shadows
-* Play button styling
-* View badge styling
-* Widget title controls
-* Navigation colors
-* Product card styling
-* Player behavior
-* Device-specific settings
+* **Reels** – Pick reels from your library and drag (or use the keyboard) to set their order.
+* **Layout** – Layout, shape, size and spacing per device, the options for the chosen layout, and the widget title.
+* **Look** – Titles, overlay, preview before play, hover effect, play button, view count, border, shadow and carousel arrows.
+* **Player** – Slide direction, sound, loop, seek bar, volume and navigation colors.
+* **Product card** – Modern or classic cards, ratings, Add to cart or Direct Checkout.
+* **Advanced** – Lazy loading and a custom CSS class.
+* **Place it** – The shortcode to copy, and how to add the widget with the block or Elementor.
 
 The preview uses the same frontend components as the published widget, helping you understand how the final reel layout will appear.
 
@@ -190,7 +183,7 @@ ProductReels tracks:
 
 * Total views
 * Total clicks
-* Click-through rate
+* Click rate
 * Views per reel
 * Clicks per reel
 * Button clicks
@@ -287,18 +280,24 @@ See `README.md` for build instructions.
 
 See `THIRD-PARTY-NOTICES.txt` for licenses related to bundled dependencies.
 
+= Credits =
+
+* Archivo typeface by Omnibus-Type, SIL Open Font License 1.1 (bundled, used in the admin only).
+* Lucide icons, ISC License.
+* dnd-kit (drag and drop in the admin), MIT License.
+
 == Installation ==
 
 1. Go to **Plugins → Add New Plugin** in your WordPress dashboard.
 2. Search for **ProductReels**.
 3. Install and activate the plugin.
-4. Go to **ProductReels → All Reels**.
-5. Add your first video using the WordPress Media Library, YouTube Shorts, Vimeo or a hosted MP4/WebM URL.
-6. Go to **ProductReels → Create Widget**.
-7. Choose your reels and select a layout.
-8. Customize the widget using the visual editor.
-9. Publish the widget.
-10. Add it to your website using a shortcode, Gutenberg block or Elementor widget.
+4. Go to **ProductReels → Reels** and choose **Add reel**.
+5. Add your first video using the WordPress Media Library, YouTube Shorts, Vimeo or a hosted MP4/WebM URL, then tag products or add a button.
+6. Go to **ProductReels → Widgets** and choose **Create widget**.
+7. Name the widget, choose a layout and reel shape, then choose its reels.
+8. Customize the widget step by step in the visual editor.
+9. Save the widget.
+10. Open **Place it** and add the widget to your website using the shortcode, Gutenberg block or Elementor widget.
 
 You can also manually upload the plugin directory to:
 
@@ -412,7 +411,7 @@ Browser storage may also be used to remember counted reels or dismissed popup st
 
 Plugin data is preserved by default.
 
-Enable **Delete all plugin data on uninstall** under **ProductReels → Settings** if you want ProductReels tables and options removed when the plugin is deleted.
+Turn on **Delete all data on uninstall** under **ProductReels → Settings** if you want ProductReels tables and options removed when the plugin is deleted.
 
 = Can I reuse the same reel in multiple widgets? =
 
@@ -424,17 +423,40 @@ Deleting a widget does not automatically delete its reels.
 
 == Screenshots ==
 
-1. **Floating Product Reels** – Display a shoppable floating video reel on WooCommerce product pages and let shoppers discover products while browsing.
-2. **Homepage Reel Slider** – Showcase multiple shoppable video reels in a scrollable carousel on your homepage, shop or landing pages.
-3. **Product Page Carousel** – Add a horizontal carousel of product videos, customer UGC and tutorials directly inside WooCommerce product detail sections.
-4. **Story-Style Category Reels** – Turn categories and collections into interactive story-style video thumbnails that shoppers can quickly explore.
+1. Widgets: totals, your top reels, and every widget with its shortcode.
+2. The widget editor: choose a layout and watch the live preview.
+3. Reels: your video library with filters and bulk actions.
+4. Add a reel: video, cover and the products it sells, with a live player preview.
+5. Statistics for a widget: which reels and buttons get clicks.
+6. Settings: view tracking, public API, caching and uninstall.
+7. Reels on a product page, with tagged products.
+8. The player on mobile and desktop.
 
 == Changelog ==
+
+= 1.1.0 =
+* New: Redesigned admin. Widgets, Reels and Settings are clearer, and every list has helpful empty, loading and error states.
+* New: The widget editor is organised into steps (Reels, Layout, Look, Player, Product card, Advanced, Place it) beside a live preview for desktop, tablet and mobile.
+* New: Create a widget by choosing its name, layout and reel shape first.
+* New: Pick a reel's cover by scrubbing through its frames.
+* New: Videos dropped on the reel sheet upload in place, with progress.
+* New: Filter reels by tagged products, buttons, or reels not used in any widget, and delete several reels at once.
+* New: Top reels and "reels in use" on the Widgets screen.
+* New: Search products by name or SKU when tagging a reel.
+* New: The block shows the live widget in the block editor.
+* Improved: Refreshed reels, product cards and player on your store. Styles you've already saved keep their values; new widgets start from refreshed defaults.
+* Improved: Keyboard access, focus states, screen reader announcements, right-to-left layouts and reduced-motion support throughout.
+* Improved: Clearer wording across the plugin, for example "Click rate" instead of "CTR".
+* Fixed: Translations of the fullscreen player's labels now load.
+* Fixed: The stacked layout fits narrow phone screens.
 
 = 1.0.0 =
 * Initial release.
 
 == Upgrade Notice ==
+
+= 1.1.0 =
+A redesigned admin and a refreshed look on your store. Your reels, widgets, statistics and settings are kept.
 
 = 1.0.0 =
 Initial release of ProductReels.

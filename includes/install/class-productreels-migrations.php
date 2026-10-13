@@ -57,6 +57,7 @@ class Productreels_Migrations {
 	protected static function migrations() {
 		return array(
 			'1.0.0' => array( __CLASS__, 'migrate_1_0_0' ),
+			'1.1.0' => array( __CLASS__, 'migrate_1_1_0' ),
 		);
 	}
 
@@ -130,5 +131,23 @@ class Productreels_Migrations {
 	 */
 	protected static function migrate_1_0_0() {
 		// Nothing to migrate: 1.0.0 is the initial schema.
+	}
+
+	/**
+	 * Migration to schema revision 1.1.0.
+	 *
+	 * 1.1.0 adds no tables, columns, indexes or options: its new REST fields
+	 * are computed from the 1.0.0 tables, and new style keys fill from
+	 * Productreels_Settings::default_styles() when read. The only work is to
+	 * retire cached render payloads, so storefronts fetch fresh ones built
+	 * with the 1.1.0 defaults (the single-reel shortcode renders from them).
+	 * Nothing a merchant saved is read, rewritten or removed, and running it
+	 * again only bumps the cache generation once more.
+	 *
+	 * @since  1.1.0
+	 * @return void
+	 */
+	protected static function migrate_1_1_0() {
+		Productreels_Render_Cache::bump();
 	}
 }

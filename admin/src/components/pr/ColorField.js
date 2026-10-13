@@ -2,9 +2,9 @@
  * ColorField: a colour setting as swatch, hex and (when the setting stores
  * it) opacity, opening the plugin's colour picker in a popover.
  *
- * It is the same picker 1.0.0 uses (ui/ColorPicker.js): the native colour
- * input as the visual picker and eyedropper, a hex field, an opacity slider
- * and this session's recent colours, which both share. Values stay lowercase
+ * It works as 1.0.0's picker did: the native colour input as the visual
+ * picker and eyedropper, a hex field, an opacity slider and this session's
+ * recent colours. Values stay lowercase
  * #rrggbb, or #rrggbbaa when `opacity` is on, as Productreels_Validator expects.
  */
 

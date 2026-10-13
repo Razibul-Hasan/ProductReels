@@ -2,7 +2,7 @@
 	"$schema": "https://schemas.wp.org/trunk/block.json",
 	"apiVersion": 3,
 	"name": "productreels/reels",
-	"version": "1.0.0",
+	"version": "1.1.0",
 	"title": "ProductReels",
 	"category": "widgets",
 	"description": "Place a ProductReels widget — a styled collection of shoppable video reels.",

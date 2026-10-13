@@ -12,6 +12,11 @@
  * @subpackage Productreels/includes
  */
 
+// If this file is called directly, abort.
+if ( ! defined( 'WPINC' ) ) {
+	die;
+}
+
 /**
  * The core plugin class.
  *
@@ -69,7 +74,7 @@ class Productreels {
 		if ( defined( 'PRODUCTREELS_VERSION' ) ) {
 			$this->version = PRODUCTREELS_VERSION;
 		} else {
-			$this->version = '1.0.0';
+			$this->version = '1.1.0';
 		}
 		$this->plugin_name = 'productreels';
 
