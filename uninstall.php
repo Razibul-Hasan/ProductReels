@@ -34,3 +34,5 @@ Productreels_Schema::delete_transients();
 delete_option( 'productreels_settings' );
 delete_option( 'productreels_db_version' );
 delete_option( 'productreels_render_generation' );
+delete_option( 'productreels_activation_redirected' );
+delete_option( 'productreels_guide_done' );

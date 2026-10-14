@@ -43,7 +43,6 @@ import {
 } from '../components/pr';
 import { formatNumber } from '../format';
 import {
-	VIDEO_TYPES,
 	fileLabel,
 	formatSize,
 	frameGrabber,
@@ -51,6 +50,7 @@ import {
 	libraryFile,
 	openImageFrame,
 	openVideoFrame,
+	playsIn,
 	saveFrame,
 	uploadMedia,
 } from '../media';
@@ -115,7 +115,7 @@ const refusedMessage = ( names ) => {
 		return sprintf(
 			/* translators: %s: file name. */
 			__(
-				'“%s” is not an MP4 or WebM video. Convert it, or choose another file.',
+				'“%s” is not a video. Choose a video file instead.',
 				'productreels'
 			),
 			names[ 0 ]
@@ -125,8 +125,8 @@ const refusedMessage = ( names ) => {
 	return sprintf(
 		/* translators: %s: number of files. */
 		_n(
-			'%s file is not an MP4 or WebM video and was not added.',
-			'%s files are not MP4 or WebM videos and were not added.',
+			'%s file is not a video and was not added.',
+			'%s files are not videos and were not added.',
 			names.length,
 			'productreels'
 		),
@@ -774,11 +774,14 @@ export const ReelEditor = ( { reelId, onClose, onSaved } ) => {
 		} ) ),
 	];
 
-	// 1.0.0 warned about formats Safari may not play; uploads now only take
-	// MP4 and WebM, but older reels and links can still hold others.
+	// Any video format may be added, so say plainly which ones shoppers may
+	// not be able to watch: some only play in some browsers, and some (AVI,
+	// WMV, FLV, MPEG) play in none until they are converted.
+	const unplayable = files.filter(
+		( file ) => ! isEmbed( file ) && playsIn( file.mime_type ) === 'none'
+	).length;
 	const risky = files.filter(
-		( file ) =>
-			! isEmbed( file ) && ! VIDEO_TYPES.includes( file.mime_type )
+		( file ) => ! isEmbed( file ) && playsIn( file.mime_type ) === 'some'
 	).length;
 
 	const products = {};
@@ -856,13 +859,27 @@ export const ReelEditor = ( { reelId, onClose, onSaved } ) => {
 							onRemove={ removeRow }
 						/>
 					) }
+					{ unplayable > 0 && (
+						<Notice tone="warn">
+							{ sprintf(
+								/* translators: %s: number of videos. */
+								_n(
+									'%s video is in a format browsers can’t play, so shoppers won’t see it. Convert it to MP4 (H.264), which plays everywhere.',
+									'%s videos are in a format browsers can’t play, so shoppers won’t see them. Convert them to MP4 (H.264), which plays everywhere.',
+									unplayable,
+									'productreels'
+								),
+								formatNumber( unplayable )
+							) }
+						</Notice>
+					) }
 					{ risky > 0 && (
 						<Notice tone="warn">
 							{ sprintf(
 								/* translators: %s: number of videos. */
 								_n(
-									'%s video may not play on iPhones and Macs. MP4 (H.264) plays everywhere.',
-									'%s videos may not play on iPhones and Macs. MP4 (H.264) plays everywhere.',
+									'%s video may not play in every browser, such as on iPhones. MP4 (H.264) plays everywhere.',
+									'%s videos may not play in every browser, such as on iPhones. MP4 (H.264) plays everywhere.',
 									risky,
 									'productreels'
 								),

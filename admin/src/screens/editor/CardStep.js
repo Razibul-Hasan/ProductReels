@@ -5,13 +5,19 @@
  * Add to cart and Direct Checkout are one buy button or the other, as in
  * 1.0.0: turning either on turns the other off in the same change, and a
  * polite status line says so. Both may be off.
+ *
+ * On a modern card the buy button is a round icon or a pill with its text;
+ * a classic card always shows the text, so the choice is offered for modern
+ * cards only.
  */
 
 import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import {
+	Field,
 	OptionCards,
 	PanelSection,
+	Segmented,
 	TextField,
 	Toggle,
 } from '../../components/pr';
@@ -84,7 +90,7 @@ export const CardStep = ( { styles, set } ) => {
 							value: 'classic',
 							label: __( 'Classic', 'productreels' ),
 							desc: __(
-								'Image above the details',
+								'Opens a product panel beside the reel',
 								'productreels'
 							),
 							art: <CardArt kind="classic" />,
@@ -146,6 +152,42 @@ export const CardStep = ( { styles, set } ) => {
 						/>
 					</div>
 				) }
+				{ styles.productCardStyle !== 'classic' &&
+					( styles.showAddToCart || styles.directCheckout ) && (
+						<Field
+							label={ __( 'Button look', 'productreels' ) }
+							help={
+								styles.buyButtonDisplay === 'text'
+									? __(
+											'A button with its text, next to the price.',
+											'productreels'
+										)
+									: __(
+											'A round icon button. Screen readers still hear its text.',
+											'productreels'
+										)
+							}
+						>
+							<Segmented
+								block
+								label={ __( 'Button look', 'productreels' ) }
+								value={ styles.buyButtonDisplay || 'icon' }
+								onChange={ ( value ) =>
+									set( 'buyButtonDisplay', value )
+								}
+								options={ [
+									{
+										value: 'icon',
+										label: __( 'Icon', 'productreels' ),
+									},
+									{
+										value: 'text',
+										label: __( 'Text', 'productreels' ),
+									},
+								] }
+							/>
+						</Field>
+					) }
 				<p
 					className="pr-cardnote pr-t-small"
 					role="status"

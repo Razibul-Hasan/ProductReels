@@ -42,4 +42,5 @@ export const settings = {
 
 export const overview = {
 	get: () => get( '/overview' ),
+	completeGuide: () => post( '/overview/guide' ),
 };

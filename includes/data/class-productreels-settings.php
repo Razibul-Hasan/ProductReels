@@ -271,6 +271,9 @@ class Productreels_Settings {
 			// The editor keeps the two exclusive; if both arrive on, this wins.
 			'directCheckout'            => false,
 			'directCheckoutText'        => 'Buy now',
+			// How the modern card draws its buy button: a round icon, or a
+			// pill with the button text. The classic card always shows text.
+			'buyButtonDisplay'          => 'icon',
 
 			// Template specific.
 			'marquee'                   => array(

@@ -167,6 +167,64 @@
 
 /* --------------------------------------------------------------- Guide */
 
+.pr-guide {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr) minmax(320px, 0.8fr);
+	background: var(--pr-surface);
+	border: 1px solid var(--pr-line);
+	border-radius: var(--pr-radius-lg);
+	overflow: hidden;
+}
+
+.pr-guide__main {
+	display: flex;
+	flex-direction: column;
+	padding: var(--pr-space-10);
+}
+
+/* Low specificity, so the rules below set the spacing that counts. */
+.pr-guide :where(h2, h3, p) {
+	margin: 0;
+}
+
+.pr-guide__eyebrow {
+	margin-bottom: var(--pr-space-3);
+	color: var(--pr-brand);
+	letter-spacing: 0.02em;
+}
+
+.pr-guide h2 {
+	color: var(--pr-ink);
+}
+
+.pr-guide__lede {
+	margin-top: var(--pr-space-3);
+	max-width: 46ch;
+	color: var(--pr-ink-muted);
+}
+
+.pr-guide__progress {
+	position: relative;
+	display: block;
+	max-width: 320px;
+	height: 4px;
+	margin: var(--pr-space-8) 0 var(--pr-space-2);
+	border-radius: var(--pr-radius-pill);
+	background: var(--pr-surface-sunken);
+	overflow: hidden;
+}
+
+.pr-guide__progress::after {
+	content: "";
+	position: absolute;
+	inset: 0;
+	border-radius: inherit;
+	background: var(--pr-brand);
+	transform: scaleX(max(var(--pr-guide-done, 0), 0.04));
+	transform-origin: left center;
+	transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
 .pr-guide__steps {
 	margin: 0;
 	padding: 0;
@@ -174,35 +232,156 @@
 }
 
 .pr-step {
+	display: grid;
+	grid-template-columns: 24px minmax(0, 1fr) auto;
+	align-items: start;
+	gap: var(--pr-space-4);
 	margin: 0;
+	padding: var(--pr-space-4) 0;
 }
 
-.pr-stepart {
+.pr-step + .pr-step {
+	border-top: 1px solid var(--pr-line);
+}
+
+.pr-step:last-child {
+	padding-bottom: 0;
+}
+
+.pr-step__num {
+	width: 24px;
+	height: 24px;
+	display: grid;
+	place-items: center;
+	border-radius: var(--pr-radius-pill);
+	box-shadow: inset 0 0 0 1px var(--pr-line);
+	color: var(--pr-ink-muted);
+}
+
+.pr-step--current .pr-step__num {
+	background: var(--pr-brand);
+	box-shadow: none;
+	color: var(--pr-on-brand);
+}
+
+.pr-step--done .pr-step__num {
+	background: var(--pr-ok-soft);
+	box-shadow: none;
+	color: var(--pr-ok);
+}
+
+.pr-step__body {
+	min-width: 0;
+	padding-top: 1px;
+}
+
+.pr-step__title {
+	color: var(--pr-ink);
+}
+
+.pr-step--done .pr-step__title,
+.pr-step--upcoming .pr-step__title {
+	color: var(--pr-ink-muted);
+	font-weight: 500;
+}
+
+.pr-step__desc {
+	margin-top: var(--pr-space-1);
+	max-width: 52ch;
+	color: var(--pr-ink-muted);
+}
+
+.pr-step__foot {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: var(--pr-space-3);
+	margin-top: var(--pr-space-4);
+}
+
+.pr-step__alt {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: var(--pr-space-2);
+	margin-top: var(--pr-space-3);
+	color: var(--pr-ink-muted);
+}
+
+.pr-guide__code {
+	padding: 6px var(--pr-space-3);
+	border-radius: var(--pr-radius-sm);
+	background: var(--pr-surface-sunken);
+	color: var(--pr-ink);
+}
+
+.pr-step__state {
+	align-self: center;
+	color: var(--pr-ok);
+}
+
+/* Illustration: the store's own covers, fanned out. */
+
+.pr-guide__art {
+	position: relative;
+	display: grid;
+	place-items: center;
+	min-height: 360px;
+	border-inline-start: 1px solid var(--pr-line);
+	background:
+		radial-gradient(80% 70% at 80% 15%, var(--pr-brand-soft), transparent 75%),
+		radial-gradient(70% 65% at 10% 100%, var(--pr-spark-soft), transparent 75%),
+		var(--pr-canvas);
+	overflow: hidden;
+}
+
+.pr-guide__art::before {
+	content: "";
 	position: absolute;
 	inset: 0;
-	display: flex;
-	align-items: center;
-	justify-content: center;
+	background-image: radial-gradient(var(--pr-line) 1px, transparent 1px);
+	background-size: 16px 16px;
+	mask-image: radial-gradient(closest-side, var(--pr-ink), transparent);
 }
 
-.pr-stepart__frame {
+.pr-guide__fan {
 	position: relative;
-	width: 52px;
-	height: 92px;
-	flex: none;
-	border-radius: 10px;
+	display: grid;
+	place-items: center;
+	width: 320px;
+	height: 340px;
+}
+
+.pr-guide__reel {
+	--pr-fan: none;
+	position: relative;
+	grid-area: 1 / 1;
+	width: 164px;
+	aspect-ratio: 9 / 16;
+	border-radius: var(--pr-radius-reel);
 	overflow: hidden;
-	background: var(--pr-surface-sunken);
-	box-shadow: var(--pr-shadow-reel);
+	background: linear-gradient(160deg, var(--pr-surface), var(--pr-surface-sunken));
+	box-shadow: var(--pr-shadow-lg);
+	transform: var(--pr-fan);
+	animation: pr-guide-fan 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) both;
 }
 
-.pr-stepart__frame--lg {
-	width: 64px;
-	height: 114px;
-	border-radius: 12px;
+.pr-guide__reel--back {
+	--pr-fan: translateX(-84px) rotate(-9deg) scale(0.86);
+	z-index: 1;
 }
 
-.pr-stepart img {
+.pr-guide__reel--side {
+	--pr-fan: translateX(84px) rotate(9deg) scale(0.86);
+	z-index: 2;
+}
+
+.pr-guide__reel--front {
+	z-index: 3;
+	animation: none;
+}
+
+.pr-guide__art img {
 	position: absolute;
 	inset: 0;
 	width: 100%;
@@ -211,104 +390,70 @@
 	display: block;
 }
 
-.pr-stepart--reel {
-	gap: 14px;
+.pr-guide__play {
+	position: absolute;
+	inset: 0;
+	width: 40px;
+	height: 40px;
+	margin: auto;
+	display: grid;
+	place-items: center;
+	border-radius: var(--pr-radius-pill);
+	background: var(--pr-reel-glass);
+	color: var(--pr-ink);
+	box-shadow: var(--pr-shadow-md);
 }
 
-.pr-stepart__card {
+.pr-guide__product {
 	position: absolute;
-	inset-inline: 4px;
-	bottom: 4px;
+	inset-inline: 8px;
+	bottom: 8px;
 	display: flex;
 	align-items: center;
-	gap: 4px;
-	padding: 3px;
-	border-radius: 6px;
-	background: var(--pr-surface);
+	gap: var(--pr-space-2);
+	padding: 6px;
+	border-radius: var(--pr-radius-sm);
+	background: var(--pr-reel-glass);
+	box-shadow: var(--pr-shadow-sm);
 }
 
-.pr-stepart__thumb {
+.pr-guide__thumb {
 	position: relative;
-	width: 14px;
-	height: 14px;
+	width: 24px;
+	height: 24px;
 	flex: none;
-	border-radius: 3px;
+	border-radius: var(--pr-radius-xs);
 	overflow: hidden;
 	background: var(--pr-surface-sunken);
 }
 
-.pr-stepart__bar {
+.pr-guide__lines {
 	flex: 1;
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+}
+
+.pr-guide__lines span {
 	height: 4px;
 	border-radius: var(--pr-radius-pill);
 	background: var(--pr-line);
 }
 
-.pr-stepart__badges {
-	display: flex;
-	flex-direction: column;
-	gap: var(--pr-space-2);
+.pr-guide__lines span:last-child {
+	width: 40%;
+	background: var(--pr-spark);
 }
 
-.pr-stepart--row {
-	gap: var(--pr-space-2);
-}
+@keyframes pr-guide-fan {
 
-.pr-stepart--row .pr-stepart__frame:nth-child(4) {
-	opacity: 0.45;
-}
+	from {
+		transform: none;
+	}
 
-.pr-stepart__arrow {
-	position: absolute;
-	inset-inline-end: 14px;
-	top: calc(50% - 16px);
-	width: 32px;
-	height: 32px;
-	display: grid;
-	place-items: center;
-	border-radius: var(--pr-radius-pill);
-	background: var(--pr-surface);
-	color: var(--pr-ink);
-	box-shadow: var(--pr-shadow-sm);
-}
-
-.pr-stepart--page {
-	inset: 16px 20px 0;
-	flex-direction: column;
-	align-items: flex-start;
-	justify-content: flex-start;
-	gap: var(--pr-space-2);
-	padding: var(--pr-space-3);
-	border-radius: 10px 10px 0 0;
-	background: var(--pr-surface);
-	box-shadow: 0 0 0 1px var(--pr-line);
-}
-
-.pr-stepart__line {
-	width: 45%;
-	height: 6px;
-	border-radius: 6px;
-	background: var(--pr-line);
-}
-
-.pr-stepart__circles {
-	display: flex;
-	gap: 6px;
-}
-
-.pr-stepart__circle {
-	position: relative;
-	width: 30px;
-	height: 30px;
-	border-radius: var(--pr-radius-pill);
-	overflow: hidden;
-	background: var(--pr-surface-sunken);
-	box-shadow: 0 0 0 1.5px var(--pr-surface), 0 0 0 2.5px var(--pr-ink);
-}
-
-.pr-stepart__code {
-	margin-top: 6px;
-	cursor: default;
+	to {
+		transform: var(--pr-fan);
+	}
 }
 
 /* ---------------------------------------------------------- Responsive */
@@ -322,20 +467,22 @@
 
 @media (max-width: 960px) {
 
-	.pr-guide__steps {
+	.pr-guide {
 		grid-template-columns: minmax(0, 1fr);
 	}
 
-	.pr-step {
+	.pr-guide__art {
+		order: -1;
+		min-height: 260px;
 		border-inline-start: 0;
-		border-top: 1px solid var(--pr-line);
+		border-bottom: 1px solid var(--pr-line);
 	}
 
-	.pr-step:first-child {
-		border-top: 0;
+	.pr-guide__fan {
+		transform: scale(0.8);
 	}
 
-	.pr-guide__head {
+	.pr-guide__main {
 		padding: var(--pr-space-6);
 	}
 }
@@ -343,8 +490,13 @@
 @media (prefers-reduced-motion: reduce) {
 
 	.pr-metric__ph,
-	.pr-widgettable tr[data-highlight="true"] td {
+	.pr-widgettable tr[data-highlight="true"] td,
+	.pr-guide__reel {
 		animation: none;
+	}
+
+	.pr-guide__progress::after {
+		transition: none;
 	}
 
 	.pr-widgettable tr[data-highlight="true"] td {

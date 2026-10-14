@@ -6,15 +6,15 @@ It bundles or includes the following third-party works, each under its own
 GPL-compatible licence.
 
 
-1. Archivo and Archivo Expanded typefaces
------------------------------------------
-Files:   admin/fonts/Archivo-Variable.woff2, admin/fonts/ArchivoExpanded-Variable.woff2
-         (renamed "ProductReels Archivo" so they never collide with a theme's
-         Archivo; used in the WordPress admin only)
-Source:  https://github.com/Omnibus-Type/Archivo
+1. Inter typeface
+-----------------
+Files:   admin/fonts/Inter-Latin.woff2, admin/fonts/Inter-LatinExt.woff2
+         (variable font, Latin subsets; renamed "ProductReels Inter" so it never
+         collides with a theme's Inter; used in the WordPress admin only)
+Source:  https://github.com/rsms/inter
 Licence: SIL Open Font License, Version 1.1. Full text: admin/fonts/OFL.txt
 
-Copyright 2020 The Archivo Project Authors (https://github.com/Omnibus-Type/Archivo)
+Copyright 2016 The Inter Project Authors (https://github.com/rsms/inter)
 
 
 2. Lucide icons

@@ -22,6 +22,8 @@ import { useInView } from './hooks/useInView';
 import { claimPlayback } from './playback';
 import { TileCard } from './ProductCard';
 import { useWidgetProducts } from './products';
+import { VimeoPlayer } from './providers/VimeoPlayer';
+import { YouTubePlayer } from './providers/YouTubePlayer';
 import { ReelIcon } from './ReelIcon';
 
 const Views = ( { count, className = '' } ) => (
@@ -30,6 +32,68 @@ const Views = ( { count, className = '' } ) => (
 		{ viewCount( count ) }
 	</span>
 );
+
+const noop = () => {};
+
+/**
+ * A YouTube or Vimeo reel previewing on its tile, through the player's own
+ * provider: muted, looping, no controls. It plays while `playing` is true —
+ * from the moment it is ready — and otherwise waits at the start, so a
+ * hover preview loads once and is instant the next time.
+ * It is footage only — inert and hidden from assistive technology — so the
+ * tile's button stays the one thing to press.
+ *
+ * @param {Object}   props             Props.
+ * @param {Object}   props.file        The YouTube or Vimeo file.
+ * @param {boolean}  props.playing     Whether it should be playing.
+ * @param {Function} props.onPlayState Called with whether it is playing.
+ */
+const EmbedPreview = ( { file, playing, onPlayState } ) => {
+	const player = useRef( null );
+	const ready = useRef( false );
+	// The provider binds its callbacks once, so `onReady` reads this ref.
+	const wanted = useRef( playing );
+	const Provider = file.source === 'vimeo' ? VimeoPlayer : YouTubePlayer;
+
+	wanted.current = playing;
+
+	useEffect( () => {
+		const instance = player.current;
+
+		if ( ! ready.current || ! instance ) {
+			return;
+		}
+
+		if ( playing ) {
+			instance.play().catch( noop );
+		} else {
+			instance.pause();
+			instance.seek( 0 );
+		}
+	}, [ playing ] );
+
+	return (
+		<span className="prs-tile__embed" aria-hidden="true" inert="">
+			<Provider
+				ref={ player }
+				file={ file }
+				muted
+				loop
+				noCookie
+				onTime={ noop }
+				onEnded={ noop }
+				onPlayState={ onPlayState }
+				onReady={ () => {
+					ready.current = true;
+
+					if ( wanted.current && player.current ) {
+						player.current.play().catch( noop );
+					}
+				} }
+			/>
+		</span>
+	);
+};
 
 /**
  * @param {Object}   props            Props.
@@ -57,6 +121,10 @@ export const Thumbnail = ( {
 	const [ frameRef, inView ] = useInView( { rootMargin: '200px' } );
 	// Whether a preview is running, which is when the cover steps aside.
 	const [ live, setLive ] = useState( false );
+	// A hover preview: whether the pointer is on the tile now, and whether it
+	// ever was (its footage, or its YouTube or Vimeo player, stays loaded after).
+	const [ hovering, setHovering ] = useState( false );
+	const [ hovered, setHovered ] = useState( false );
 	const products = useWidgetProducts();
 
 	const file = firstFile( reel );
@@ -94,21 +162,34 @@ export const Thumbnail = ( {
 			: '';
 	const views = styles.showViews && ! plain;
 
-	// With lazyLoad on, the <video> gets no src at all until it is near the
-	// viewport — an off-screen widget should cost nothing but markup.
-	const videoSrc =
-		! styles.lazyLoad || inView
-			? `${ file ? file.url : '' }#t=0.1`
-			: undefined;
+	const hover = styles.playBehavior === 'hover' && ! styles.disablePreview;
+	const previewable = hover && playable;
 
-	const previewable =
-		styles.playBehavior === 'hover' && ! styles.disablePreview && playable;
+	// With lazyLoad on, the <video> gets no src at all until it is near the
+	// viewport — an off-screen widget should cost nothing but markup. A hover
+	// preview behind a cover waits longer still, for the first hover: nobody
+	// asked for the footage yet, and a page load that fetches every reel's
+	// file is what download managers pounce on.
+	const wantsSrc =
+		previewable && poster ? hovered : ! styles.lazyLoad || inView;
+	const videoSrc = wantsSrc ? `${ file ? file.url : '' }#t=0.1` : undefined;
 	const autoplay =
 		styles.playBehavior === 'autoplay' && ! styles.disablePreview;
+	const embedded =
+		!! file &&
+		!! file.provider_id &&
+		( file.source === 'youtube' || file.source === 'vimeo' );
+	const embedHover = hover && embedded;
 	// The cover is the picture. A <video> is only there to preview (on hover
 	// or in view), or to stand in with its first frame for a reel without a
 	// cover; a tile that only opens the player never loads any footage.
 	const withVideo = playable && ( previewable || autoplay || ! poster );
+	// YouTube and Vimeo have no <video> to play, so their own player stands
+	// in — mounted only when it is needed (the tile near the viewport for
+	// autoplay, the first hover for a hover preview), because each one loads
+	// the provider's whole player.
+	const withEmbed =
+		embedded && ( ( autoplay && inView ) || ( embedHover && hovered ) );
 
 	useEffect( () => {
 		const node = video.current;
@@ -133,22 +214,36 @@ export const Thumbnail = ( {
 		return () => node.pause();
 	}, [ inView, styles.playBehavior, styles.disablePreview ] );
 
+	// A <video> hover preview follows `hovering`. An effect rather than the
+	// pointer handlers, because the first hover only now gives it a src.
+	useEffect( () => {
+		const node = video.current;
+
+		if ( ! node || ! previewable ) {
+			return;
+		}
+
+		if ( hovering ) {
+			node.play().catch( noop );
+		} else {
+			node.pause();
+
+			if ( node.readyState > 0 ) {
+				node.currentTime = 0;
+			}
+		}
+	}, [ hovering, previewable, videoSrc ] );
+
 	const hoverIn = () => {
-		if ( previewable && video.current ) {
-			const node = video.current;
-
+		if ( embedHover || previewable ) {
 			// One video at a time, page-wide: a hover preview yields to the player.
-			claimPlayback( () => node.pause() );
-			node.play().catch( () => {} );
+			claimPlayback( () => setHovering( false ) );
+			setHovered( true );
+			setHovering( true );
 		}
 	};
 
-	const hoverOut = () => {
-		if ( previewable && video.current ) {
-			video.current.pause();
-			video.current.currentTime = 0;
-		}
-	};
+	const hoverOut = () => setHovering( false );
 
 	return (
 		<button
@@ -192,6 +287,13 @@ export const Thumbnail = ( {
 							aria-hidden="true"
 							onPlaying={ () => setLive( true ) }
 							onPause={ () => setLive( false ) }
+						/>
+					) }
+					{ withEmbed && (
+						<EmbedPreview
+							file={ file }
+							playing={ autoplay || hovering }
+							onPlayState={ setLive }
 						/>
 					) }
 					{ poster && (

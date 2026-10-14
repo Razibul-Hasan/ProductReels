@@ -44,7 +44,16 @@ class Productreels_Media {
 		'ogv'  => 'video/ogg',
 		'ogg'  => 'video/ogg',
 		'mov'  => 'video/quicktime',
+		'qt'   => 'video/quicktime',
 		'm3u8' => 'application/x-mpegURL',
+		'mkv'  => 'video/x-matroska',
+		'avi'  => 'video/avi',
+		'wmv'  => 'video/x-ms-wmv',
+		'flv'  => 'video/x-flv',
+		'mpeg' => 'video/mpeg',
+		'mpg'  => 'video/mpeg',
+		'3gp'  => 'video/3gpp',
+		'3g2'  => 'video/3gpp2',
 	);
 
 	/**

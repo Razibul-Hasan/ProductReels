@@ -216,6 +216,8 @@ class Productreels {
 
 		$this->loader->add_action( 'admin_menu', $plugin_admin, 'register_menu' );
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_assets' );
+		$this->loader->add_action( 'admin_init', $plugin_admin, 'redirect_after_activation' );
+		$this->loader->add_filter( 'plugin_action_links_' . plugin_basename( PRODUCTREELS_FILE ), $plugin_admin, 'plugin_action_links' );
 
 		// Both halves of the core admin footer, on ProductReels screens only.
 		$this->loader->add_filter( 'admin_footer_text', $plugin_admin, 'admin_footer_text', 99 );

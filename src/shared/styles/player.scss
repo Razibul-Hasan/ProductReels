@@ -726,6 +726,30 @@ body.wr-player-open {
 	cursor: progress;
 }
 
+/* The modern card's buy button with its text: a pill, not a circle. */
+:is(.wr-portal-root, .wr-player-compact) .prs-card__add--text,
+:is(.wr-portal-root, .wr-player-compact) .prs-card__add--text:is(:hover, :focus, :active) {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	width: auto;
+	max-width: 50%;
+	height: 32px;
+	padding: 0 var(--pr-space-3);
+	text-transform: none;
+	letter-spacing: normal;
+	white-space: nowrap;
+}
+
+.prs-card__add-text {
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.prs-card__add--text > svg {
+	flex: none;
+}
+
 .prs-spin {
 	animation: prs-spin 0.8s linear infinite;
 }
@@ -735,6 +759,607 @@ body.wr-player-open {
 	to {
 		rotate: 360deg;
 	}
+}
+
+/* ---------------------------------------------------------- Classic card */
+
+/* A dark strip as wide as the reel: the picture at the start, then the
+   name, the price and a full-width button. */
+:is(.wr-portal-root, .wr-player-compact) .prs-card--classic {
+	flex-direction: row;
+	align-items: stretch;
+	width: auto;
+	gap: var(--pr-space-3);
+	padding: var(--pr-space-2);
+	border-radius: var(--pr-radius-md);
+	background: var(--pr-reel-badge);
+	color: var(--pr-on-reel);
+	box-shadow: none;
+}
+
+.prs-card--classic .prs-card__thumb {
+	width: 88px;
+	height: 88px;
+	aspect-ratio: auto;
+	border-radius: var(--pr-radius-sm);
+	background: var(--pr-surface);
+}
+
+.prs-card--classic .prs-card__text {
+	justify-content: center;
+	gap: 2px;
+}
+
+.prs-card--classic .prs-card__name {
+	font-weight: 600;
+}
+
+:is(.wr-portal-root, .wr-player-compact) .prs-card--classic .prs-price {
+	color: var(--pr-on-reel);
+	font-weight: 700;
+}
+
+:is(.wr-portal-root, .wr-player-compact) .prs-card--classic .prs-price del {
+	color: var(--pr-on-reel);
+	font-weight: 400;
+	opacity: 0.7;
+}
+
+:is(.wr-portal-root, .wr-player-compact) .prs-card--classic .prs-price ins {
+	color: var(--pr-spark-bright);
+}
+
+.prs-card--classic .prs-stars,
+.prs-card--classic .prs-stars .prs-stars__n {
+	color: var(--pr-on-reel);
+}
+
+:is(.wr-portal-root, .wr-player-compact) .prs-card--classic .prs-btn,
+:is(.wr-portal-root, .wr-player-compact) .prs-card--classic .prs-btn:is(:hover, :focus, :active, :visited) {
+	margin-block-start: 6px;
+	border-radius: var(--pr-radius-sm);
+	background: var(--pr-reel-scrim);
+	color: var(--pr-on-reel);
+	box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.16);
+}
+
+:is(.wr-portal-root, .wr-player-compact) .prs-card--classic .prs-btn:hover {
+	background: var(--pr-studio-raised);
+}
+
+:is(.wr-portal-root, .wr-player-compact) .prs-card--classic .prs-btn:focus-visible {
+	box-shadow: var(--pr-focus-ring-studio);
+}
+
+:is(.wr-portal-root, .wr-player-compact) .prs-card--classic .prs-btn.is-done {
+	background: var(--pr-ok);
+}
+
+.prs-card--classic.is-loading .prs-card__text {
+	gap: var(--pr-space-2);
+}
+
+/* The chevron that folds the classic cards away, at the end above them. */
+.prs-player__fold {
+	align-self: flex-end;
+}
+
+/* --------------------------------------------------------- Product panel */
+
+/* The stage and the panel sit side by side as one piece. Without a panel
+   the pair is not a box at all, and the stage is a child of the layout as
+   it always was. */
+.prs-room__duo {
+	display: contents;
+}
+
+.prs-room.has-panel {
+	--prs-stage-w: min(calc(min(100vh - 96px, 720px) * 9 / 16), calc((100vw - 200px) / 2.2));
+	--prs-panel-w: calc(var(--prs-stage-w) * 1.2);
+}
+
+.prs-room.has-panel .prs-room__duo {
+	display: flex;
+	flex: none;
+	border-radius: var(--pr-radius-lg);
+	box-shadow: 0 0 0 1px var(--pr-studio-line), 0 40px 100px -24px rgb(0 0 0 / 0.7);
+}
+
+.prs-room.has-panel .prs-room__stage {
+	border-start-end-radius: 0;
+	border-end-end-radius: 0;
+	box-shadow: none;
+}
+
+/* Vertical: the up and down buttons move to the start side of the pair. */
+.prs-room.is-vertical.has-panel .prs-room__duo {
+	grid-column: 2;
+	grid-row: 1 / span 2;
+	align-self: center;
+}
+
+.prs-room.is-vertical.has-panel :is(.prs-room__nav--prev, .prs-room__nav--next) {
+	grid-column: 1;
+}
+
+@media (max-width: 1679px) {
+
+	.prs-room.has-panel .prs-room__peek {
+		display: none;
+	}
+}
+
+.prs-pp {
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	overflow: hidden;
+	background: var(--pr-surface);
+	color: var(--pr-ink);
+	text-align: start;
+	user-select: text;
+	-webkit-user-select: text;
+}
+
+.prs-pp--dock {
+	flex: none;
+	width: var(--prs-panel-w);
+	height: calc(var(--prs-stage-w) * 16 / 9);
+	border-start-end-radius: var(--pr-radius-lg);
+	border-end-end-radius: var(--pr-radius-lg);
+	animation: prs-panel-in 520ms var(--prs-out) 120ms backwards;
+}
+
+@keyframes prs-panel-in {
+
+	from {
+		opacity: 0;
+		translate: -16px 0;
+	}
+}
+
+/* A phone: a sheet over the reel, on a shade that lowers it when tapped. */
+.prs-room__sheet {
+	position: absolute;
+	inset: 0;
+	z-index: 5;
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-end;
+}
+
+.prs-room__sheet-scrim {
+	position: absolute;
+	inset: 0;
+	background: var(--pr-scrim);
+	animation: prs-fade-in 240ms var(--prs-out);
+}
+
+.prs-pp--sheet {
+	max-height: 90%;
+	border-radius: var(--pr-radius-lg) var(--pr-radius-lg) 0 0;
+	animation: prs-sheet-in 420ms var(--prs-out);
+}
+
+@keyframes prs-sheet-in {
+
+	from {
+		translate: 0 100%;
+	}
+}
+
+.prs-pp__bar {
+	position: absolute;
+	inset-block-start: var(--pr-space-3);
+	inset-inline: var(--pr-space-3);
+	z-index: 2;
+	display: flex;
+	justify-content: space-between;
+	pointer-events: none;
+}
+
+.prs-pp__bar > * {
+	pointer-events: auto;
+}
+
+.wr-portal-root .prs-pp__round,
+.wr-portal-root .prs-pp__round:is(:hover, :focus, :active) {
+	display: grid;
+	place-items: center;
+	width: var(--pr-control);
+	height: var(--pr-control);
+	min-height: 0;
+	margin: 0;
+	padding: 0;
+	border: 0;
+	border-radius: var(--pr-radius-pill);
+	background: var(--pr-surface);
+	color: var(--pr-ink);
+	box-shadow: var(--pr-shadow-md);
+	cursor: pointer;
+}
+
+.wr-portal-root .prs-pp__x,
+.wr-portal-root .prs-pp__x:is(:hover, :focus, :active) {
+	margin-inline-start: auto;
+}
+
+.wr-portal-root .prs-pp__round:hover {
+	background: var(--pr-surface-hover);
+}
+
+.wr-portal-root .prs-pp__round:focus-visible {
+	box-shadow: var(--pr-focus-ring);
+}
+
+.prs-pp__scroll {
+	flex: 1 1 auto;
+	min-height: 0;
+	overflow-y: auto;
+	overscroll-behavior: contain;
+	touch-action: pan-y;
+	scrollbar-width: thin;
+}
+
+/* Pictures: one per swipe, letterboxed on white, never cropped. */
+.prs-pp__track {
+	display: flex;
+	overflow-x: auto;
+	scroll-snap-type: x mandatory;
+	scrollbar-width: none;
+	overscroll-behavior-x: contain;
+	touch-action: pan-x pan-y;
+}
+
+.prs-pp__track::-webkit-scrollbar {
+	display: none;
+}
+
+.prs-pp__shot {
+	flex: 0 0 100%;
+	aspect-ratio: 4 / 3;
+	scroll-snap-align: start;
+	background: var(--pr-surface);
+}
+
+.prs-pp__shot:empty {
+	background: var(--pr-surface-sunken);
+}
+
+.wr-portal-root .prs-pp__shot > img {
+	width: 100%;
+	height: 100%;
+	object-fit: contain;
+}
+
+.prs-pp__dots {
+	display: flex;
+	justify-content: center;
+	gap: 6px;
+	padding-block-start: var(--pr-space-3);
+}
+
+.wr-portal-root .prs-pp__dot,
+.wr-portal-root .prs-pp__dot:is(:hover, :focus, :active) {
+	position: relative;
+	width: 8px;
+	height: 8px;
+	min-height: 0;
+	margin: 0;
+	padding: 0;
+	border: 0;
+	border-radius: var(--pr-radius-pill);
+	background: var(--pr-line-strong);
+	box-shadow: none;
+	opacity: 0.45;
+	cursor: pointer;
+}
+
+/* A bigger target than the dot. */
+.prs-pp__dot::after {
+	content: "";
+	position: absolute;
+	inset: -6px -3px;
+}
+
+.wr-portal-root .prs-pp__dot.is-on {
+	background: var(--pr-ink);
+	opacity: 1;
+}
+
+.wr-portal-root .prs-pp__dot:focus-visible {
+	box-shadow: var(--pr-focus-ring);
+	opacity: 1;
+}
+
+.prs-pp__body {
+	display: flex;
+	flex-direction: column;
+	gap: var(--pr-space-6);
+	padding: var(--pr-space-6) var(--pr-space-6) var(--pr-space-5);
+}
+
+.prs-pp__scroll.is-loading .prs-pp__body {
+	gap: var(--pr-space-2);
+}
+
+.prs-pp__head {
+	display: flex;
+	flex-direction: column;
+	gap: var(--pr-space-2);
+}
+
+/* The storefront inherits the theme's font, display sizes included. */
+.wr-portal-root .prs-pp :is(.pr-t-display, .pr-t-title) {
+	font-family: inherit;
+}
+
+.wr-portal-root .prs-pp__name {
+	margin: 0;
+	padding: 0;
+	color: var(--pr-ink);
+	overflow-wrap: anywhere;
+}
+
+.wr-portal-root .prs-pp a:is(.prs-pp__more, :not([class])) {
+	color: inherit;
+	text-decoration: none;
+}
+
+.wr-portal-root .prs-pp a:is(.prs-pp__more, :not([class])):hover {
+	text-decoration: underline;
+	text-underline-offset: 3px;
+}
+
+.wr-portal-root .prs-pp a:is(.prs-pp__more, :not([class])):focus-visible {
+	outline: 2px solid var(--pr-brand);
+	outline-offset: 2px;
+	border-radius: 2px;
+}
+
+.wr-portal-root .prs-pp .prs-price {
+	flex-wrap: wrap;
+	white-space: normal;
+	color: var(--pr-ink);
+}
+
+.prs-pp__option {
+	display: flex;
+	flex-direction: column;
+	gap: var(--pr-space-3);
+}
+
+.prs-pp__pills {
+	display: flex;
+	flex-wrap: wrap;
+	gap: var(--pr-space-2);
+}
+
+.wr-portal-root .prs-pp__pill,
+.wr-portal-root .prs-pp__pill:is(:hover, :focus, :active) {
+	height: var(--pr-control);
+	min-height: 0;
+	margin: 0;
+	padding: 0 18px;
+	border: 0;
+	border-radius: var(--pr-radius-pill);
+	background: var(--pr-surface-sunken);
+	color: var(--pr-ink);
+	box-shadow: none;
+	font-family: inherit;
+	text-transform: none;
+	letter-spacing: normal;
+	cursor: pointer;
+}
+
+.wr-portal-root .prs-pp__pill:hover {
+	background: var(--pr-line);
+}
+
+.wr-portal-root .prs-pp__pill.is-on {
+	background: var(--pr-ink);
+	color: var(--pr-on-ink);
+}
+
+/* No variation has this choice with the others: still pressable, so a
+   shopper can change their mind in any order, but struck through. */
+.wr-portal-root .prs-pp__pill.is-off {
+	color: var(--pr-ink-disabled);
+	text-decoration: line-through;
+}
+
+.wr-portal-root .prs-pp__pill.is-on.is-off {
+	color: var(--pr-on-ink);
+	opacity: 0.6;
+}
+
+.wr-portal-root .prs-pp__pill:focus-visible {
+	box-shadow: var(--pr-focus-ring);
+}
+
+.prs-pp__desc {
+	color: var(--pr-ink-muted);
+	overflow-wrap: anywhere;
+}
+
+.prs-pp__desc > * + * {
+	margin-block-start: var(--pr-space-2);
+}
+
+.wr-portal-root .prs-pp__more {
+	display: inline-flex;
+	align-items: center;
+	align-self: flex-start;
+	gap: var(--pr-space-1);
+}
+
+/* The buy button and the cart, kept in view under the scroll. */
+.prs-pp__foot {
+	flex: none;
+	display: flex;
+	gap: var(--pr-space-3);
+	padding: var(--pr-space-4) var(--pr-space-6) var(--pr-space-6);
+	border-block-start: 1px solid var(--pr-line);
+	background: var(--pr-surface);
+}
+
+.prs-pp--sheet .prs-pp__foot {
+	padding: var(--pr-space-3) var(--pr-space-4) calc(var(--pr-space-4) + env(safe-area-inset-bottom, 0px));
+}
+
+.wr-portal-root .prs-pp__buy,
+.wr-portal-root .prs-pp__buy:is(:hover, :focus, :active, :visited) {
+	flex: 1;
+	min-width: 0;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: var(--pr-space-2);
+	height: var(--pr-control-lg);
+	min-height: 0;
+	margin: 0;
+	padding: 0 var(--pr-space-4);
+	border: 0;
+	border-radius: var(--pr-radius-sm);
+	background: var(--pr-ink);
+	color: var(--pr-on-ink);
+	box-shadow: none;
+	font-family: inherit;
+	line-height: 1.2;
+	text-decoration: none;
+	text-transform: none;
+	letter-spacing: normal;
+	white-space: nowrap;
+	cursor: pointer;
+}
+
+.wr-portal-root .prs-pp__buy:hover {
+	background: var(--pr-studio-raised);
+}
+
+.wr-portal-root .prs-pp__buy:focus-visible {
+	box-shadow: var(--pr-focus-ring);
+}
+
+.wr-portal-root .prs-pp__buy.is-done {
+	background: var(--pr-ok);
+}
+
+.wr-portal-root .prs-pp__buy.is-disabled {
+	background: var(--pr-surface-sunken);
+	color: var(--pr-ink-muted);
+	cursor: not-allowed;
+}
+
+.wr-portal-root .prs-pp__buy:disabled {
+	cursor: progress;
+}
+
+.wr-portal-root .prs-pp__cart,
+.wr-portal-root .prs-pp__cart:is(:hover, :focus, :active, :visited) {
+	flex: none;
+	display: grid;
+	place-items: center;
+	width: var(--pr-control-lg);
+	height: var(--pr-control-lg);
+	border-radius: var(--pr-radius-sm);
+	background: var(--pr-surface-sunken);
+	color: var(--pr-ink);
+	box-shadow: none;
+	text-decoration: none;
+}
+
+.wr-portal-root .prs-pp__cart:hover {
+	background: var(--pr-line);
+}
+
+.wr-portal-root .prs-pp__cart:focus-visible {
+	box-shadow: var(--pr-focus-ring);
+}
+
+/* Several products: a list to pick from, the title level with the close. */
+.prs-pp__scroll--list {
+	padding: var(--pr-space-3) var(--pr-space-5) var(--pr-space-5);
+}
+
+.wr-portal-root .prs-pp__heading {
+	display: flex;
+	align-items: center;
+	min-height: var(--pr-control);
+	margin: 0 0 var(--pr-space-4);
+	padding-inline-end: 52px;
+	color: var(--pr-ink);
+}
+
+.wr-portal-root .prs-pp__list {
+	display: flex;
+	flex-direction: column;
+	gap: var(--pr-space-2);
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.wr-portal-root .prs-pp__row,
+.wr-portal-root .prs-pp__row:is(:hover, :focus, :active) {
+	display: flex;
+	align-items: center;
+	gap: var(--pr-space-3);
+	width: 100%;
+	min-height: 0;
+	margin: 0;
+	padding: var(--pr-space-2);
+	border: 1px solid var(--pr-line);
+	border-radius: var(--pr-radius-md);
+	background: var(--pr-surface);
+	color: var(--pr-ink);
+	box-shadow: none;
+	font-family: inherit;
+	text-align: start;
+	text-transform: none;
+	letter-spacing: normal;
+	cursor: pointer;
+}
+
+.wr-portal-root .prs-pp__row:hover {
+	background: var(--pr-surface-hover);
+}
+
+.wr-portal-root .prs-pp__row:focus-visible {
+	box-shadow: var(--pr-focus-ring);
+}
+
+.wr-portal-root .prs-pp__row:disabled {
+	cursor: default;
+}
+
+.prs-pp__thumb {
+	flex: none;
+	width: 64px;
+	height: 64px;
+	overflow: hidden;
+	border-radius: var(--pr-radius-sm);
+	background: var(--pr-surface-sunken);
+}
+
+.wr-portal-root .prs-pp__thumb > img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+}
+
+.prs-pp__rowtext {
+	flex: 1;
+	min-width: 0;
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+}
+
+.prs-pp__rowname {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
 }
 
 /* ------------------------------------------------------------------ Toast */

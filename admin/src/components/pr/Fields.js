@@ -34,7 +34,7 @@ export const Field = ( {
 		{ error && (
 			<p className="pr-field__error pr-t-small" id={ describedBy }>
 				<Icon name="alert" size={ 15 } />
-				{ error }
+				<span>{ error }</span>
 			</p>
 		) }
 		{ ! error && help && (

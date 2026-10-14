@@ -94,7 +94,8 @@ const loadAll = async ( search ) => {
 
 /**
  * The step the guide is on, from the overview: 0 no reels, 1 no widgets,
- * 2 no views yet, 3 set up (no guide).
+ * 2 not on a page yet, 3 set up (no guide). `placed` is true once a widget
+ * has a view, is found on a page, or the merchant marked the step done.
  *
  * @param {Object} data The overview.
  * @return {number} The step.
@@ -108,7 +109,7 @@ const guideStep = ( data ) => {
 		return 1;
 	}
 
-	return data.views === 0 ? 2 : 3;
+	return data.views > 0 || data.placed ? 3 : 2;
 };
 
 const Metrics = ( { data } ) => {
@@ -536,6 +537,35 @@ export const WidgetsList = ( { navigate, creating = false } ) => {
 			.catch( () => setCovers( [] ) );
 	}, [ showGuide, step ] );
 
+	// On the last step, look again when the merchant comes back from placing
+	// the widget in another tab, so the step ticks off without a reload.
+	useEffect( () => {
+		if ( step !== 2 ) {
+			return undefined;
+		}
+
+		const recheck = () =>
+			document.visibilityState === 'visible' &&
+			loadOverview().catch( () => {} );
+
+		document.addEventListener( 'visibilitychange', recheck );
+
+		return () =>
+			document.removeEventListener( 'visibilitychange', recheck );
+	}, [ step, loadOverview ] );
+
+	const completeGuide = async () => {
+		try {
+			await overviewApi.completeGuide();
+			await loadOverview();
+			toasts.success( __( 'You’re all set', 'productreels' ), {
+				icon: 'success',
+			} );
+		} catch ( requestError ) {
+			toasts.error( requestError.message );
+		}
+	};
+
 	useEffect( () => {
 		if ( ! highlight ) {
 			return undefined;
@@ -673,6 +703,7 @@ export const WidgetsList = ( { navigate, creating = false } ) => {
 					onAddReel={ () => setEditingReel( 0 ) }
 					onCreateWidget={ () => navigate( '#/widgets/new' ) }
 					onCopyShortcode={ () => copyShortcode( firstWidgetId ) }
+					onMarkDone={ completeGuide }
 				/>
 				{ /* Widgets without views stay reachable under the guide. */ }
 				{ step === 2 && items.length > 0 && table }

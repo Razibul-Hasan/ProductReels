@@ -186,6 +186,12 @@
 	opacity: 0;
 }
 
+/* A YouTube or Vimeo preview that fails keeps the cover; the player's
+   fallback link belongs in the player, not inside the tile's button. */
+.productreels-embed .prs-tile__embed .wr-player__fallback {
+	display: none;
+}
+
 .productreels-embed .prs-tile--zoom-in:hover .prs-tile__frame > *,
 .productreels-embed .prs-tile--zoom-out .prs-tile__frame > * {
 	transform: scale(1.07);

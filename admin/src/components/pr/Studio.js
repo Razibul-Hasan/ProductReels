@@ -340,19 +340,13 @@ export const DeviceSwitch = ( { value, onChange } ) => (
  * the size it looks, so the stage scrolls the right distance, and a
  * fixed-position player opened from a reel still covers the viewport.
  *
- * @param {Object}  props          Props.
- * @param {string}  props.device   desktop, tablet or mobile.
- * @param {string}  props.url      The address shown in the browser bar.
- * @param {Object}  props.children The widget.
- * @param {boolean} props.context  Placeholder page text around the widget.
+ * @param {Object} props          Props.
+ * @param {string} props.device   desktop, tablet or mobile.
+ * @param {string} props.url      The address shown in the browser bar.
+ * @param {Object} props.children The widget.
  * @return {Object} The frame.
  */
-export const DeviceFrame = ( {
-	device = 'desktop',
-	url,
-	children,
-	context = true,
-} ) => {
+export const DeviceFrame = ( { device = 'desktop', url, children } ) => {
 	const screen = useRef( null );
 	const [ zoom, setZoom ] = useState( 0 );
 	const width = ( DEVICES[ device ] || DEVICES.desktop ).width;
@@ -413,27 +407,9 @@ export const DeviceFrame = ( {
 						visibility: zoom ? undefined : 'hidden',
 					} }
 				>
-					{ context && (
-						<div className="pr-skel pr-skel--title">
-							<span />
-						</div>
-					) }
 					{ children }
-					{ context && device !== 'mobile' && (
-						<div className="pr-device__cards" aria-hidden="true">
-							<span />
-							<span />
-							<span />
-						</div>
-					) }
-					{ context && (
-						<div className="pr-skel pr-skel--lines">
-							<span />
-							<span />
-							<span />
-						</div>
-					) }
 				</div>
+				{ device === 'mobile' && <div className="pr-device__home" /> }
 			</div>
 		</div>
 	);

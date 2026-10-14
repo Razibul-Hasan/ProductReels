@@ -282,7 +282,7 @@ See `THIRD-PARTY-NOTICES.txt` for licenses related to bundled dependencies.
 
 = Credits =
 
-* Archivo typeface by Omnibus-Type, SIL Open Font License 1.1 (bundled, used in the admin only).
+* Inter typeface by Rasmus Andersson, SIL Open Font License 1.1 (bundled, used in the admin only).
 * Lucide icons, ISC License.
 * dnd-kit (drag and drop in the admin), MIT License.
 
@@ -444,6 +444,7 @@ Deleting a widget does not automatically delete its reels.
 * New: Top reels and "reels in use" on the Widgets screen.
 * New: Search products by name or SKU when tagging a reel.
 * New: The block shows the live widget in the block editor.
+* New: The classic product card opens a product panel in the player, with the product's pictures, options and buy button beside the reel (a sheet on phones).
 * Improved: Refreshed reels, product cards and player on your store. Styles you've already saved keep their values; new widgets start from refreshed defaults.
 * Improved: Keyboard access, focus states, screen reader announcements, right-to-left layouts and reduced-motion support throughout.
 * Improved: Clearer wording across the plugin, for example "Click rate" instead of "CTR".

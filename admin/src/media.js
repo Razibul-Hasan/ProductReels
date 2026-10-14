@@ -14,41 +14,100 @@ import { nonceMiddleware } from './api/client';
 import { uuid } from './uuid';
 
 /** The formats that play in every browser the storefront supports. */
-export const VIDEO_TYPES = [ 'video/mp4', 'video/webm' ];
+export const VIDEO_TYPES = [ 'video/mp4', 'video/webm', 'video/x-m4v' ];
 
+/**
+ * Formats some browsers play and others don't: QuickTime and 3GP play when
+ * they hold H.264, Ogg and Matroska play in Chrome and Firefox but not on
+ * iPhones, and HLS streams only play natively in Safari.
+ */
+const SOME_BROWSER_TYPES = [
+	'video/quicktime',
+	'video/ogg',
+	'video/x-matroska',
+	'video/3gpp',
+	'video/3gpp2',
+	'application/x-mpegurl',
+	'application/vnd.apple.mpegurl',
+];
+
+/**
+ * Every video extension WordPress accepts in the media library, by mime
+ * type. Browsers report their own guess for a file's type, and on Windows
+ * that guess comes from whatever app claimed the extension (a real .mp4 can
+ * arrive as video/x-m4v or application/octet-stream), so the name decides
+ * whenever it is a video name.
+ */
 const VIDEO_EXTENSIONS = {
 	mp4: 'video/mp4',
 	m4v: 'video/mp4',
 	webm: 'video/webm',
+	ogv: 'video/ogg',
+	mov: 'video/quicktime',
+	qt: 'video/quicktime',
+	mkv: 'video/x-matroska',
+	avi: 'video/avi',
+	divx: 'video/divx',
+	wmv: 'video/x-ms-wmv',
+	wmx: 'video/x-ms-wmx',
+	wm: 'video/x-ms-wm',
+	asf: 'video/x-ms-asf',
+	asx: 'video/x-ms-asf',
+	flv: 'video/x-flv',
+	mpeg: 'video/mpeg',
+	mpg: 'video/mpeg',
+	mpe: 'video/mpeg',
+	'3gp': 'video/3gpp',
+	'3gpp': 'video/3gpp',
+	'3g2': 'video/3gpp2',
+	'3gp2': 'video/3gpp2',
 };
 
 /**
- * The mime type of a dropped or picked file, from its type or its name.
+ * The mime type of a dropped or picked file: its name when that is a video
+ * name, else the type the browser or the media library reported.
+ *
+ * A media library attachment is shaped differently from a File: its `name`
+ * is the slug, with no extension, and its `type` is only "video"; the file
+ * name is in `filename` and the full type in `mime`. Those come first.
  *
  * @param {Object} file A File, or an attachment with `mime` and `filename`.
  * @return {string} The mime type, or an empty string.
  */
 const mimeOf = ( file ) => {
-	const type = file.type || file.mime || '';
+	const name = file.filename || file.name || '';
+	const extension = name.includes( '.' )
+		? name.split( '.' ).pop().toLowerCase()
+		: '';
 
-	if ( type ) {
-		return type;
-	}
-
-	const name = file.name || file.filename || '';
-	const extension = name.split( '.' ).pop().toLowerCase();
-
-	return VIDEO_EXTENSIONS[ extension ] || '';
+	return VIDEO_EXTENSIONS[ extension ] || file.mime || file.type || '';
 };
 
 /**
- * Whether a file is an MP4 or WebM video.
+ * Whether a file is a video, in any format.
  *
  * @param {Object} file A File, or an attachment.
  * @return {boolean} Whether it may be added.
  */
 export const isAllowedVideo = ( file ) =>
-	VIDEO_TYPES.includes( mimeOf( file ) );
+	mimeOf( file ).toLowerCase().startsWith( 'video/' );
+
+/**
+ * Where a video of this type plays.
+ *
+ * @param {string} mime The file's mime type.
+ * @return {string} `everywhere`, `some` (some browsers) or `none` (no
+ *                  browser plays it; it needs converting to MP4).
+ */
+export const playsIn = ( mime ) => {
+	const type = ( mime || '' ).toLowerCase();
+
+	if ( VIDEO_TYPES.includes( type ) ) {
+		return 'everywhere';
+	}
+
+	return SOME_BROWSER_TYPES.includes( type ) ? 'some' : 'none';
+};
 
 /**
  * Something readable to call a file: its name for a real file, the provider
@@ -108,7 +167,7 @@ export const libraryFile = ( item ) => ( {
 	file_uuid: uuid(),
 	wp_media_id: item.id,
 	url: item.url || item.source_url,
-	mime_type: item.mime || item.mime_type || 'video/mp4',
+	mime_type: item.mime || item.mime_type || mimeOf( item ) || 'video/mp4',
 	source: 'native',
 	provider_id: '',
 	poster_url: attachmentPoster( item ),
@@ -118,14 +177,14 @@ export const libraryFile = ( item ) => ( {
 /**
  * Open the media frame for videos.
  *
- * @param {Function} onPicked Receives `{ items, rejected }`: the chosen MP4
- *                            and WebM attachments (each `{ file, size }`) and
- *                            the names of anything else that was chosen.
+ * @param {Function} onPicked Receives `{ items, rejected }`: the chosen video
+ *                            attachments (each `{ file, size }`) and the
+ *                            names of anything else that was chosen.
  */
 export const openVideoFrame = ( onPicked ) => {
 	const frame = window.wp.media( {
 		title: __( 'Choose videos', 'productreels' ),
-		library: { type: VIDEO_TYPES },
+		library: { type: 'video' },
 		button: { text: __( 'Add videos', 'productreels' ) },
 		multiple: true,
 	} );

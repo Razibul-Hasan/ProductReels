@@ -1,4 +1,5 @@
 <?php
+
 /**
  * The admin-specific functionality of the plugin.
  *
@@ -10,7 +11,7 @@
  */
 
 // If this file is called directly, abort.
-if ( ! defined( 'WPINC' ) ) {
+if (! defined('WPINC')) {
 	die;
 }
 
@@ -27,7 +28,8 @@ if ( ! defined( 'WPINC' ) ) {
  * @subpackage Productreels/admin
  * @author     bestwpexpert <https://bestwebexpert.com/>
  */
-class Productreels_Admin {
+class Productreels_Admin
+{
 
 	/**
 	 * The one admin page slug the app lives on.
@@ -52,6 +54,23 @@ class Productreels_Admin {
 		'productreels-new-widget' => '#/widgets/new',
 		'productreels-settings'   => '#/settings',
 	);
+
+	/**
+	 * Transient set on activation: send the admin to the dashboard next.
+	 *
+	 * @since 1.1.0
+	 * @var   string
+	 */
+	const ACTIVATION_REDIRECT = 'productreels_activation_redirect';
+
+	/**
+	 * Option recording that the welcome redirect has happened, so it is
+	 * only ever done on the first activation.
+	 *
+	 * @since 1.1.0
+	 * @var   string
+	 */
+	const ACTIVATION_REDIRECTED = 'productreels_activation_redirected';
 
 	/**
 	 * The ID of this plugin.
@@ -89,7 +108,8 @@ class Productreels_Admin {
 	 * @param string $plugin_name The name of this plugin.
 	 * @param string $version     The version of this plugin.
 	 */
-	public function __construct( $plugin_name, $version ) {
+	public function __construct($plugin_name, $version)
+	{
 		$this->plugin_name = $plugin_name;
 		$this->version     = $version;
 	}
@@ -102,36 +122,37 @@ class Productreels_Admin {
 	 *               a hidden page that still redirects.
 	 * @return void
 	 */
-	public function register_menu() {
+	public function register_menu()
+	{
 		add_menu_page(
-			__( 'ProductReels', 'productreels' ),
-			__( 'ProductReels', 'productreels' ),
+			__('ProductReels', 'productreels'),
+			__('ProductReels', 'productreels'),
 			Productreels_Rest_Controller::CAPABILITY,
 			self::PAGE,
-			array( $this, 'render_app' ),
+			array($this, 'render_app'),
 			'dashicons-format-video'
 		);
 
 		// Replaces the duplicate of the parent WordPress adds automatically.
 		add_submenu_page(
 			self::PAGE,
-			__( 'Widgets', 'productreels' ),
-			__( 'Widgets', 'productreels' ),
+			__('Widgets', 'productreels'),
+			__('Widgets', 'productreels'),
 			Productreels_Rest_Controller::CAPABILITY,
 			self::PAGE,
-			array( $this, 'render_app' )
+			array($this, 'render_app')
 		);
 
 		// Parent '' registers a page without a menu item: the 1.0.0 create
 		// link keeps working with the same capability check.
 		$pages = array(
-			'productreels-reels'      => array( self::PAGE, __( 'Reels', 'productreels' ) ),
-			'productreels-settings'   => array( self::PAGE, __( 'Settings', 'productreels' ) ),
-			'productreels-new-widget' => array( '', __( 'Create widget', 'productreels' ) ),
+			'productreels-reels'      => array(self::PAGE, __('Reels', 'productreels')),
+			'productreels-settings'   => array(self::PAGE, __('Settings', 'productreels')),
+			'productreels-new-widget' => array('', __('Create widget', 'productreels')),
 		);
 
-		foreach ( $pages as $slug => $page ) {
-			list( $parent, $label ) = $page;
+		foreach ($pages as $slug => $page) {
+			list($parent, $label) = $page;
 
 			$hook = add_submenu_page(
 				$parent,
@@ -142,9 +163,9 @@ class Productreels_Admin {
 				'__return_null'
 			);
 
-			if ( $hook ) {
+			if ($hook) {
 				// Redirect on load, before a single byte of markup is sent.
-				add_action( 'load-' . $hook, array( $this, 'redirect_to_route' ) );
+				add_action('load-' . $hook, array($this, 'redirect_to_route'));
 			}
 		}
 	}
@@ -155,21 +176,75 @@ class Productreels_Admin {
 	 * @since  1.0.0
 	 * @return void
 	 */
-	public function redirect_to_route() {
+	public function redirect_to_route()
+	{
 		$screen = get_current_screen();
 
-		if ( ! $screen instanceof WP_Screen ) {
+		if (! $screen instanceof WP_Screen) {
 			return;
 		}
 
-		foreach ( self::REDIRECTS as $slug => $route ) {
-			if ( false === strpos( $screen->id, $slug ) ) {
+		foreach (self::REDIRECTS as $slug => $route) {
+			if (false === strpos($screen->id, $slug)) {
 				continue;
 			}
 
-			wp_safe_redirect( admin_url( 'admin.php?page=' . self::PAGE ) . $route );
+			wp_safe_redirect(admin_url('admin.php?page=' . self::PAGE) . $route);
 			exit;
 		}
+	}
+
+	/**
+	 * Add "Dashboard" before "Deactivate" on the Plugins screen.
+	 *
+	 * @since  1.1.0
+	 * @param  string[] $links The plugin's action links.
+	 * @return string[]
+	 */
+	public function plugin_action_links($links)
+	{
+		if (! current_user_can(Productreels_Rest_Controller::CAPABILITY)) {
+			return $links;
+		}
+
+		$dashboard = sprintf(
+			'<a href="%s">%s</a>',
+			esc_url(admin_url('admin.php?page=' . self::PAGE)),
+			esc_html__('Dashboard', 'productreels')
+		);
+
+		return array_merge(array('dashboard' => $dashboard), $links);
+	}
+
+	/**
+	 * Open the dashboard once, right after the first activation.
+	 *
+	 * Skipped when several plugins were activated together, in the network
+	 * admin and for users who can't open the dashboard; the redirect is then
+	 * left for a later activation.
+	 *
+	 * @since  1.1.0
+	 * @return void
+	 */
+	public function redirect_after_activation()
+	{
+		if (! get_transient(self::ACTIVATION_REDIRECT)) {
+			return;
+		}
+
+		delete_transient(self::ACTIVATION_REDIRECT);
+
+		// Only reads WordPress's own bulk-activation flag; nothing is changed from it.
+		$bulk = isset($_GET['activate-multi']); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+
+		if ($bulk || wp_doing_ajax() || is_network_admin() || ! current_user_can(Productreels_Rest_Controller::CAPABILITY)) {
+			return;
+		}
+
+		update_option(self::ACTIVATION_REDIRECTED, 1, false);
+
+		wp_safe_redirect(admin_url('admin.php?page=' . self::PAGE));
+		exit;
 	}
 
 	/**
@@ -178,7 +253,8 @@ class Productreels_Admin {
 	 * @since  1.0.0
 	 * @return void
 	 */
-	public function render_app() {
+	public function render_app()
+	{
 		require PRODUCTREELS_PATH . 'admin/partials/productreels-admin-display.php';
 	}
 
@@ -188,15 +264,16 @@ class Productreels_Admin {
 	 * @since  1.0.0
 	 * @return void
 	 */
-	public function enqueue_assets() {
-		if ( ! $this->is_productreels_screen() ) {
+	public function enqueue_assets()
+	{
+		if (! $this->is_productreels_screen()) {
 			return;
 		}
 
 		$asset_file = PRODUCTREELS_PATH . 'admin/dist/productreels-admin.asset.php';
 
-		if ( ! file_exists( $asset_file ) ) {
-			add_action( 'admin_notices', array( $this, 'render_missing_build_notice' ) );
+		if (! file_exists($asset_file)) {
+			add_action('admin_notices', array($this, 'render_missing_build_notice'));
 
 			return;
 		}
@@ -211,15 +288,15 @@ class Productreels_Admin {
 			true
 		);
 
-		wp_set_script_translations( 'productreels-admin', 'productreels', PRODUCTREELS_PATH . 'languages' );
+		wp_set_script_translations('productreels-admin', 'productreels', PRODUCTREELS_PATH . 'languages');
 
 		wp_add_inline_script(
 			'productreels-admin',
-			'window.productreelsAdmin = ' . wp_json_encode( $this->bootstrap() ) . ';',
+			'window.productreelsAdmin = ' . wp_json_encode($this->bootstrap()) . ';',
 			'before'
 		);
 
-		// Archivo ships with the plugin and loads on ProductReels screens only:
+		// Inter ships with the plugin and loads on ProductReels screens only:
 		// never on the storefront, other admin screens or the block editor.
 		wp_register_style(
 			'productreels-admin-fonts',
@@ -231,12 +308,12 @@ class Productreels_Admin {
 		wp_enqueue_style(
 			'productreels-admin',
 			PRODUCTREELS_URL . 'admin/dist/style-productreels-admin.css',
-			array( 'productreels-admin-fonts' ),
+			array('productreels-admin-fonts'),
 			$asset['version']
 		);
 
 		// The build emits a mirrored stylesheet; WordPress swaps it in for RTL locales.
-		wp_style_add_data( 'productreels-admin', 'rtl', 'replace' );
+		wp_style_add_data('productreels-admin', 'rtl', 'replace');
 
 		// The reel editor picks videos and posters out of the media library.
 		wp_enqueue_media();
@@ -252,7 +329,8 @@ class Productreels_Admin {
 	 * @param  string $text The footer text WordPress would print.
 	 * @return string The text, or an empty string on a ProductReels screen.
 	 */
-	public function admin_footer_text( $text ) {
+	public function admin_footer_text($text)
+	{
 		return $this->is_productreels_screen() ? '' : $text;
 	}
 
@@ -268,12 +346,13 @@ class Productreels_Admin {
 	 * @param  string $classes Space-separated body classes.
 	 * @return string The classes, with ours added on a ProductReels screen.
 	 */
-	public function admin_body_class( $classes ) {
-		if ( ! $this->is_productreels_screen() ) {
+	public function admin_body_class($classes)
+	{
+		if (! $this->is_productreels_screen()) {
 			return $classes;
 		}
 
-		return trim( $classes . ' productreels-screen' );
+		return trim($classes . ' productreels-screen');
 	}
 
 	/**
@@ -291,25 +370,26 @@ class Productreels_Admin {
 	 * @param  string $title       The screen name alone.
 	 * @return string The title, with the plugin name on a ProductReels screen.
 	 */
-	public function admin_title( $admin_title, $title = '' ) {
-		if ( ! $this->is_productreels_screen() ) {
+	public function admin_title($admin_title, $title = '')
+	{
+		if (! $this->is_productreels_screen()) {
 			return $admin_title;
 		}
 
 		$title = (string) $title;
-		$at    = '' === $title ? false : strpos( $admin_title, $title );
+		$at    = '' === $title ? false : strpos($admin_title, $title);
 
 		// Another plugin rewrote the title: leave it as it is.
-		if ( false === $at ) {
+		if (false === $at) {
 			return $admin_title;
 		}
 
-		$before = substr( $admin_title, 0, $at );
-		$after  = ' &lsaquo; ' . __( 'ProductReels', 'productreels' ) . substr( $admin_title, $at + strlen( $title ) );
+		$before = substr($admin_title, 0, $at);
+		$after  = ' &lsaquo; ' . __('ProductReels', 'productreels') . substr($admin_title, $at + strlen($title));
 
 		$this->title_parts = array(
-			'before' => html_entity_decode( $before, ENT_QUOTES, 'UTF-8' ),
-			'after'  => html_entity_decode( $after, ENT_QUOTES, 'UTF-8' ),
+			'before' => html_entity_decode($before, ENT_QUOTES, 'UTF-8'),
+			'after'  => html_entity_decode($after, ENT_QUOTES, 'UTF-8'),
 		);
 
 		return $before . $title . $after;
@@ -321,10 +401,11 @@ class Productreels_Admin {
 	 * @since  1.0.0
 	 * @return void
 	 */
-	public function render_missing_build_notice() {
+	public function render_missing_build_notice()
+	{
 		printf(
 			'<div class="notice notice-error"><p>%s</p></div>',
-			esc_html__( 'The ProductReels admin bundle is missing. Run "npm install && npm run build" in the plugin folder.', 'productreels' )
+			esc_html__('The ProductReels admin bundle is missing. Run "npm install && npm run build" in the plugin folder.', 'productreels')
 		);
 	}
 
@@ -335,14 +416,15 @@ class Productreels_Admin {
 	 * @access private
 	 * @return bool Whether it does.
 	 */
-	private function is_productreels_screen() {
-		if ( ! function_exists( 'get_current_screen' ) ) {
+	private function is_productreels_screen()
+	{
+		if (! function_exists('get_current_screen')) {
 			return false;
 		}
 
 		$screen = get_current_screen();
 
-		return $screen instanceof WP_Screen && false !== strpos( $screen->id, self::PAGE );
+		return $screen instanceof WP_Screen && false !== strpos($screen->id, self::PAGE);
 	}
 
 	/**
@@ -352,18 +434,19 @@ class Productreels_Admin {
 	 * @access private
 	 * @return array<string,mixed> The bootstrap payload.
 	 */
-	private function bootstrap() {
+	private function bootstrap()
+	{
 		return array_merge(
 			array(
-				'restUrl'    => esc_url_raw( rest_url() ),
-				'nonce'      => wp_create_nonce( 'wp_rest' ),
+				'restUrl'    => esc_url_raw(rest_url()),
+				'nonce'      => wp_create_nonce('wp_rest'),
 				'defaults'   => Productreels_Settings::default_styles(),
 				'settings'   => Productreels_Settings::all(),
 				'version'    => PRODUCTREELS_VERSION,
 				'logoUrl'    => PRODUCTREELS_URL . 'admin/images/logo.png',
 				'title'      => $this->title_parts,
 				// The reel editor's "WooCommerce is turned off" notice links here.
-				'pluginsUrl' => current_user_can( 'activate_plugins' ) ? esc_url_raw( admin_url( 'plugins.php' ) ) : '',
+				'pluginsUrl' => current_user_can('activate_plugins') ? esc_url_raw(admin_url('plugins.php')) : '',
 			),
 			Productreels_WooCommerce::bootstrap()
 		);

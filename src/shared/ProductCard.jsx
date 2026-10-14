@@ -5,7 +5,13 @@
  * nothing pressable, because the whole tile is the one button that opens the
  * reel. Inside the player it is the real card (`ProductCard`), in one of two
  * looks: "modern", a glass strip with a round buy button at its end, and
- * "classic", a small card with the picture on top and a full-width button.
+ * "classic", a dark card with the picture beside the name, the price and a
+ * full-width button under them. The modern button can also be a pill that
+ * shows its text (`buttonDisplay: 'text'`); the classic one always does.
+ *
+ * A classic card in the full player is the way into the product panel: with
+ * `onOpen` its button is "Shop now", and the picture and name open the panel
+ * too instead of leaving for the product page.
  *
  * The price arrives as HTML that WooCommerce has already formatted, so
  * currency, tax display and the sale strike-through match the rest of the
@@ -28,13 +34,14 @@ import { ReelIcon } from './ReelIcon';
 /**
  * WooCommerce's own price markup, coloured by the stylesheet.
  *
- * @param {Object} props      Props.
- * @param {string} props.html The product's `price_html`.
+ * @param {Object} props           Props.
+ * @param {string} props.html      The product's `price_html`.
+ * @param {string} props.className The type class.
  * @return {Object} The price.
  */
-export const Price = ( { html } ) => (
+export const Price = ( { html, className = 'pr-t-caption' } ) => (
 	<span
-		className="prs-price pr-t-caption"
+		className={ `prs-price ${ className }` }
 		// WooCommerce formats this string itself; it is the same markup the shop page prints.
 		dangerouslySetInnerHTML={ { __html: html || '' } }
 	/>
@@ -130,10 +137,12 @@ export const ProductCard = ( {
 	addToCartText,
 	directCheckout = false,
 	directCheckoutText,
+	buttonDisplay = 'icon',
 	cartUrl,
 	checkoutUrl,
 	onAddToCart,
 	onNavigate,
+	onOpen,
 	onToast,
 } ) => {
 	const [ state, setState ] = useState( 'idle' );
@@ -256,6 +265,21 @@ export const ProductCard = ( {
 		}
 	};
 
+	// The product panel, where the player has one: a click that opens it is
+	// a click on the product, so it is tracked like one.
+	const open = onOpen
+		? ( event ) => {
+				event.preventDefault();
+				stop( event );
+
+				if ( onNavigate ) {
+					onNavigate( link );
+				}
+
+				onOpen( link );
+			}
+		: null;
+
 	const busy = state === 'adding';
 	const buyText = directCheckoutText || __( 'Buy now', 'productreels' );
 	const addText = addToCartText || __( 'Add to cart', 'productreels' );
@@ -310,7 +334,17 @@ export const ProductCard = ( {
 	let button = null;
 	let note = null;
 
-	if ( action && action.kind === 'out' ) {
+	if ( classic && open ) {
+		button = (
+			<button
+				type="button"
+				className="prs-btn prs-btn--sm prs-btn--block prs-card__shop pr-t-body-strong"
+				onClick={ open }
+			>
+				{ __( 'Shop now', 'productreels' ) }
+			</button>
+		);
+	} else if ( action && action.kind === 'out' ) {
 		// Nothing to press, so it is said rather than offered as a dead
 		// button: under the price on a strip, in the button's place on a card.
 		if ( classic ) {
@@ -368,25 +402,39 @@ export const ProductCard = ( {
 				</button>
 			);
 	} else if ( action ) {
+		// A round icon by default; a pill with the text when asked, which
+		// takes the same icons as the classic button.
+		const text = buttonDisplay === 'text';
 		let icon = 'plus';
 
 		if ( busy ) {
 			icon = 'loader';
-		} else if ( action.kind === 'link' ) {
+		} else if ( action.kind === 'link' || text ) {
 			icon = action.icon;
 		} else if ( directCheckout ) {
 			icon = 'zap';
 		}
 
 		const content = (
-			<ReelIcon
-				name={ icon }
-				size={ 16 }
-				strokeWidth={ 2.25 }
-				className={ busy ? 'prs-spin' : undefined }
-			/>
+			<>
+				<ReelIcon
+					name={ icon }
+					size={ text ? 14 : 16 }
+					strokeWidth={ 2.25 }
+					className={ busy ? 'prs-spin' : undefined }
+				/>
+				{ text && (
+					<span className="prs-card__add-text pr-t-label">
+						{ busy && ! directCheckout
+							? __( 'Adding…', 'productreels' )
+							: action.text }
+					</span>
+				) }
+			</>
 		);
-		const className = `prs-card__add${ action.done ? ' is-done' : '' }`;
+		const className = `prs-card__add${ text ? ' prs-card__add--text' : '' }${
+			action.done ? ' is-done' : ''
+		}`;
 
 		button =
 			action.kind === 'link' ? (
@@ -418,7 +466,7 @@ export const ProductCard = ( {
 			<a
 				className="prs-card__thumb"
 				href={ product.permalink }
-				onClick={ navigate }
+				onClick={ open || navigate }
 				tabIndex={ -1 }
 				aria-hidden="true"
 			>
@@ -438,7 +486,7 @@ export const ProductCard = ( {
 						classic ? 'pr-t-body-strong' : 'pr-t-label'
 					}` }
 					href={ product.permalink }
-					onClick={ navigate }
+					onClick={ open || navigate }
 				>
 					{ product.name }
 				</a>
@@ -448,11 +496,15 @@ export const ProductCard = ( {
 						reviews={ classic ? product.rating_count : 0 }
 					/>
 				) }
-				<Price html={ product.price_html } />
+				<Price
+					html={ product.price_html }
+					className={ classic ? 'pr-t-title' : undefined }
+				/>
 				{ note }
+				{ classic && button }
 			</span>
 
-			{ button }
+			{ ! classic && button }
 		</div>
 	);
 };

@@ -447,6 +447,10 @@ class Productreels_Validator {
 				'type'   => 'text',
 				'length' => 60,
 			),
+			'buyButtonDisplay'          => array(
+				'type'   => 'enum',
+				'values' => array( 'icon', 'text' ),
+			),
 
 			// Template specific.
 			'marquee'                   => array(

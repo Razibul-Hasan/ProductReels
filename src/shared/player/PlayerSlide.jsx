@@ -42,6 +42,8 @@ export const PlayerSlide = forwardRef(
 			onPlayState,
 			onEnded,
 			onReady,
+			onOpenProduct,
+			hideProducts = false,
 		},
 		providerRef
 	) => {
@@ -51,8 +53,12 @@ export const PlayerSlide = forwardRef(
 		const Provider = file ? providerFor( file ) : null;
 		const live = active && ! standby && !! Provider;
 		// Product links only mean something with WooCommerce there to sell them.
+		// While the product panel is docked beside the stage, it is the
+		// products; the slide keeps only the custom links.
 		const links = ( reel.links || [] ).filter(
-			( link ) => link.btn_type !== 'product' || services.hasWoo
+			( link ) =>
+				link.btn_type !== 'product' ||
+				( services.hasWoo && ! hideProducts )
 		);
 		const showLinks =
 			styles.playerAppearance === 'overlay' && links.length > 0;
@@ -168,6 +174,7 @@ export const PlayerSlide = forwardRef(
 								products={ products }
 								services={ services }
 								onToast={ onToast }
+								onOpenProduct={ onOpenProduct }
 							/>
 						) }
 					</div>

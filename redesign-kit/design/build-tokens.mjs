@@ -6,7 +6,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 const dir = path.dirname(fileURLToPath(import.meta.url));
 const t = JSON.parse(fs.readFileSync(path.join(dir, 'tokens.json'), 'utf8'));
-const FONT = { 'Archivo': 'ProductReels Archivo', 'Archivo Expanded': 'ProductReels Archivo Expanded' };
+const FONT = { 'Inter': 'ProductReels Inter' };
 const first = t.color.themes[0].id;
 const val = (v) => (typeof v === 'string' ? v : v[first]);
 const fam = (stack) => Object.keys(FONT).sort((a, b) => b.length - a.length).reduce((s, k) => s.split(`"${k}"`).join(`"${FONT[k]}"`), stack);
@@ -21,7 +21,7 @@ for (const g of t.type.groups) for (const s of g.styles) {
   out.push(`.pr-t-${s.name} { ${d} }`);
 }
 fs.writeFileSync(path.join(dir, 'css', 'pr-tokens.css'), out.join('\n') + '\n');
-const fonts = ['/* Admin screens only. Never enqueue on the storefront or in the block editor canvas. Archivo, SIL OFL 1.1: see ../fonts/OFL.txt. */'];
-for (const f of t.type.fonts) fonts.push(`@font-face { font-family: "${FONT[f.family]}"; src: url("../fonts/${path.basename(f.file)}") format("woff2"); font-weight: ${f.weight}; font-style: normal; font-display: swap; }`);
+const fonts = ['/* Admin screens only. Never enqueue on the storefront or in the block editor canvas. Inter, SIL OFL 1.1: see ../fonts/OFL.txt. */'];
+for (const f of t.type.fonts) fonts.push(`@font-face { font-family: "${FONT[f.family]}"; src: url("../fonts/${path.basename(f.file)}") format("woff2"); font-weight: ${f.weight}; font-style: normal; font-display: swap;${f.unicodeRange ? ` unicode-range: ${f.unicodeRange};` : ''} }`);
 fs.writeFileSync(path.join(dir, 'css', 'pr-fonts.css'), fonts.join('\n') + '\n');
 console.log('Wrote css/pr-tokens.css and css/pr-fonts.css');

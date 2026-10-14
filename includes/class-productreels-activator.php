@@ -31,9 +31,11 @@ class Productreels_Activator {
 	 * Install the schema and seed settings.
 	 *
 	 * @since  1.0.0
+	 * @since  1.1.0 Queues the first-activation redirect to the dashboard.
+	 * @param  bool $network_wide Whether the plugin is being network activated.
 	 * @return void
 	 */
-	public static function activate() {
+	public static function activate( $network_wide = false ) {
 		require_once PRODUCTREELS_PATH . 'includes/install/class-productreels-schema.php';
 		require_once PRODUCTREELS_PATH . 'includes/support/class-productreels-validator.php';
 		require_once PRODUCTREELS_PATH . 'includes/data/class-productreels-settings.php';
@@ -46,12 +48,36 @@ class Productreels_Activator {
 
 		flush_rewrite_rules();
 
+		self::queue_redirect( $network_wide );
+
 		/**
 		 * Fires once ProductReels has finished activating.
 		 *
 		 * @since 1.0.0
 		 */
 		do_action( 'productreels_activated' );
+	}
+
+	/**
+	 * Ask the next admin page load to open the dashboard, the first time only.
+	 *
+	 * Productreels_Admin::redirect_after_activation() does the redirect. A
+	 * short expiry keeps a WP-CLI or network activation from redirecting
+	 * someone much later.
+	 *
+	 * @since  1.1.0
+	 * @access private
+	 * @param  bool $network_wide Whether the plugin is being network activated.
+	 * @return void
+	 */
+	private static function queue_redirect( $network_wide ) {
+		require_once PRODUCTREELS_PATH . 'admin/class-productreels-admin.php';
+
+		if ( $network_wide || ( defined( 'WP_CLI' ) && WP_CLI ) || get_option( Productreels_Admin::ACTIVATION_REDIRECTED ) ) {
+			return;
+		}
+
+		set_transient( Productreels_Admin::ACTIVATION_REDIRECT, 1, 30 );
 	}
 
 	/**

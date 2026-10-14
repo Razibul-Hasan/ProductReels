@@ -32,6 +32,14 @@ body.productreels-screen {
 	}
 }
 
+/* The widget editor pins itself beside the admin menu (_pr-studio.scss); a
+   collapsed menu is 36px wide. */
+@media (min-width: 961px) {
+	body.productreels-screen.folded #productreels-admin-app .wr-app--editor {
+		inset-inline-start: 36px;
+	}
+}
+
 #productreels-admin-app {
 	box-sizing: border-box;
 	/* Flush with #wpcontent on both sides: the start cancels core's padding,

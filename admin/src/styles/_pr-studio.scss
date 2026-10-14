@@ -136,6 +136,22 @@ $pr-minis: (
 	min-height: 0;
 }
 
+/* When the window is shorter than the admin menu, core makes the page as tall
+   as the menu, so scrolling would carry the header and Save away and leave a
+   grey band under the shell. Pin the shell to the content area instead, as
+   the block editor does: only the menu scrolls. A collapsed menu is set in
+   _base.scss (body is outside this scope). Under 960px the page scrolls as
+   one (below). */
+@media (min-width: 961px) {
+
+	.wr-app--editor {
+		position: fixed;
+		inset-block: var(--wp-admin--admin-bar--height, 32px) 0;
+		inset-inline: 160px 0;
+		height: auto;
+	}
+}
+
 .pr-studio {
 	min-height: 0;
 }
@@ -450,25 +466,27 @@ a.pr-studio__crumb:focus-visible {
 	border-radius: var(--pr-radius-pill);
 }
 
+/* Classic: the picture beside the name and price, a button under them. */
 .pr-cardart--classic {
-	width: 44%;
-	height: 88px;
+	display: grid;
+	grid-template-columns: 30px 1fr;
+	grid-template-rows: 1fr 8px;
+	width: 78%;
+	height: 44px;
 	padding: 5px;
-	gap: 5px;
-	flex-direction: column;
+	gap: 4px 6px;
 }
 
 .pr-cardart--classic .pr-cardart__img {
-	flex: 1;
+	grid-row: 1 / span 2;
 }
 
-.pr-cardart--classic .pr-cardart__lines > span {
-	width: 80%;
+.pr-cardart--classic .pr-cardart__lines > span:last-child {
+	width: 40%;
 }
 
 .pr-cardart--classic .pr-cardart__btn {
-	height: 9px;
-	border-radius: var(--pr-radius-pill);
+	border-radius: 3px;
 }
 
 .pr-cardnote {
@@ -540,49 +558,224 @@ a.pr-studio__crumb:focus-visible {
 
 /* ----------------------------------------------------------------- Stage */
 
+/* A calm stage: one soft pool of light behind the device, nothing else. */
+.pr-stage {
+	background:
+		radial-gradient(ellipse 85% 80% at 50% 50%, var(--pr-studio-raised), transparent 100%),
+		var(--pr-studio);
+}
+
+.pr-stage__bar {
+	padding: var(--pr-space-4) var(--pr-space-6) var(--pr-space-2);
+}
+
+.pr-stage__cap {
+	min-width: 0;
+	flex: 1 1 0;
+	white-space: nowrap;
+}
+
+.pr-stage__cap:last-child {
+	justify-content: flex-end;
+	color: var(--pr-studio-line-strong);
+	font-variant-numeric: tabular-nums;
+}
+
+/* The live dot breathes, so the stage reads as live rather than static. */
+.pr-stage__live {
+	position: relative;
+}
+
+.pr-stage__live::after {
+	content: "";
+	position: absolute;
+	inset: 0;
+	border-radius: inherit;
+	background: inherit;
+	animation: pr-stage-live 2.4s ease-out infinite;
+}
+
+@keyframes pr-stage-live {
+
+	0% {
+		opacity: 0.6;
+		transform: scale(1);
+	}
+
+	70%,
+	100% {
+		opacity: 0;
+		transform: scale(2.6);
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+	.pr-stage__live::after {
+		animation: none;
+		opacity: 0;
+	}
+}
+
 .pr-stage__canvas {
 	overflow: auto;
 	align-items: safe center;
 	justify-content: safe center;
+	padding: var(--pr-space-6) var(--pr-space-10) var(--pr-space-10);
 }
 
+/* The device: a clean screen with a hairline edge, lifted by one deep, soft
+   shadow. Each device keeps a real screen's proportions (height over width,
+   in page pixels before zoom) and centres the widget on it. */
 .pr-device {
+	--pr-device-ratio: 0.5625;
 	flex: none;
+	border-radius: var(--pr-radius-md);
+	box-shadow:
+		0 0 0 1px var(--pr-studio-raised),
+		0 40px 80px -24px var(--pr-studio),
+		0 24px 48px -12px var(--pr-studio);
+	transition: max-width 0.3s ease, width 0.3s ease;
 }
 
-.pr-device__spacer {
-	width: 34px;
+.pr-device--desktop {
+	--pr-device-max: 1040px;
+	max-width: var(--pr-device-max);
+}
+
+.pr-device--tablet {
+	--pr-device-ratio: 0.75;
+	--pr-device-max: 620px;
+	max-width: var(--pr-device-max);
+}
+
+/* A phone: a thin dark bezel around a rounded screen, an island at the top
+   and a home bar at the bottom. */
+.pr-device--mobile {
+	--pr-device-ratio: 1.86;
+	width: 300px;
+	padding: 7px;
+	border-radius: 46px;
+	background: var(--pr-ink);
+	box-shadow:
+		0 0 0 1px var(--pr-studio-line),
+		0 40px 80px -24px var(--pr-studio),
+		0 24px 48px -12px var(--pr-studio);
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+	.pr-device {
+		transition: none;
+	}
+}
+
+/* While the stage has a fixed height (above 960px), the device also fits its
+   height, so a short window shows the whole screen without scrolling. The
+   32px is the browser bar; the phone's 14px is its bezel. A taller widget
+   still grows the page, and the stage scrolls. */
+@media (min-width: 961px) {
+
+	.pr-stage__canvas {
+		container-type: size;
+	}
+
+	.pr-device--desktop,
+	.pr-device--tablet {
+		max-width: min(var(--pr-device-max), calc((100cqh - 32px) / var(--pr-device-ratio)));
+	}
+
+	.pr-device--mobile {
+		width: min(300px, calc((100cqh - 14px) / var(--pr-device-ratio) + 14px));
+	}
+}
+
+.pr-device__screen {
+	position: relative;
+	display: flex;
+	flex-direction: column;
+}
+
+.pr-device--mobile .pr-device__screen {
+	border-radius: 39px;
+}
+
+.pr-device__notch {
+	position: absolute;
+	z-index: 1;
+	inset-block-start: 10px;
+	inset-inline: 0;
+	width: 76px;
+	height: 22px;
+	margin: 0 auto;
+}
+
+.pr-device__home {
+	position: absolute;
+	inset-block-end: 7px;
+	inset-inline: 0;
+	width: 96px;
+	height: 4px;
+	margin: 0 auto;
+	border-radius: var(--pr-radius-pill);
+	background: var(--pr-ink);
+	opacity: 0.85;
+	pointer-events: none;
+}
+
+/* A slim browser bar on the page colour: three dots and a quiet address. */
+.pr-device__chrome {
 	flex: none;
+	height: 32px;
+	padding-inline: var(--pr-space-4);
+	background: var(--pr-surface);
+	border-bottom-color: var(--pr-surface-sunken);
 }
 
-/* The page lays out at the device's width and is zoomed to the frame. */
-.pr-device__page {
-	width: var(--pr-device-width, 1280px);
-	zoom: var(--pr-device-zoom, 1);
+.pr-device__dots {
+	gap: 6px;
 }
 
-.pr-device__cards {
-	display: grid;
-	grid-template-columns: repeat(3, minmax(0, 1fr));
-	gap: var(--pr-space-4);
-}
-
-.pr-device__cards > span {
-	height: 120px;
-	border-radius: 10px;
+.pr-device__dots > span {
+	width: 9px;
+	height: 9px;
 	background: var(--pr-surface-sunken);
 }
 
-.pr-skel--lines > span:nth-child(1) {
-	width: 92%;
+.pr-device__url {
+	height: 20px;
+	background: transparent;
+	color: var(--pr-ink-disabled);
+	letter-spacing: 0.01em;
 }
 
-.pr-skel--lines > span:nth-child(2) {
-	width: 78%;
+.pr-device__spacer {
+	width: 39px;
+	flex: none;
 }
 
-.pr-skel--lines > span:nth-child(3) {
-	width: 64%;
+/* The page lays out at the device's width and is zoomed to the frame. It is
+   at least a screen tall, with the widget in the middle of it. */
+.pr-device__page {
+	width: var(--pr-device-width, 1280px);
+	min-height: calc(var(--pr-device-width, 1280px) * var(--pr-device-ratio));
+	zoom: var(--pr-device-zoom, 1);
+	justify-content: center;
+	padding: var(--pr-space-16);
+}
+
+.pr-device--tablet .pr-device__page {
+	padding: var(--pr-space-10);
+}
+
+.pr-device--mobile .pr-device__page {
+	padding: var(--pr-space-16) var(--pr-space-5);
+}
+
+/* The widget keeps its own height so it can sit in the middle; a popup
+   stands in for the whole page, so it still fills it. */
+.pr-device__page > .productreels-embed:not([data-template="popup"]) {
+	flex: none;
 }
 
 .pr-stage__empty {

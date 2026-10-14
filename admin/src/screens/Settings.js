@@ -368,7 +368,7 @@ const NumberRow = ( {
 						id={ `${ id }-error` }
 					>
 						<Icon name="alert" size={ 15 } />
-						{ error }
+						<span>{ error }</span>
 					</p>
 				)
 			}

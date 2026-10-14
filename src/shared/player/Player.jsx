@@ -12,6 +12,11 @@
  * either side, the previous / next buttons between them, the position ("2 of
  * 6") and the close button in the room's top corners.
  *
+ * With the classic product card, the reel's products open up in the product
+ * panel: docked beside the stage on a wide screen for as long as the reel
+ * tags a product (its close button folds it back into the card on the
+ * reel), and on a phone a sheet that the card's "Shop now" raises.
+ *
  * Reels are flattened into slots — one per file — and the stage carries the
  * current slot with its two neighbours, so a swipe reveals what is next
  * before the step commits. Only the active slot owns a provider.
@@ -39,6 +44,7 @@ import { withDefaults } from '../services';
 import { playerVars } from '../styleVars';
 import { PlayerNav } from './PlayerNav';
 import { PlayerSlide } from './PlayerSlide';
+import { ProductPanel } from './ProductPanel';
 import { Seekbar } from './Seekbar';
 import { VolumeControl } from './VolumeControl';
 
@@ -116,6 +122,11 @@ export const Player = ( {
 	// which remount on every step; `closing` plays the exit before unmount.
 	const [ opening, setOpening ] = useState( true );
 	const [ closing, setClosing ] = useState( false );
+	// The product panel: docked unless folded away (wide screens), raised as
+	// a sheet (phones), and which of the reel's products it shows.
+	const [ panelOpen, setPanelOpen ] = useState( true );
+	const [ sheet, setSheet ] = useState( false );
+	const [ picked, setPicked ] = useState( null );
 
 	const root = useRef( null );
 	const stage = useRef( null );
@@ -379,6 +390,89 @@ export const Player = ( {
 
 	const products = useProducts( widget.reels, services );
 
+	const classic =
+		styles.productCardStyle === 'classic' &&
+		styles.playerAppearance === 'overlay' &&
+		services.hasWoo;
+	// The reel's products, each with its lookup (undefined while it runs).
+	const tagged = useMemo( () => {
+		if ( ! classic || ! current ) {
+			return [];
+		}
+
+		return ( current.reel.links || [] )
+			.filter( ( link ) => link.btn_type === 'product' )
+			.map( ( link ) => ( {
+				link,
+				product: products
+					? products[ Number( link.product_id ) ]
+					: undefined,
+			} ) )
+			.filter( ( item ) => ! products || item.product );
+	}, [ classic, current, products ] );
+	const docked = ! mobile && panelOpen && tagged.length > 0;
+
+	// Every reel opens on its own products: the list, or its one product.
+	useEffect( () => {
+		setPicked( null );
+		setSheet( false );
+	}, [ cursor ] );
+
+	const openProduct = useCallback(
+		( link ) => {
+			setPicked( Number( link.product_id ) );
+
+			if ( mobile ) {
+				setSheet( true );
+			} else {
+				setPanelOpen( true );
+			}
+		},
+		[ mobile ]
+	);
+
+	// Folding the panel takes away the button that was pressed, and so does
+	// opening it from the card: focus goes to what replaced it. A step of the
+	// reel that docks or undocks it leaves focus where it was.
+	const wasDocked = useRef( docked );
+
+	useEffect( () => {
+		const node = root.current;
+
+		if ( ! node || wasDocked.current === docked ) {
+			return;
+		}
+
+		wasDocked.current = docked;
+
+		const active = node.ownerDocument.activeElement;
+
+		if (
+			active &&
+			active !== node.ownerDocument.body &&
+			node.contains( active )
+		) {
+			return;
+		}
+
+		const target = node.querySelector(
+			docked
+				? '.prs-pp__bar button'
+				: '.prs-player__slide.is-active .prs-card__shop'
+		);
+
+		if ( target ) {
+			target.focus();
+		}
+	}, [ docked ] );
+
+	const closeSheet = useCallback( () => setSheet( false ), [] );
+	const foldPanel = useCallback( () => setPanelOpen( false ), [] );
+	const trackProduct = useCallback(
+		( link ) => current && services.trackClick( current.reel, link ),
+		[ current, services ]
+	);
+
 	/* ------------------------------------------------------------- toast */
 
 	const showToast = useCallback(
@@ -599,6 +693,8 @@ export const Player = ( {
 		onPlayState,
 		onEnded,
 		onReady,
+		onOpenProduct: classic ? openProduct : undefined,
+		hideProducts: docked,
 	};
 
 	const label = current
@@ -654,6 +750,7 @@ export const Player = ( {
 				horizontal ? 'is-horizontal' : 'is-vertical',
 				mobile ? 'is-mobile' : '',
 				theatre ? 'is-theatre' : '',
+				docked ? 'has-panel' : '',
 				current && current.fileCount > 1 ? 'has-files' : '',
 				showBar ? '' : 'no-bar',
 				swipe.dragging ? 'is-dragging' : '',
@@ -690,100 +787,145 @@ export const Player = ( {
 
 			{ ! mobile && close }
 
-			<div className="prs-room__layout">
+			{ /* Behind a raised sheet, nothing can be reached but the sheet. */ }
+			<div
+				className="prs-room__layout"
+				inert={ mobile && sheet && tagged.length > 0 ? '' : undefined }
+			>
 				{ theatre && <Peek slot={ prevSlot } /> }
 				{ nav( 'prev' ) }
 
-				<div
-					ref={ stage }
-					className="prs-player prs-room__stage"
-					{ ...swipe.handlers }
-				>
+				{ /* Always here, so the stage never remounts when the panel
+				     comes and goes; without a panel it is display: contents. */ }
+				<div className="prs-room__duo">
 					<div
-						className="prs-player__track"
-						style={ { transform } }
-						onTransitionEnd={ onTransitionEnd }
+						ref={ stage }
+						className="prs-player prs-room__stage"
+						{ ...swipe.handlers }
 					>
-						{ prevSlot && (
-							<PlayerSlide
-								key={ `p-${ wrap( cursor - 1 ) }` }
-								slot={ prevSlot }
-								active={ false }
-								{ ...slideProps }
-							/>
-						) }
-						<PlayerSlide
-							key={ `c-${ cursor }` }
-							ref={ provider }
-							slot={ current }
-							active
-							{ ...slideProps }
-						/>
-						{ nextSlot && (
-							<PlayerSlide
-								key={ `n-${ wrap( cursor + 1 ) }` }
-								slot={ nextSlot }
-								active={ false }
-								{ ...slideProps }
-							/>
-						) }
-					</div>
-
-					{ /* Views on the start side; sound (and, on a phone, close)
-					     on the end side, within thumb reach. */ }
-					<div className="prs-player__top" data-wr-no-swipe="">
-						{ styles.showViews && current && (
-							<span className="prs-views pr-t-caption">
-								<ReelIcon name="eye" size={ 12 } />
-								{ viewCount( current.reel.view_count ) }
-							</span>
-						) }
-
-						<div className="prs-player__tools">
-							{ hasFile && styles.showVolumeControl && (
-								<VolumeControl
-									muted={ muted }
-									volume={ volume }
-									onToggleMute={ toggleMute }
-									onVolume={ changeVolume }
+						<div
+							className="prs-player__track"
+							style={ { transform } }
+							onTransitionEnd={ onTransitionEnd }
+						>
+							{ prevSlot && (
+								<PlayerSlide
+									key={ `p-${ wrap( cursor - 1 ) }` }
+									slot={ prevSlot }
+									active={ false }
+									{ ...slideProps }
 								/>
 							) }
-							{ mobile && close }
-						</div>
-					</div>
-
-					{ soundTap && (
-						<button
-							type="button"
-							className="prs-btn prs-btn--light prs-btn--sm pr-t-body-strong prs-player__sound"
-							data-wr-no-swipe=""
-							onClick={ toggle }
-						>
-							<ReelIcon name="volume" size={ 16 } />
-							{ __( 'Tap for sound', 'productreels' ) }
-						</button>
-					) }
-
-					{ showBar && (
-						<div className="prs-player__bar" data-wr-no-swipe="">
-							<Seekbar
-								current={ time }
-								duration={ duration }
-								onSeek={ seek }
+							<PlayerSlide
+								key={ `c-${ cursor }` }
+								ref={ provider }
+								slot={ current }
+								active
+								{ ...slideProps }
 							/>
-							{ mobile && (
-								<span className="prs-player__time pr-t-caption">
-									<span>{ formatClock( time ) }</span>
-									<span>{ formatClock( duration ) }</span>
-								</span>
+							{ nextSlot && (
+								<PlayerSlide
+									key={ `n-${ wrap( cursor + 1 ) }` }
+									slot={ nextSlot }
+									active={ false }
+									{ ...slideProps }
+								/>
 							) }
 						</div>
+
+						{ /* Views on the start side; sound (and, on a phone, close)
+					     on the end side, within thumb reach. */ }
+						<div className="prs-player__top" data-wr-no-swipe="">
+							{ styles.showViews && current && (
+								<span className="prs-views pr-t-caption">
+									<ReelIcon name="eye" size={ 12 } />
+									{ viewCount( current.reel.view_count ) }
+								</span>
+							) }
+
+							<div className="prs-player__tools">
+								{ hasFile && styles.showVolumeControl && (
+									<VolumeControl
+										muted={ muted }
+										volume={ volume }
+										onToggleMute={ toggleMute }
+										onVolume={ changeVolume }
+									/>
+								) }
+								{ mobile && close }
+							</div>
+						</div>
+
+						{ soundTap && (
+							<button
+								type="button"
+								className="prs-btn prs-btn--light prs-btn--sm pr-t-body-strong prs-player__sound"
+								data-wr-no-swipe=""
+								onClick={ toggle }
+							>
+								<ReelIcon name="volume" size={ 16 } />
+								{ __( 'Tap for sound', 'productreels' ) }
+							</button>
+						) }
+
+						{ showBar && (
+							<div
+								className="prs-player__bar"
+								data-wr-no-swipe=""
+							>
+								<Seekbar
+									current={ time }
+									duration={ duration }
+									onSeek={ seek }
+								/>
+								{ mobile && (
+									<span className="prs-player__time pr-t-caption">
+										<span>{ formatClock( time ) }</span>
+										<span>{ formatClock( duration ) }</span>
+									</span>
+								) }
+							</div>
+						) }
+					</div>
+
+					{ docked && (
+						<ProductPanel
+							items={ tagged }
+							picked={ picked }
+							onPick={ setPicked }
+							onClose={ foldPanel }
+							styles={ styles }
+							services={ services }
+							onTrack={ trackProduct }
+							onToast={ showToast }
+						/>
 					) }
 				</div>
 
 				{ nav( 'next' ) }
 				{ theatre && <Peek slot={ nextSlot } /> }
 			</div>
+
+			{ mobile && sheet && tagged.length > 0 && (
+				<div className="prs-room__sheet">
+					<div
+						className="prs-room__sheet-scrim"
+						aria-hidden="true"
+						onClick={ closeSheet }
+					/>
+					<ProductPanel
+						sheet
+						items={ tagged }
+						picked={ picked }
+						onPick={ setPicked }
+						onClose={ closeSheet }
+						styles={ styles }
+						services={ services }
+						onTrack={ trackProduct }
+						onToast={ showToast }
+					/>
+				</div>
+			) }
 
 			{ toast && (
 				<div

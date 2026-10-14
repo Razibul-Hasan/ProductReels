@@ -112,8 +112,8 @@ const linkError = ( source, numbers ) => {
 	return sprintf(
 		/* translators: %s: a line number, or a list of them. */
 		_n(
-			'Line %s is not a video link. Use the full link to an MP4 or WebM file, like https://yourstore.com/videos/clip.mp4.',
-			'Lines %s are not video links. Use the full link to an MP4 or WebM file, like https://yourstore.com/videos/clip.mp4.',
+			'Line %s is not a video link. Use the full link to a video file, like https://yourstore.com/videos/clip.mp4.',
+			'Lines %s are not video links. Use the full link to a video file, like https://yourstore.com/videos/clip.mp4.',
 			numbers.length,
 			'productreels'
 		),
@@ -222,7 +222,7 @@ export const SourcePicker = ( {
 						</span>
 						<span className="pr-drop__hint pr-t-small">
 							{ __(
-								'MP4 or WebM. Add several at once and each one becomes its own clip.',
+								'Any video format; MP4 plays everywhere. Add several at once and each one becomes its own clip.',
 								'productreels'
 							) }
 						</span>
@@ -242,7 +242,7 @@ export const SourcePicker = ( {
 					{ uploadError && (
 						<p className="pr-field__error pr-t-small" role="alert">
 							<Icon name="alert" size={ 15 } />
-							{ uploadError }
+							<span>{ uploadError }</span>
 						</p>
 					) }
 				</>

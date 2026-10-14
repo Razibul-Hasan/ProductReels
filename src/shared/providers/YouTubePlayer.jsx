@@ -4,6 +4,9 @@
  * The IFrame API is loaded lazily, the first time a YouTube reel is opened.
  * YouTube offers no timeupdate event, so the clock is polled while playing —
  * four times a second is enough for a seekbar and costs nothing while paused.
+ *
+ * `noCookie` serves the video from youtube-nocookie.com, for a tile preview
+ * that starts without the visitor asking for it.
  */
 
 import {
@@ -21,7 +24,10 @@ const hasSdk = () =>
 	typeof window.YT !== 'undefined' && typeof window.YT.Player === 'function';
 
 export const YouTubePlayer = forwardRef(
-	( { file, muted, loop, onTime, onPlayState, onEnded, onReady }, ref ) => {
+	(
+		{ file, muted, loop, noCookie, onTime, onPlayState, onEnded, onReady },
+		ref
+	) => {
 		const mount = useRef( null );
 		const player = useRef( null );
 		const ticker = useRef( 0 );
@@ -111,6 +117,9 @@ export const YouTubePlayer = forwardRef(
 
 					player.current = new window.YT.Player( target, {
 						videoId: file.provider_id,
+						...( noCookie && {
+							host: 'https://www.youtube-nocookie.com',
+						} ),
 						width: '100%',
 						height: '100%',
 						playerVars: {

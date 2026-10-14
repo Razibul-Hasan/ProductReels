@@ -16,6 +16,7 @@ export const STOREFRONT_ICONS = {
 	play: '<polygon points="6 3 20 12 6 21 6 3" />',
 	pause: '<rect x="14" y="4" width="4" height="16" rx="1" /><rect x="6" y="4" width="4" height="16" rx="1" />',
 	eye: '<path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0" /><circle cx="12" cy="12" r="3" />',
+	'arrow-left': '<path d="m12 19-7-7 7-7" /><path d="M19 12H5" />',
 	check: '<path d="M20 6 9 17l-5-5" />',
 	x: '<path d="M18 6 6 18" /><path d="m6 6 12 12" />',
 	'chevron-left': '<path d="m15 18-6-6 6-6" />',

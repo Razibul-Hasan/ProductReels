@@ -7,7 +7,7 @@
  * previewing their own widget is not a view.
  */
 
-import { createAddToCart } from '@shared/storeApi';
+import { createAddToCart, createGetProduct } from '@shared/storeApi';
 import { boot, get } from './api/client';
 
 export const editorServices = {
@@ -19,6 +19,9 @@ export const editorServices = {
 				restUrl: boot.restUrl,
 				nonce: boot.storeApiNonce,
 			} )
+		: () => Promise.reject( new Error( '' ) ),
+	getProduct: boot.hasWoo
+		? createGetProduct( { restUrl: boot.restUrl } )
 		: () => Promise.reject( new Error( '' ) ),
 	cartUrl: boot.cartUrl || '',
 	checkoutUrl: boot.checkoutUrl || '',

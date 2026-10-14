@@ -74,11 +74,12 @@ add_action( 'before_woocommerce_init', 'productreels_declare_woocommerce_compati
  * This action is documented in includes/class-productreels-activator.php
  *
  * @since 1.0.0
+ * @param bool $network_wide Whether the plugin is being network activated.
  * @return void
  */
-function productreels_activate() {
+function productreels_activate( $network_wide = false ) {
 	require_once PRODUCTREELS_PATH . 'includes/class-productreels-activator.php';
-	Productreels_Activator::activate();
+	Productreels_Activator::activate( $network_wide );
 }
 
 /**

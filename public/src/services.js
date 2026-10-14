@@ -6,7 +6,7 @@
  * element and i18n, so a shop page pays for nothing it does not use.
  */
 
-import { createAddToCart } from '@shared/storeApi';
+import { createAddToCart, createGetProduct } from '@shared/storeApi';
 
 const boot = window.productreelsPublic || {};
 
@@ -183,6 +183,10 @@ export const createServices = ( widgetId ) => ( {
 				restUrl: boot.restUrl,
 				nonce: boot.storeApiNonce,
 			} )
+		: () => Promise.reject( new Error( '' ) ),
+
+	getProduct: boot.hasWoo
+		? createGetProduct( { restUrl: boot.restUrl } )
 		: () => Promise.reject( new Error( '' ) ),
 
 	cartUrl: boot.cartUrl || '',
