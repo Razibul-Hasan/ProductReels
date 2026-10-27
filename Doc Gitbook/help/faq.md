@@ -93,13 +93,31 @@ Yes. Use **Add a button** in the reel sheet and enter any link, such as a collec
 
 </details>
 
+<details>
+
+<summary>Can I see how much my reels sell?</summary>
+
+Yes. With WooCommerce, a widget's **Statistics** show **Orders** and **Revenue** for each reel: paid orders with a product added to the cart from that reel. See [How a sale is counted](../widgets/statistics.md#how-a-sale-is-counted).
+
+</details>
+
 ## Placement
 
 <details>
 
 <summary>Can I show different reels on different product pages?</summary>
 
-Yes. Create one widget per product (or product group) and add its shortcode to that product's description, or use a small code snippet. See [Product page carousel](../recipes/product-page-carousel.md).
+Yes, with a single widget. Set its **Reels to show** to **Current product's reels** and turn on **Show on product pages**. Each product page then shows the reels tagged with that product. See [Product pages](../placing-widgets/product-pages.md) and the [Product page carousel](../recipes/product-page-carousel.md) recipe.
+
+You can still create one widget per product and paste its shortcode into that product's description, if you'd rather hand-pick each one.
+
+</details>
+
+<details>
+
+<summary>Can I add reels to product pages without a shortcode?</summary>
+
+Yes. In the widget's **Place it** step, turn on **Show on product pages** and choose where it goes: above the product, under Add to cart, above or below the tabs, or at the end of the page.
 
 </details>
 
@@ -117,7 +135,7 @@ There's a native **block** for the WordPress editor and a native **Elementor** w
 
 <summary>Does ProductReels store personal data?</summary>
 
-No IP addresses are stored. A salted hash of the IP is kept temporarily for view rate limiting, and the visitor's browser remembers counted reels and closed popups. See [Privacy and performance](../configuration/privacy-and-performance.md).
+No IP addresses are stored. A salted hash of the IP is kept temporarily for view rate limiting, and the visitor's browser remembers counted reels and closed popups. Sales tracking stores only which reel an order line came from, alongside the order WooCommerce already keeps. See [Privacy and performance](../configuration/privacy-and-performance.md).
 
 </details>
 
@@ -134,5 +152,13 @@ Deactivating never removes anything. Deleting keeps your data too, unless you tu
 <summary>Will updating from 1.0 to 1.1 change my widgets?</summary>
 
 No. Your reels, widgets, statistics and settings are kept, and existing shortcodes, blocks and Elementor widgets keep working. Styles you already saved keep their values. Only new widgets start from the refreshed defaults.
+
+</details>
+
+<details>
+
+<summary>What changes when I update to 1.1.1?</summary>
+
+Nothing you've set up changes. Existing widgets keep showing the reels you picked and don't appear on product pages until you turn that on. The update adds two database tables, for daily numbers and sales from reels, and starts counting both from the day you update.
 
 </details>

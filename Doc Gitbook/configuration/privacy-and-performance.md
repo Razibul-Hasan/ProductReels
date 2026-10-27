@@ -12,7 +12,9 @@ ProductReels **doesn't send any information about your site or visitors to Produ
 
 | Data | Where | Details |
 | --- | --- | --- |
-| View and click counts | Your WordPress database | Totals per reel, widget and button. No personal data. |
+| View and click counts | Your WordPress database | Totals per reel, widget and button, and per day for date ranges. No personal data. |
+| Sales from reels | Your WordPress database | For each paid order line added from a reel: the order, line, product, reel, widget, quantity and line total. Nothing about the shopper beyond what WooCommerce already keeps with the order. |
+| Which reel a cart item came from | The shopper's WooCommerce session, then the order line | A reel and widget ID for each cart item added from a reel, kept until checkout or until the cart is emptied. At checkout, they're saved as hidden meta on the order line. |
 | A hash of the visitor's IP | A temporary WordPress transient | Used only for view rate limiting, salted with your site's keys and deleted when the time window ends. Raw IP addresses are never stored. |
 | Counted reels, closed popups | The visitor's browser storage | Remembers which reels were already counted and whether a popup was closed |
 

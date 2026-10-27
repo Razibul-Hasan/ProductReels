@@ -16,13 +16,13 @@ The preview uses the same code as your live store, so what you see is what shopp
 
 | Step | What you set there |
 | --- | --- |
-| [**Reels**](#reels) | Which reels are in the widget, and their order |
+| [**Reels**](#reels) | Which reels are in the widget and their order, or the current product's reels |
 | [**Layout**](layouts.md) | Layout type, shape, size, spacing, alignment and widget title |
 | [**Look**](look-player-product-card.md#look) | How each reel thumbnail looks |
 | [**Player**](look-player-product-card.md#player) | How the full-screen player behaves |
 | [**Product card**](look-player-product-card.md#product-card) | How tagged products appear in the player |
 | [**Advanced**](look-player-product-card.md#advanced) | Lazy loading and a custom CSS class |
-| [**Place it**](#place-it) | The shortcode and how to add the widget to a page |
+| [**Place it**](#place-it) | Show on product pages, the shortcode, and how to add the widget to a page |
 
 {% hint style="info" %}
 **Need more room for the preview?** Click the active step on the rail again to collapse the panel, so the stage fills the width. Click any step to bring the panel back.
@@ -30,7 +30,22 @@ The preview uses the same code as your live store, so what you see is what shopp
 
 ## Reels
 
-The Reels step has two parts.
+### Reels to show
+
+With WooCommerce active, the Reels step starts with a choice:
+
+* **Reels you pick** (default): the widget shows the reels you add below, in your order, wherever it's placed.
+* **Current product's reels**: on a product page, the widget shows the reels tagged with that product. The reels you pick below become the fallback, for products with no reels and for pages that aren't product pages.
+
+See [Product pages](../placing-widgets/product-pages.md) for a full example.
+
+{% hint style="info" %}
+The editor preview always shows the reels you pick. With **Current product's reels**, add a few so you can see the look while you style the widget.
+{% endhint %}
+
+### The widget's reels and your library
+
+The rest of the step has two parts.
 
 **The widget's reels (top)** are in the order they'll appear on the page. For each reel you can preview it or remove it from this widget. Removing a reel here doesn't delete it from your library.
 
@@ -51,12 +66,13 @@ Some settings, such as reel width and gap, can differ between desktop, tablet an
 
 The last step shows how to put the widget on your site:
 
+* **Product pages** (WooCommerce only): turn on **Show on product pages** and choose a **Position** to add the widget to every product page. See [Product pages](../placing-widgets/product-pages.md).
 * **Shortcode** with a copy button, for example `[productreels id="3"]`
 * **Block editor:** add the ProductReels block and choose this widget
 * **Elementor:** drag the ProductReels widget onto the page and choose this widget
 * **Single reels:** the format for showing one reel on its own
 
-Before the first save there's nothing to place yet, so this step offers a **Save widget** button instead.
+Before the first save there's no shortcode yet, so this step offers a **Save widget** button in its place. You can already turn on **Show on product pages**; it takes effect when you save.
 
 See [Shortcodes](../placing-widgets/shortcodes.md), [Block editor](../placing-widgets/block-editor.md) and [Elementor](../placing-widgets/elementor.md).
 

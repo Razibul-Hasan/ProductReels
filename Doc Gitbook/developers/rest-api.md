@@ -31,10 +31,15 @@ GET /wp-json/productreels/v1/render/{widget_id}
 
 Returns everything needed to draw a widget: its styles and its reels, with titles, video and cover links, view counts and product links. It never returns visitor or order data.
 
+| Parameter | Description |
+| --- | --- |
+| `product` | Optional product ID. For a widget set to **Current product's reels**, returns the reels tagged with that product, or the widget's own reels when it has none. Other widgets ignore it. |
+
 **Example:**
 
 ```bash
 curl https://lumaskin.com/wp-json/productreels/v1/render/3
+curl "https://lumaskin.com/wp-json/productreels/v1/render/5?product=101"
 ```
 
 ### Get a single reel's render data
@@ -76,7 +81,27 @@ All need `manage_options` unless noted.
 | `PUT` / `PATCH` | `/widgets/{id}` | Update a widget |
 | `DELETE` | `/widgets/{id}` | Delete a widget |
 | `POST` | `/widgets/{id}/duplicate` | Duplicate a widget |
-| `GET` | `/widgets/{id}/stats` | Views and clicks per reel and button |
+| `GET` | `/widgets/{id}/stats` | Views, clicks, orders and revenue per reel, and clicks per button |
+
+#### Widget statistics
+
+`GET /widgets/{id}/stats` accepts `range`: `all` (default), `7`, `30` or `90`. Any other value returns a `400` error.
+
+| Field | Description |
+| --- | --- |
+| `totals` | `views`, `clicks`, `ctr`, `orders`, `revenue` for the range |
+| `reels[]` | `reel_id`, `title`, `thumbnail`, `view_count`, `click_count`, `ctr`, `orders`, `revenue` |
+| `buttons[]` | Clicks per button, always all time |
+| `series[]` | One entry per day (`day`, `views`, `clicks`, `orders`, `revenue`), oldest first. Empty for `all`. |
+| `range` | The range used |
+| `since` | The first day daily numbers were kept (`YYYY-MM-DD`) |
+
+`revenue` is in the store's currency, before tax.
+
+```bash
+curl -u "admin:abcd efgh ijkl mnop qrst uvwx" \
+  "https://lumaskin.com/wp-json/productreels/v1/widgets/3/stats?range=30"
+```
 
 ### Reels
 

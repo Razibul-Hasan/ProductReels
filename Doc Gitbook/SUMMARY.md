@@ -24,6 +24,7 @@
 
 ## Place it
 
+* [Product pages](placing-widgets/product-pages.md)
 * [Shortcodes](placing-widgets/shortcodes.md)
 * [Block editor (Gutenberg)](placing-widgets/block-editor.md)
 * [Elementor](placing-widgets/elementor.md)

@@ -18,21 +18,24 @@ Make three to five reels about **this product only**:
 
 Tag **Trailhead 30L** on each one. On the packing video, also tag the **Dry Bag Set**. That's a natural upsell.
 
-## 2. Create a widget for the product
+## 2. Create one widget for all product pages
 
-1. **Create widget** → name it `Product – Trailhead 30L`.
+1. **Create widget** → name it `Product videos`.
 2. **Layout:** Carousel. **Shape:** Rectangle.
-3. Add the reels.
+3. **Reels step:** under **Reels to show**, choose **Current product's reels**. Each product page will show the reels tagged with that product.
+4. Still in the Reels step, pick one or two brand videos, such as *"How we test our packs"*. They show on products that don't have their own videos yet. If you'd rather show nothing there, leave the list empty.
 
 **Layout step:** reel width **140** desktop / **120** mobile, alignment **Left**, so it lines up with the product description.
 
 **Product card step:** **Add to cart**. The shopper is already on the product page, so let them add the upsell without leaving.
 
-Save the widget.
+## 3. Show it on every product page
 
-## 3. Add it to the product page
+**Place it step:** turn on **Show on product pages** and choose **Below the product, above the tabs**. Click **Save widget**.
 
-Choose the method that matches your setup:
+That's it. The Trailhead 30L page shows its three videos, the Summit 45L page shows its own, and every new video you tag with a product appears on that product's page. See [Product pages](../placing-widgets/product-pages.md) for all positions.
+
+### Other ways to place it
 
 {% tabs %}
 {% tab title="Product description" %}
@@ -42,38 +45,21 @@ Edit the product and paste the shortcode at the end of the **Product description
 [productreels id="8"]
 ```
 
-Best when only a few products have videos.
+Best when only a few products have videos, or when one product needs its own hand-picked widget.
 {% endtab %}
 
 {% tab title="Block theme template" %}
-**Appearance → Editor → Templates → Single Product.** Add the **ProductReels** block where you want it.
+**Appearance → Editor → Templates → Single Product.** Add the **ProductReels** block where you want it, and choose the `Product videos` widget.
 
-Note that this shows the **same** widget on every product. Use it for brand-wide videos, such as *"How we make our bags"*.
-{% endtab %}
-
-{% tab title="Code snippet" %}
-Show a widget only on specific products, by product ID:
-
-```php
-add_action( 'woocommerce_after_single_product_summary', function () {
-	$map = array(
-		101 => 8,  // Trailhead 30L   → widget 8
-		102 => 9,  // Summit 45L      → widget 9
-	);
-
-	$product_id = get_the_ID();
-
-	if ( isset( $map[ $product_id ] ) ) {
-		echo do_shortcode( sprintf( '[productreels id="%d"]', $map[ $product_id ] ) );
-	}
-}, 15 );
-```
+Use this when you want a spot that **Show on product pages** doesn't offer. The widget still shows each product's own reels.
 {% endtab %}
 {% endtabs %}
 
 ## Result
 
 Under the product summary, shoppers see a short row of real-use videos. They can watch the backpack being packed, then add it or the dry bag set to their cart from the player.
+
+Because the packing video also tags the **Dry Bag Set**, it shows on the dry bag's page too. A month later, the widget's [Statistics](../widgets/statistics.md) show which videos led to orders and how much revenue each one brought in.
 
 {% hint style="success" %}
 **Tip:** product pages are where buying decisions happen. Short, practical clips like sizing, fit, "how it works" and "what's in the box" usually beat polished brand ads here.

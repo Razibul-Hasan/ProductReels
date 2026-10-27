@@ -59,13 +59,18 @@ A **button** is a custom call to action on a reel, for example *"Shop the look"*
 
 ## Place it
 
-**Place it** is the last step of the widget editor. It shows the widget's shortcode and how to add it with the block editor or Elementor.
+**Place it** is the last step of the widget editor. It shows the widget's shortcode and how to add it with the block editor or Elementor. With WooCommerce, you can also turn on **Show on product pages** to add the widget to every product page. See [Product pages](../placing-widgets/product-pages.md).
+
+## Current product's reels
+
+A widget usually shows the reels you pick for it. Set its **Reels to show** to **Current product's reels**, and on a product page it shows the reels tagged with that product instead. One widget can then cover your whole catalogue.
 
 ## Views, clicks and click rate
 
 * **Views:** how many times reels were watched (counted after about one second of playback).
 * **Clicks:** how many times shoppers clicked a product card or button.
 * **Click rate:** clicks divided by views. A click rate of 8% means 8 clicks for every 100 views.
+* **Orders and revenue:** paid WooCommerce orders with a product added to the cart from a reel, and those products' order lines before tax.
 
 ## How it fits together
 

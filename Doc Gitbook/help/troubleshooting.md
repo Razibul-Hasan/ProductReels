@@ -53,6 +53,19 @@ This is expected for **variable**, **grouped** and **external** products. The sh
 
 ProductReels syncs supported mini-carts automatically. If your theme uses a custom cart widget, the count may only update on the next page load. Ask your theme developer to listen for WooCommerce cart updates, or reload the fragment on `added_to_cart`.
 
+## The widget doesn't show on product pages
+
+* Check that **Show on product pages** is on in the widget's **Place it** step, and that you saved the widget.
+* With **Current product's reels**, a product with no tagged reels shows the reels you picked for the widget. If you picked none, the widget is hidden on that product. Tag the product on a reel, or pick a fallback reel.
+* Some themes and page builders replace WooCommerce's product template and skip its standard positions. Add the ProductReels block or Elementor widget to your product template instead. See [Product pages](../placing-widgets/product-pages.md#using-it-with-themes-and-builders).
+
+## Orders and revenue stay at zero
+
+* Only **paid** orders count (Processing or Completed). Pending and on-hold orders appear once they're paid.
+* The product has to be added to the cart **from the reel**, with the player's Add to cart or Buy now. Adding it from the product page doesn't count.
+* Sales are counted from the day you updated to 1.1.1.
+* Try a different date range: **All time** shows every sale.
+
 ## View counts seem low
 
 * Views are counted after about **one second of playback**, not when a thumbnail appears.

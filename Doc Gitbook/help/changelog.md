@@ -4,6 +4,26 @@ description: What's new in each version of ProductReels.
 
 # Changelog
 
+## 1.1.1
+
+Reels on every product page, sales tracked from reels, and date ranges in Statistics. Your reels, widgets, statistics and settings are kept.
+
+### New
+
+* **Show on product pages.** Add a widget to every WooCommerce product page from its **Place it** step, with no shortcode. Choose where: above the product, under Add to cart, above or below the tabs, or at the end of the page. See [Product pages](../placing-widgets/product-pages.md).
+* **Current product's reels.** A widget can show the reels tagged with the product being viewed, so one widget covers the whole catalogue. The reels you pick show where a product has none.
+* The `[productreels]` shortcode accepts `product="ID"` to show a product's reels on any page.
+* **Sales from reels.** When a shopper adds a product to the cart from a reel and the order is paid, Statistics shows the **Orders** and **Revenue** for that reel and widget. Cancelled, refunded and failed orders are taken back out. See [How a sale is counted](../widgets/statistics.md#how-a-sale-is-counted).
+* **Date ranges in Statistics.** All time, or the last 7, 30 or 90 days, with a day-by-day chart of views, clicks, orders or revenue.
+
+### Fixed
+
+* Views and clicks are now counted for reels a widget shows from the current product.
+
+{% hint style="info" %}
+**About the update:** 1.1.1 adds two database tables, for daily numbers and for sales from reels. Both start counting on the day you update, so day ranges and orders begin there. All-time views and clicks are unchanged.
+{% endhint %}
+
 ## 1.1.0
 
 A redesigned admin and a refreshed look on your store. Your reels, widgets, statistics and settings are kept.

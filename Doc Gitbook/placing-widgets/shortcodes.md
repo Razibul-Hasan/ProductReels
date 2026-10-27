@@ -15,6 +15,7 @@ Shortcodes work in pages, posts, text widgets, most page builders and theme file
 | Attribute | Required | Description |
 | --- | --- | --- |
 | `id` | Yes | The widget's ID. You'll find it in the Widgets table, the editor header and the **Place it** step. |
+| `product` | No | A WooCommerce product ID. Only used by a widget set to **Current product's reels**: it shows that product's reels. See [below](#show-a-products-reels-anywhere). |
 
 **Where to copy it:**
 
@@ -28,6 +29,16 @@ Watch our customers' favourite routines:
 
 [productreels id="3"]
 ```
+
+### Show a product's reels anywhere
+
+A widget set to **Current product's reels** (in its [Reels step](../widgets/widget-editor.md#reels-to-show)) picks up the product automatically on a product page. To use it somewhere else, such as a landing page or a blog post, name the product:
+
+```
+[productreels id="5" product="101"]
+```
+
+**Example:** a *"Summer hiking guide"* post shows the reels tagged with the **Trailhead 30L** (product 101) under the paragraph about day packs. When you tag a new video with the backpack, the post shows it too.
 
 ## Single-reel shortcode
 
@@ -59,13 +70,9 @@ For developers who want to add a widget to a template file, such as below the pr
 <?php echo do_shortcode( '[productreels id="3"]' ); ?>
 ```
 
-To show a widget on every WooCommerce product page without editing templates, add this to your child theme's `functions.php` or a code snippets plugin:
-
-```php
-add_action( 'woocommerce_after_single_product_summary', function () {
-	echo do_shortcode( '[productreels id="5"]' );
-}, 15 );
-```
+{% hint style="info" %}
+**To show a widget on every WooCommerce product page**, you don't need code. Turn on **Show on product pages** in the widget's **Place it** step. See [Product pages](product-pages.md).
+{% endhint %}
 
 ## What if the ID is wrong?
 
