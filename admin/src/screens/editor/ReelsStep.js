@@ -7,6 +7,11 @@
  * first, 24 at a time; tapping a reel adds it to the end of the widget or
  * takes it out. "Add new reel" opens the reel sheet, and the reel it saves
  * joins this widget straight away.
+ *
+ * With WooCommerce, a switch on top chooses where the reels come from: the
+ * ones picked here, or the reels tagged with the product being viewed. In
+ * the second case the picked reels are the fallback for a product with
+ * none, and for pages that aren't a product's.
  */
 
 import { useCallback, useEffect, useRef, useState } from '@wordpress/element';
@@ -25,7 +30,7 @@ import {
 	sortableKeyboardCoordinates,
 	verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
-import { reels as reelsApi } from '../../api';
+import { boot, reels as reelsApi } from '../../api';
 import { formatNumber } from '../../format';
 import {
 	Button,
@@ -34,6 +39,7 @@ import {
 	ReelPicker,
 	ReelRow,
 	SearchField,
+	Segmented,
 	useToasts,
 } from '../../components/pr';
 import { useDebounced } from '../../hooks/use-debounced';
@@ -42,10 +48,61 @@ import { ReelEditor } from '../ReelEditor';
 /** How many reels the library fetches per page (1.0.0's PICKER_PAGE). */
 const PICKER_PAGE = 24;
 
+/**
+ * Where the widget's reels come from. Product tags need WooCommerce, so the
+ * switch only shows with it.
+ *
+ * @param {Object}   props        Props.
+ * @param {Object}   props.styles The widget's styles.
+ * @param {Function} props.set    Style setter.
+ * @return {Object|null} The section.
+ */
+const SourceSection = ( { styles, set } ) => {
+	if ( ! boot.hasWoo ) {
+		return null;
+	}
+
+	const source = styles.reelSource === 'product' ? 'product' : 'chosen';
+
+	return (
+		<PanelSection title={ __( 'Reels to show', 'productreels' ) }>
+			<Segmented
+				block
+				label={ __( 'Reels to show', 'productreels' ) }
+				value={ source }
+				onChange={ ( value ) => set( 'reelSource', value ) }
+				options={ [
+					{
+						value: 'chosen',
+						label: __( 'Reels you pick', 'productreels' ),
+					},
+					{
+						value: 'product',
+						label: __( 'Current product’s reels', 'productreels' ),
+					},
+				] }
+			/>
+			<p className="pr-t-small pr-muted">
+				{ source === 'product'
+					? __(
+							'On a product page, shows the reels tagged with that product. The reels you pick below show where a product has none, and on other pages.',
+							'productreels'
+						)
+					: __(
+							'Shows the reels you pick below, in this order, wherever the widget is placed.',
+							'productreels'
+						) }
+			</p>
+		</PanelSection>
+	);
+};
+
 export const ReelsStep = ( {
 	attached,
 	setAttached,
 	onPreview,
+	styles,
+	set,
 	ready = true,
 } ) => {
 	const toasts = useToasts();
@@ -344,6 +401,8 @@ export const ReelsStep = ( {
 
 	return (
 		<>
+			<SourceSection styles={ styles } set={ set } />
+
 			{ attached.length > 0 && (
 				<PanelSection>
 					<DndContext

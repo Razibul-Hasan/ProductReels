@@ -128,6 +128,7 @@ class Productreels {
 		 */
 		require_once plugin_dir_path( __DIR__ ) . 'includes/integrations/class-productreels-woocommerce.php';
 		require_once plugin_dir_path( __DIR__ ) . 'includes/integrations/class-productreels-elementor.php';
+		require_once plugin_dir_path( __DIR__ ) . 'includes/integrations/class-productreels-sales.php';
 
 		/**
 		 * The data layer: the repository base, the five repositories and settings.
@@ -138,6 +139,7 @@ class Productreels {
 		require_once plugin_dir_path( __DIR__ ) . 'includes/data/class-productreels-clicks.php';
 		require_once plugin_dir_path( __DIR__ ) . 'includes/data/class-productreels-reels.php';
 		require_once plugin_dir_path( __DIR__ ) . 'includes/data/class-productreels-widgets.php';
+		require_once plugin_dir_path( __DIR__ ) . 'includes/data/class-productreels-stats.php';
 
 		/**
 		 * The REST layer: the base controller, one controller per resource, and
@@ -158,6 +160,7 @@ class Productreels {
 		 */
 		require_once plugin_dir_path( __DIR__ ) . 'includes/frontend/class-productreels-shortcodes.php';
 		require_once plugin_dir_path( __DIR__ ) . 'includes/frontend/class-productreels-block.php';
+		require_once plugin_dir_path( __DIR__ ) . 'includes/frontend/class-productreels-product-pages.php';
 
 		/**
 		 * The class responsible for defining all actions that occur in the admin area.
@@ -193,6 +196,10 @@ class Productreels {
 		// Every widget, reel or file write orphans the cached render payloads.
 		Productreels_Render_Cache::register( $this->loader );
 
+		// Dated views and clicks, and sales that came from a reel.
+		Productreels_Stats::register( $this->loader );
+		Productreels_Sales::register( $this->loader );
+
 		// Placement: shortcodes, the block, and Elementor when it is active.
 		$shortcodes = new Productreels_Shortcodes();
 		$block      = new Productreels_Block();
@@ -201,6 +208,9 @@ class Productreels {
 		$this->loader->add_action( 'init', $shortcodes, 'register' );
 		$this->loader->add_action( 'init', $block, 'register' );
 		$this->loader->add_action( 'plugins_loaded', $elementor, 'maybe_boot', 20 );
+
+		// Widgets set to show on every product page.
+		Productreels_Product_Pages::register( $this->loader );
 	}
 
 	/**

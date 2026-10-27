@@ -230,6 +230,55 @@ class Productreels_Widgets extends Productreels_Repository {
 	}
 
 	/**
+	 * Where a widget's reels come from, read straight from its stored styles:
+	 * `chosen` (its own, in order) or `product` (the current product's).
+	 *
+	 * @since  1.1.1
+	 * @param  string $styles_json The stored styles JSON.
+	 * @return string `chosen` or `product`.
+	 */
+	public static function reel_source( $styles_json ) {
+		$styles = json_decode( (string) $styles_json, true );
+
+		return Productreels_Validator::enum(
+			is_array( $styles ) && isset( $styles['reelSource'] ) ? $styles['reelSource'] : '',
+			array( 'chosen', 'product' ),
+			'chosen'
+		);
+	}
+
+	/**
+	 * Whether a widget can show a reel: the reel is in its list, or the
+	 * widget shows the current product's reels and the reel tags a product.
+	 *
+	 * @since  1.1.1
+	 * @param  int $widget_id Widget id.
+	 * @param  int $reel_id   Reel id.
+	 * @return bool Whether it can.
+	 */
+	public function shows_reel( $widget_id, $reel_id ) {
+		if ( in_array( (int) $reel_id, $this->reel_ids( $widget_id ), true ) ) {
+			return true;
+		}
+
+		$summary = $this->summary( $widget_id );
+
+		if ( null === $summary || 'product' !== self::reel_source( $summary['styles_json'] ) ) {
+			return false;
+		}
+
+		$reel = ( new Productreels_Reels() )->find( $reel_id );
+
+		foreach ( null === $reel ? array() : (array) $reel['links'] as $link ) {
+			if ( isset( $link['btn_type'] ) && 'product' === $link['btn_type'] ) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
 	 * The widget row alone — no reels, no files — for callers that only need
 	 * to know it exists and what version it is at.
 	 *

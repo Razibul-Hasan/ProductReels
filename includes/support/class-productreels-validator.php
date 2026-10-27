@@ -520,6 +520,23 @@ class Productreels_Validator {
 			// Performance.
 			'lazyLoad'                  => $flag,
 
+			// Reels and product pages.
+			'reelSource'                => array(
+				'type'   => 'enum',
+				'values' => array( 'chosen', 'product' ),
+			),
+			'productPage'               => array(
+				'type'   => 'object',
+				'fields' => array(
+					'show'     => $flag,
+					'position' => array(
+						'type'   => 'enum',
+						// The keys of Productreels_Product_Pages::POSITIONS.
+						'values' => array( 'before_product', 'after_cart', 'before_tabs', 'after_tabs', 'after_product' ),
+					),
+				),
+			),
+
 			// Advanced.
 			'customClass'               => array( 'type' => 'classes' ),
 		);

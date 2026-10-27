@@ -15,23 +15,37 @@ import { __ } from '@wordpress/i18n';
 /**
  * Build the add-to-cart function for a given site.
  *
- * @param {Object} config         Site details.
- * @param {string} config.restUrl The REST root, e.g. https://site/wp-json/.
- * @param {string} config.nonce   The wc_store_api nonce.
- * @return {Function} (product, link, quantity, variation) => Promise<Object> resolving to the cart.
+ * With a `widgetId` (the storefront's, never the editor preview's), the
+ * request also names the reel and widget the product was added from, so the
+ * order it ends up in counts as a sale from that reel.
+ *
+ * @param {Object} config            Site details.
+ * @param {string} config.restUrl    The REST root, e.g. https://site/wp-json/.
+ * @param {string} config.nonce      The wc_store_api nonce.
+ * @param {number} [config.widgetId] The widget, 0 for a standalone reel; omit to send no attribution.
+ * @return {Function} (product, link, quantity, variation, reel) => Promise<Object> resolving to the cart.
  *                    `variation` is the chosen attributes of a variable product,
  *                    as [ { attribute, value } ], with `product.id` the variation's.
  */
 export const createAddToCart =
-	( { restUrl, nonce } ) =>
-	async ( product, link, quantity = 1, variation ) => {
+	( { restUrl, nonce, widgetId } ) =>
+	async ( product, link, quantity = 1, variation, reel ) => {
 		if ( ! restUrl ) {
 			throw new Error(
 				__( 'WooCommerce is not available.', 'productreels' )
 			);
 		}
 
-		const response = await fetch( `${ restUrl }wc/store/v1/cart/add-item`, {
+		let url = `${ restUrl }wc/store/v1/cart/add-item`;
+
+		if ( widgetId !== undefined && reel && reel.id ) {
+			// Plain permalinks put the route in ?rest_route=, so join with &.
+			url += `${ url.includes( '?' ) ? '&' : '?' }productreels_reel=${ Number(
+				reel.id
+			) }&productreels_widget=${ Number( widgetId ) }`;
+		}
+
+		const response = await fetch( url, {
 			method: 'POST',
 			credentials: 'same-origin',
 			headers: {

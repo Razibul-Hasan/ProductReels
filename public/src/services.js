@@ -182,6 +182,7 @@ export const createServices = ( widgetId ) => ( {
 		? createAddToCart( {
 				restUrl: boot.restUrl,
 				nonce: boot.storeApiNonce,
+				widgetId,
 			} )
 		: () => Promise.reject( new Error( '' ) ),
 

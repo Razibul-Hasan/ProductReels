@@ -47,14 +47,27 @@ class Productreels_Shortcodes {
 	/**
 	 * [productreels id="12"]
 	 *
+	 * Since 1.1.1 an optional `product` attribute names the product whose
+	 * reels a "current product" widget shows, for a page that is not that
+	 * product's own (a landing page, say).
+	 *
 	 * @since  1.0.0
 	 * @param  array|string $atts Shortcode attributes.
 	 * @return string The mount node, or nothing.
 	 */
 	public function widget( $atts ) {
-		$atts = shortcode_atts( array( 'id' => 0 ), $atts, 'productreels' );
+		$atts = shortcode_atts(
+			array(
+				'id'      => 0,
+				'product' => 0,
+			),
+			$atts,
+			'productreels'
+		);
 
-		return self::widget_markup( absint( $atts['id'] ) );
+		$product_id = absint( $atts['product'] );
+
+		return self::widget_markup( absint( $atts['id'] ), $product_id > 0 ? $product_id : null );
 	}
 
 	/**
@@ -73,11 +86,15 @@ class Productreels_Shortcodes {
 	/**
 	 * The mount node for a widget.
 	 *
+	 * A widget that shows the current product's reels also carries that
+	 * product's id: the one given, else the product page being viewed.
+	 *
 	 * @since  1.0.0
-	 * @param  int $widget_id Widget id.
+	 * @param  int      $widget_id  Widget id.
+	 * @param  int|null $product_id The product, or null for the one being viewed.
 	 * @return string The markup, an admin-only notice, or an empty string.
 	 */
-	public static function widget_markup( $widget_id ) {
+	public static function widget_markup( $widget_id, $product_id = null ) {
 		$widget_id = absint( $widget_id );
 		$widgets   = new Productreels_Widgets();
 		$summary   = $widget_id > 0 ? $widgets->summary( $widget_id ) : null;
@@ -93,12 +110,37 @@ class Productreels_Shortcodes {
 
 		Productreels_Public::request_assets();
 
+		$product_attr = '';
+
+		if ( 'product' === Productreels_Widgets::reel_source( $summary['styles_json'] ) ) {
+			$product_id = null === $product_id ? self::current_product_id() : absint( $product_id );
+
+			if ( $product_id > 0 ) {
+				$product_attr = sprintf( ' data-product-id="%d"', $product_id );
+			}
+		}
+
 		return sprintf(
-			'<div class="productreels-embed prs" data-widget-id="%1$d" data-version="%2$s" data-name="%3$s"></div>',
+			'<div class="productreels-embed prs" data-widget-id="%1$d" data-version="%2$s" data-name="%3$s"%4$s></div>',
 			$summary['id'],
 			esc_attr( Productreels_Render_Cache::version( $summary['updated_at'] ) ),
-			esc_attr( $summary['name'] )
+			esc_attr( $summary['name'] ),
+			$product_attr // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- built above from an integer.
 		);
+	}
+
+	/**
+	 * The product page being viewed, if this request is one.
+	 *
+	 * @since  1.1.1
+	 * @return int The product id, or 0.
+	 */
+	public static function current_product_id() {
+		if ( ! function_exists( 'is_product' ) || ! is_product() ) {
+			return 0;
+		}
+
+		return absint( get_queried_object_id() );
 	}
 
 	/**

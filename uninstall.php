@@ -2,7 +2,7 @@
 /**
  * Fired when the plugin is uninstalled.
  *
- * Removes everything ProductReels ever wrote — the five tables, its options and
+ * Removes everything ProductReels ever wrote — the seven tables, its options and
  * every productreels_* transient — but only when the site owner has turned on
  * "Delete all plugin data on uninstall" in Settings. That flag is off by
  * default, so an accidental delete of the plugin never costs anyone their
@@ -36,3 +36,5 @@ delete_option( 'productreels_db_version' );
 delete_option( 'productreels_render_generation' );
 delete_option( 'productreels_activation_redirected' );
 delete_option( 'productreels_guide_done' );
+delete_option( 'productreels_product_page_widgets' );
+delete_option( 'productreels_stats_since' );

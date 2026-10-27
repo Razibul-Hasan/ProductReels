@@ -15,7 +15,7 @@
  * Plugin Name:       ProductReels – Shoppable Video Reels for WooCommerce
  * Plugin URI:        https://bestwebexpert.com/productreels/
  * Description:       Turn product videos and customer UGC into shoppable Instagram-style reels. Grid, carousel, marquee, stacked and popup layouts, WooCommerce product tagging, CTA buttons, and built-in view/click analytics.
- * Version:           1.1.0
+ * Version:           1.1.1
  * Requires at least: 6.6
  * Requires PHP:      7.4
  * Author:            bestwpexpert
@@ -35,7 +35,7 @@ if ( ! defined( 'WPINC' ) ) {
 /**
  * The plugin version, following SemVer — https://semver.org
  */
-define( 'PRODUCTREELS_VERSION', '1.1.0' );
+define( 'PRODUCTREELS_VERSION', '1.1.1' );
 
 /**
  * The database schema revision.
@@ -43,7 +43,7 @@ define( 'PRODUCTREELS_VERSION', '1.1.0' );
  * Deliberately separate from PRODUCTREELS_VERSION: bumping this re-runs dbDelta()
  * on the next load, without the site owner reactivating the plugin.
  */
-define( 'PRODUCTREELS_DB_VERSION', '1.1.0' );
+define( 'PRODUCTREELS_DB_VERSION', '1.1.1' );
 
 /**
  * Absolute path to this file, the plugin directory, and the plugin URL.

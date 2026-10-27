@@ -83,3 +83,99 @@
 	border: 0;
 	border-radius: 0;
 }
+
+/* The date range above the numbers, and the note on how far back it goes. */
+.pr-stats__range {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	justify-content: space-between;
+	gap: var(--pr-space-3);
+}
+
+/* Revenue and orders are wide numbers; keep them on one line. */
+.pr-stats__reels .pr-table td.num {
+	font-variant-numeric: tabular-nums;
+}
+
+/* Trend chart: one measure per day. */
+.pr-trend {
+	background: var(--pr-surface);
+	border: 1px solid var(--pr-line);
+	border-radius: var(--pr-radius-md);
+	padding: var(--pr-space-5) var(--pr-space-6);
+}
+
+.pr-trend__head {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	justify-content: space-between;
+	gap: var(--pr-space-3);
+	margin-block-end: var(--pr-space-4);
+}
+
+.pr-trend__plot {
+	position: relative;
+	min-height: 168px;
+}
+
+.pr-trend__plot svg {
+	display: block;
+	overflow: visible;
+	/* Time runs left to right, and text-anchor follows direction. */
+	/*rtl:ignore*/
+	direction: ltr;
+}
+
+.pr-trend__grid {
+	stroke: var(--pr-line);
+	stroke-width: 1;
+}
+
+.pr-trend__tick {
+	fill: var(--pr-ink-muted);
+	font-variant-numeric: tabular-nums;
+}
+
+.pr-trend__bar {
+	fill: var(--pr-brand);
+}
+
+.pr-trend__bar.is-hover {
+	fill: var(--pr-brand-strong);
+}
+
+.pr-trend__hit {
+	fill: transparent;
+}
+
+.pr-trend__tip {
+	position: absolute;
+	inset-block-start: 0;
+	/* Physical on purpose: the SVG's x runs left to right in RTL too. */
+	/*rtl:ignore*/
+	left: var(--pr-tip-x);
+	/*rtl:ignore*/
+	transform: translateX(-50%);
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+	padding: var(--pr-space-2) var(--pr-space-3);
+	background: var(--pr-surface);
+	border: 1px solid var(--pr-line);
+	border-radius: var(--pr-radius-sm);
+	box-shadow: var(--pr-shadow-md);
+	color: var(--pr-ink);
+	white-space: nowrap;
+	pointer-events: none;
+}
+
+.pr-trend__empty {
+	position: absolute;
+	inset: 0;
+	display: grid;
+	place-items: center;
+	margin: 0;
+	pointer-events: none;
+}

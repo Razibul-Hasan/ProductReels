@@ -473,6 +473,23 @@ export const Player = ( {
 		[ current, services ]
 	);
 
+	// The product panel adds to the cart from the reel on screen, so a sale
+	// can be traced back to it.
+	const panelServices = useMemo(
+		() => ( {
+			...services,
+			addToCart: ( product, link, quantity, variation ) =>
+				services.addToCart(
+					product,
+					link,
+					quantity,
+					variation,
+					current ? current.reel : undefined
+				),
+		} ),
+		[ current, services ]
+	);
+
 	/* ------------------------------------------------------------- toast */
 
 	const showToast = useCallback(
@@ -895,7 +912,7 @@ export const Player = ( {
 							onPick={ setPicked }
 							onClose={ foldPanel }
 							styles={ styles }
-							services={ services }
+							services={ panelServices }
 							onTrack={ trackProduct }
 							onToast={ showToast }
 						/>
@@ -920,7 +937,7 @@ export const Player = ( {
 						onPick={ setPicked }
 						onClose={ closeSheet }
 						styles={ styles }
-						services={ services }
+						services={ panelServices }
 						onTrack={ trackProduct }
 						onToast={ showToast }
 					/>

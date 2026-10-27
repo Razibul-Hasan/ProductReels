@@ -137,6 +137,11 @@ class Productreels_Rest_Widgets extends Productreels_Rest_Controller {
 							'default' => 'DESC',
 							'enum'    => array( 'ASC', 'DESC', 'asc', 'desc' ),
 						),
+						'range'   => array(
+							'type'    => 'string',
+							'default' => 'all',
+							'enum'    => array( 'all', '7', '30', '90' ),
+						),
 					)
 				),
 			)
@@ -292,6 +297,13 @@ class Productreels_Rest_Widgets extends Productreels_Rest_Controller {
 	/**
 	 * View, click and per-button numbers for one widget.
 	 *
+	 * Since 1.1.1 every reel and the totals also carry `orders` and `revenue`
+	 * (paid orders with a product added from the reel), and `range` picks
+	 * all time (the default, 1.0.0's numbers) or the last 7, 30 or 90 days.
+	 * A day range adds `series`, one entry per day, and `buttons` stays all
+	 * time: clicks per button aren't dated. `since` is the first day dated
+	 * numbers were kept.
+	 *
 	 * @since  1.0.0
 	 * @param  WP_REST_Request $request The request.
 	 * @return WP_REST_Response|WP_Error The response.
@@ -321,11 +333,17 @@ class Productreels_Rest_Widgets extends Productreels_Rest_Controller {
 			);
 		}
 
+		$range  = (string) $request->get_param( 'range' );
+		$report = ( new Productreels_Stats() )->report( $request->get_param( 'id' ), $range, $stats );
+
 		return rest_ensure_response(
 			array(
-				'reels'   => $stats['reels'],
+				'reels'   => $report['reels'],
 				'buttons' => $buttons,
-				'totals'  => $stats['totals'],
+				'totals'  => $report['totals'],
+				'range'   => $range,
+				'series'  => $report['series'],
+				'since'   => Productreels_Stats::since(),
 			)
 		);
 	}

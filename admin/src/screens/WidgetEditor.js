@@ -504,6 +504,8 @@ export const WidgetEditor = ( { widgetId, navigate } ) => {
 					attached={ attached }
 					setAttached={ updateReels }
 					onPreview={ preview }
+					styles={ styles }
+					set={ setStyle }
 					ready={ ! loading }
 				/>
 			);
@@ -528,6 +530,8 @@ export const WidgetEditor = ( { widgetId, navigate } ) => {
 				<PlaceStep
 					id={ savedId }
 					name={ name }
+					styles={ styles }
+					set={ setStyle }
 					onSave={ save }
 					saving={ saving }
 				/>
@@ -545,10 +549,17 @@ export const WidgetEditor = ( { widgetId, navigate } ) => {
 				panel
 				icon="film"
 				title={ __( 'Add reels to see your widget', 'productreels' ) }
-				description={ __(
-					'Pick reels from your library in the Reels step.',
-					'productreels'
-				) }
+				description={
+					styles.reelSource === 'product'
+						? __(
+								'On product pages this widget shows each product’s reels. Pick reels in the Reels step to preview its look, and to show where a product has none.',
+								'productreels'
+							)
+						: __(
+								'Pick reels from your library in the Reels step.',
+								'productreels'
+							)
+				}
 				actions={
 					step !== 'reels' || ! panelOpen ? (
 						<Button

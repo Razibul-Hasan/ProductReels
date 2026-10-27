@@ -53,7 +53,7 @@ const Placeholder = () => (
 	<div className="wr-embed-loading" aria-hidden="true" />
 );
 
-export const Embed = ( { widgetId, reelId, version } ) => {
+export const Embed = ( { widgetId, reelId, productId, version } ) => {
 	const [ widget, setWidget ] = useState( null );
 	const [ failed, setFailed ] = useState( false );
 	const [ playing, setPlaying ] = useState( null );
@@ -70,7 +70,13 @@ export const Embed = ( { widgetId, reelId, version } ) => {
 			? `render/${ widgetId }`
 			: `render/reel/${ reelId }`;
 
-		api( `${ path }?v=${ encodeURIComponent( version || '' ) }` )
+		// A "current product" widget shows that product's reels.
+		const product =
+			widgetId && productId ? `&product=${ Number( productId ) }` : '';
+
+		api(
+			`${ path }?v=${ encodeURIComponent( version || '' ) }${ product }`
+		)
 			.then( ( payload ) => {
 				if ( ! cancelled ) {
 					setWidget( payload );
@@ -85,7 +91,7 @@ export const Embed = ( { widgetId, reelId, version } ) => {
 		return () => {
 			cancelled = true;
 		};
-	}, [ widgetId, reelId, version ] );
+	}, [ widgetId, reelId, productId, version ] );
 
 	if ( failed ) {
 		return null;

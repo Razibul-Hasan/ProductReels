@@ -61,3 +61,51 @@ export const formatPercent = ( value, digits = 1 ) =>
  */
 export const formatRate = ( clicks, views ) =>
 	views ? formatPercent( ( clicks / views ) * 100 ) : '—';
+
+/**
+ * An amount in the store's currency, e.g. 1249.5 → "$1,249.50".
+ *
+ * Uses the store's currency code (from the admin bootstrap) with the
+ * admin's locale; falls back to the store's symbol and decimals when Intl
+ * doesn't know the code.
+ *
+ * @param {number} value    The amount.
+ * @param {Object} currency { code, symbol, position, decimals } from the bootstrap.
+ * @return {string} The formatted amount.
+ */
+export const formatMoney = ( value, currency = {} ) => {
+	const amount =
+		typeof value === 'number' && Number.isFinite( value ) ? value : 0;
+	const decimals = Number.isInteger( currency.decimals )
+		? currency.decimals
+		: 2;
+
+	try {
+		return formatter( {
+			style: 'currency',
+			currency: currency.code || 'USD',
+			minimumFractionDigits: decimals,
+			maximumFractionDigits: decimals,
+		} ).format( amount );
+	} catch ( error ) {
+		const number = formatter( {
+			minimumFractionDigits: decimals,
+			maximumFractionDigits: decimals,
+		} ).format( amount );
+
+		return ( currency.position || 'left' ).startsWith( 'right' )
+			? `${ number }${ currency.symbol || '' }`
+			: `${ currency.symbol || '' }${ number }`;
+	}
+};
+
+/**
+ * A compact amount or count for chart ticks, e.g. 12480 → "12K".
+ *
+ * @param {number} value The number.
+ * @return {string} The formatted number.
+ */
+export const formatCompact = ( value ) =>
+	formatter( { notation: 'compact', maximumFractionDigits: 1 } ).format(
+		value
+	);

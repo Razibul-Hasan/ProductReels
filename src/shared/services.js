@@ -12,7 +12,7 @@
  * @property {Function} trackView   (widgetId, reel) => void — a reel has been watched.
  * @property {Function} trackClick  (reel, link) => void — a link was pressed.
  * @property {Function} getProducts (ids) => Promise<Array> — display data for tagged products.
- * @property {Function} addToCart   (product, link, quantity, variation) => Promise<void> — add one to the cart.
+ * @property {Function} addToCart   (product, link, quantity, variation, reel) => Promise<void> — add one to the cart, from `reel`.
  * @property {Function} getProduct  (id) => Promise<Object> — the Store API product, for the product panel.
  * @property {string}   cartUrl     Where "View cart" goes.
  * @property {string}   checkoutUrl Where "Buy now" goes once the product is in the cart.

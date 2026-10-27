@@ -42,6 +42,8 @@ class Productreels_Schema {
 		'widget_reels' => 'productreels_widget_reels',
 		'files'        => 'productreels_files',
 		'clicks'       => 'productreels_clicks',
+		'daily'        => 'productreels_daily',
+		'sales'        => 'productreels_sales',
 	);
 
 	/**
@@ -172,6 +174,36 @@ class Productreels_Schema {
 	PRIMARY KEY  (id),
 	UNIQUE KEY uq_btn (widget_id,btn_uuid),
 	KEY idx_widget (widget_id)
+) {$charset_collate};";
+
+		// Since 1.1.1: views and clicks per site-local day, for date ranges.
+		$sql['daily'] = "CREATE TABLE {$tables['daily']} (
+	id bigint unsigned NOT NULL AUTO_INCREMENT,
+	day date NOT NULL,
+	widget_id bigint unsigned NOT NULL,
+	reel_id bigint unsigned NOT NULL,
+	views bigint unsigned NOT NULL DEFAULT 0,
+	clicks bigint unsigned NOT NULL DEFAULT 0,
+	PRIMARY KEY  (id),
+	UNIQUE KEY uq_day_widget_reel (day,widget_id,reel_id),
+	KEY idx_widget_day (widget_id,day)
+) {$charset_collate};";
+
+		// Since 1.1.1: one row per paid order line added to the cart from a reel.
+		$sql['sales'] = "CREATE TABLE {$tables['sales']} (
+	id bigint unsigned NOT NULL AUTO_INCREMENT,
+	order_id bigint unsigned NOT NULL,
+	item_id bigint unsigned NOT NULL,
+	widget_id bigint unsigned NOT NULL,
+	reel_id bigint unsigned NOT NULL,
+	product_id bigint unsigned NOT NULL,
+	quantity int unsigned NOT NULL DEFAULT 1,
+	revenue decimal(19,4) NOT NULL DEFAULT 0,
+	day date NOT NULL,
+	PRIMARY KEY  (id),
+	UNIQUE KEY uq_order_item (order_id,item_id),
+	KEY idx_widget_day (widget_id,day),
+	KEY idx_reel (reel_id)
 ) {$charset_collate};";
 
 		return $sql;

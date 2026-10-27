@@ -302,6 +302,52 @@ class Productreels_Reels extends Productreels_Repository {
 	}
 
 	/**
+	 * The reels that tag a product, newest first, each with every file it owns.
+	 *
+	 * `links` is always written by wp_json_encode() from validated links, in
+	 * the key order validate_links() builds, so a product link carries the
+	 * exact token `"product_id":<id>,` and the comma keeps 12 from matching 123.
+	 *
+	 * @since  1.1.1
+	 * @param  int $product_id WooCommerce product id.
+	 * @param  int $limit      The most reels to return.
+	 * @return array[] The hydrated reels.
+	 */
+	public function tagged_with_product( $product_id, $limit = 30 ) {
+		$product_id = absint( $product_id );
+
+		if ( $product_id < 1 ) {
+			return array();
+		}
+
+		$table = $this->table();
+
+		$rows = $this->db()->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			$this->db()->prepare(
+				"SELECT * FROM `{$table}` WHERE links LIKE %s AND links LIKE %s ORDER BY id DESC LIMIT %d", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+				$this->link_type_pattern( 'product' ),
+				'%' . $this->db()->esc_like( '"product_id":' . $product_id . ',' ) . '%',
+				max( 1, (int) $limit )
+			),
+			ARRAY_A
+		);
+
+		$reels = $this->cast_rows( $rows );
+
+		if ( empty( $reels ) ) {
+			return array();
+		}
+
+		$files = $this->files()->for_reels( wp_list_pluck( $reels, 'id' ) );
+
+		foreach ( $reels as $index => $reel ) {
+			$reels[ $index ]['files'] = isset( $files[ $reel['id'] ] ) ? $files[ $reel['id'] ] : array();
+		}
+
+		return $reels;
+	}
+
+	/**
 	 * Create a reel and its files in one transaction.
 	 *
 	 * @since  1.0.0

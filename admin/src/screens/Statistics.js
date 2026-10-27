@@ -1,19 +1,25 @@
 /**
- * Statistics: one widget's numbers, all time.
+ * Statistics: one widget's numbers, all time or for the last 7, 30 or 90 days.
  *
- * Three totals, the widget's reels ranked by views and its buttons ranked by
- * clicks. The numbers are 1.0.0's, from GET /widgets/:id/stats: a reel's
+ * The totals, the widget's reels ranked by views and its buttons ranked by
+ * clicks. All time is 1.0.0's numbers, from GET /widgets/:id/stats: a reel's
  * views are its lifetime views (every widget and the single-reel shortcode),
- * clicks are this widget's own. Both tables still sort on the client by any
- * column, as in 1.0.0; views and clicks rank first by default.
+ * clicks are this widget's own. A day range counts this widget's views and
+ * clicks on those days only, and adds a per-day trend chart. Both tables
+ * still sort on the client by any column, as in 1.0.0; views and clicks rank
+ * first by default.
+ *
+ * With WooCommerce, orders and revenue join the totals and the reels table:
+ * paid orders with a product added to the cart from one of the reels.
  *
  * The buttons table lists every click counter the widget holds, as 1.0.0
  * did: custom buttons, and product cards (whose clicks are counted too).
+ * Button clicks aren't dated, so it is all time whatever the range.
  */
 
 import { useCallback, useEffect, useMemo, useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
-import { widgets as widgetsApi } from '../api';
+import { boot, widgets as widgetsApi } from '../api';
 import {
 	Badge,
 	BarCell,
@@ -24,14 +30,67 @@ import {
 	PLACE_STEP,
 	PageHeader,
 	ReelCover,
+	Segmented,
 	ShortcodeChip,
 	Skeleton,
 	SortHeader,
 	shortUrl,
 } from '../components/pr';
-import { formatNumber, formatRate } from '../format';
+import { formatMoney, formatNumber, formatRate } from '../format';
 import { ReelEditor } from './ReelEditor';
 import { openStep } from './editor/step-memory';
+import { TrendChart } from './stats/TrendChart';
+
+/** Sales numbers need WooCommerce. */
+const hasWoo = !! boot.hasWoo;
+const currency = boot.currency || {};
+
+const RANGES = () => [
+	{ value: 'all', label: __( 'All time', 'productreels' ) },
+	{ value: '90', label: __( '90 days', 'productreels' ) },
+	{ value: '30', label: __( '30 days', 'productreels' ) },
+	{ value: '7', label: __( '7 days', 'productreels' ) },
+];
+
+/**
+ * The page description for a range.
+ *
+ * @param {string} name  The widget's name.
+ * @param {string} range `all` or a number of days.
+ * @return {string} The description.
+ */
+const rangeText = ( name, range ) =>
+	range === 'all'
+		? sprintf(
+				/* translators: %s: widget name. */
+				__( '%s, all time.', 'productreels' ),
+				name
+			)
+		: sprintf(
+				/* translators: 1: widget name; 2: number of days. */
+				__( '%1$s, last %2$s days.', 'productreels' ),
+				name,
+				formatNumber( Number( range ) )
+			);
+
+/**
+ * Whether a day range reaches back before dated numbers were kept.
+ *
+ * @param {string} range `all` or a number of days.
+ * @param {string} since First dated day, Y-m-d.
+ * @return {boolean} Whether it does.
+ */
+const startsBeforeSince = ( range, since ) => {
+	if ( range === 'all' || ! since ) {
+		return false;
+	}
+
+	const start = new Date();
+
+	start.setDate( start.getDate() - ( Number( range ) - 1 ) );
+
+	return start.toISOString().slice( 0, 10 ) < since;
+};
 
 const collator = () =>
 	new Intl.Collator( document.documentElement.lang || undefined, {
@@ -95,12 +154,40 @@ const REEL_SORT_TEXT = {
 	view_count: __( 'Sorted by views', 'productreels' ),
 	click_count: __( 'Sorted by clicks', 'productreels' ),
 	ctr: __( 'Sorted by click rate', 'productreels' ),
+	orders: __( 'Sorted by orders', 'productreels' ),
+	revenue: __( 'Sorted by revenue', 'productreels' ),
 };
 
 const shortcodeOf = ( id ) => `[productreels id="${ id }"]`;
 
 const Totals = ( { totals } ) => {
 	const placeholder = <span className="pr-metric__ph" aria-hidden="true" />;
+	const sales = hasWoo
+		? [
+				{
+					label: __( 'Orders', 'productreels' ),
+					icon: 'cart',
+					value: totals
+						? formatNumber( totals.orders || 0 )
+						: placeholder,
+					hint: __(
+						'Paid, with a product added from a reel',
+						'productreels'
+					),
+				},
+				{
+					label: __( 'Revenue', 'productreels' ),
+					icon: 'tag',
+					value: totals
+						? formatMoney( totals.revenue || 0, currency )
+						: placeholder,
+					hint: __(
+						'Those products’ order lines, before tax',
+						'productreels'
+					),
+				},
+			]
+		: [];
 
 	return (
 		<MetricBand
@@ -128,6 +215,7 @@ const Totals = ( { totals } ) => {
 						: placeholder,
 					hint: __( 'Clicks per view', 'productreels' ),
 				},
+				...sales,
 			] }
 		/>
 	);
@@ -185,6 +273,24 @@ const ReelsTable = ( { reels, covers, sort, onSort, onOpen } ) => {
 							onSort={ onSort }
 							numeric
 						/>
+						{ hasWoo && (
+							<>
+								<SortHeader
+									column="orders"
+									label={ __( 'Orders', 'productreels' ) }
+									sort={ sort }
+									onSort={ onSort }
+									numeric
+								/>
+								<SortHeader
+									column="revenue"
+									label={ __( 'Revenue', 'productreels' ) }
+									sort={ sort }
+									onSort={ onSort }
+									numeric
+								/>
+							</>
+						) }
 					</tr>
 				</thead>
 				<tbody>
@@ -224,6 +330,19 @@ const ReelsTable = ( { reels, covers, sort, onSort, onOpen } ) => {
 									reel.view_count
 								) }
 							</td>
+							{ hasWoo && (
+								<>
+									<td className="num pr-t-body">
+										{ formatNumber( reel.orders || 0 ) }
+									</td>
+									<td className="num pr-t-body">
+										{ formatMoney(
+											reel.revenue || 0,
+											currency
+										) }
+									</td>
+								</>
+							) }
 						</tr>
 					) ) }
 				</tbody>
@@ -252,7 +371,7 @@ const whereText = ( button, isProduct ) =>
 				button.reelTitle
 			);
 
-const ButtonsTable = ( { buttons, products, sort, onSort } ) => {
+const ButtonsTable = ( { buttons, products, sort, onSort, allTime } ) => {
 	const top = Math.max(
 		0,
 		...buttons.map( ( button ) => button.clickCount )
@@ -260,6 +379,20 @@ const ButtonsTable = ( { buttons, products, sort, onSort } ) => {
 	const hasProducts = buttons.some( ( button ) =>
 		products.has( button.btn_uuid )
 	);
+
+	let aside = hasProducts
+		? __(
+				'Buttons and product cards across this widget’s reels',
+				'productreels'
+			)
+		: __( 'Custom buttons across this widget’s reels', 'productreels' );
+
+	if ( allTime ) {
+		aside = __(
+			'All time: button clicks aren’t counted by day',
+			'productreels'
+		);
+	}
 
 	return (
 		<section
@@ -269,17 +402,7 @@ const ButtonsTable = ( { buttons, products, sort, onSort } ) => {
 			<TableHead
 				id="pr-stats-buttons"
 				title={ __( 'Buttons', 'productreels' ) }
-				aside={
-					hasProducts
-						? __(
-								'Buttons and product cards across this widget’s reels',
-								'productreels'
-							)
-						: __(
-								'Custom buttons across this widget’s reels',
-								'productreels'
-							)
-				}
+				aside={ aside }
 			/>
 			<table className="pr-table">
 				<thead>
@@ -385,6 +508,7 @@ export const Statistics = ( { widgetId, navigate } ) => {
 	const [ stats, setStats ] = useState( null );
 	const [ error, setError ] = useState( null );
 	const [ editingReel, setEditingReel ] = useState( null );
+	const [ range, setRange ] = useState( 'all' );
 	const [ reelSort, toggleReelSort ] = useSort( 'view_count' );
 	const [ buttonSort, toggleButtonSort ] = useSort( 'clickCount' );
 
@@ -398,7 +522,7 @@ export const Statistics = ( { widgetId, navigate } ) => {
 			try {
 				const [ full, report ] = await Promise.all( [
 					widgetsApi.get( widgetId ),
-					widgetsApi.stats( widgetId ),
+					widgetsApi.stats( widgetId, { range } ),
 				] );
 
 				setWidget( full );
@@ -409,7 +533,7 @@ export const Statistics = ( { widgetId, navigate } ) => {
 				}
 			}
 		},
-		[ widgetId ]
+		[ widgetId, range ]
 	);
 
 	useEffect( () => {
@@ -482,7 +606,12 @@ export const Statistics = ( { widgetId, navigate } ) => {
 				<Loading />
 			</>
 		);
-	} else if ( stats.totals.views === 0 && stats.totals.clicks === 0 ) {
+	} else if (
+		range === 'all' &&
+		stats.totals.views === 0 &&
+		stats.totals.clicks === 0 &&
+		! stats.totals.orders
+	) {
 		body = (
 			<EmptyState
 				panel
@@ -514,6 +643,13 @@ export const Statistics = ( { widgetId, navigate } ) => {
 		body = (
 			<>
 				<Totals totals={ stats.totals } />
+				{ range !== 'all' && (
+					<TrendChart
+						series={ stats.series || [] }
+						hasWoo={ hasWoo }
+						currency={ currency }
+					/>
+				) }
 				{ reels.length > 0 && (
 					<ReelsTable
 						reels={ reels }
@@ -529,6 +665,7 @@ export const Statistics = ( { widgetId, navigate } ) => {
 						products={ products }
 						sort={ buttonSort }
 						onSort={ toggleButtonSort }
+						allTime={ range !== 'all' }
 					/>
 				) : (
 					<p className="pr-stats__none pr-t-body pr-muted">
@@ -550,11 +687,10 @@ export const Statistics = ( { widgetId, navigate } ) => {
 				onBack={ () => navigate( '#/widgets' ) }
 				description={
 					widget
-						? sprintf(
-								/* translators: %s: widget name. */
-								__( '%s, all time.', 'productreels' ),
+						? rangeText(
 								widget.name ||
-									__( 'Untitled widget', 'productreels' )
+									__( 'Untitled widget', 'productreels' ),
+								range
 							)
 						: // Hold the line while loading, so the page doesn't jump.
 							! error && '\u00a0'
@@ -570,6 +706,34 @@ export const Statistics = ( { widgetId, navigate } ) => {
 					)
 				}
 			/>
+
+			{ ! notFound && (
+				<div className="pr-stats__range">
+					<Segmented
+						label={ __( 'Date range', 'productreels' ) }
+						value={ range }
+						onChange={ setRange }
+						options={ RANGES() }
+					/>
+					{ stats && startsBeforeSince( range, stats.since ) && (
+						<span className="pr-t-small pr-muted">
+							{ sprintf(
+								/* translators: %s: a date. */
+								__(
+									'Daily numbers start on %s, when this update was installed.',
+									'productreels'
+								),
+								new Intl.DateTimeFormat(
+									document.documentElement.lang || undefined,
+									{ dateStyle: 'medium', timeZone: 'UTC' }
+								).format(
+									new Date( `${ stats.since }T12:00:00Z` )
+								)
+							) }
+						</span>
+					) }
+				</div>
+			) }
 
 			{ body }
 

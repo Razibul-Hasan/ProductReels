@@ -4,7 +4,7 @@ Tags: shoppable video, woocommerce, product video, video reels, ugc
 Requires at least: 6.6
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 1.1.0
+Stable tag: 1.1.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -434,6 +434,14 @@ Deleting a widget does not automatically delete its reels.
 
 == Changelog ==
 
+= 1.1.1 =
+* New: Show a widget on every WooCommerce product page, with no shortcode. Turn on "Show on product pages" in the widget's Place it step and choose where: above the product, under Add to cart, above or below the tabs, or at the end of the page.
+* New: "Current product's reels". A widget can show the reels tagged with the product being viewed, so one widget covers the whole catalogue. The reels you pick show where a product has none.
+* New: The `[productreels]` shortcode accepts `product="ID"` to show a product's reels on any page.
+* New: Sales from reels. When a shopper adds a product to the cart from a reel and the order is paid, Statistics shows the orders and revenue for that reel and widget. Cancelled, refunded and failed orders are taken back out. Everything stays in your own database.
+* New: Date ranges in Statistics: all time, or the last 7, 30 or 90 days, with a day-by-day chart of views, clicks, orders or revenue.
+* Fixed: Views and clicks are now counted for reels a widget shows from the current product.
+
 = 1.1.0 =
 * New: Redesigned admin. Widgets, Reels and Settings are clearer, and every list has helpful empty, loading and error states.
 * New: The widget editor is organised into steps (Reels, Layout, Look, Player, Product card, Advanced, Place it) beside a live preview for desktop, tablet and mobile.
@@ -455,6 +463,9 @@ Deleting a widget does not automatically delete its reels.
 * Initial release.
 
 == Upgrade Notice ==
+
+= 1.1.1 =
+Reels on every product page, sales tracked from reels, and date ranges in Statistics. Adds two database tables; your existing data is kept.
 
 = 1.1.0 =
 A redesigned admin and a refreshed look on your store. Your reels, widgets, statistics and settings are kept.

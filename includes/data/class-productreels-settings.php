@@ -298,6 +298,13 @@ class Productreels_Settings {
 			// Performance.
 			'lazyLoad'                  => true,
 
+			// Reels and product pages (1.1.1).
+			'reelSource'                => 'chosen',
+			'productPage'               => array(
+				'show'     => false,
+				'position' => 'before_tabs',
+			),
+
 			// Advanced.
 			'customClass'               => '',
 		);

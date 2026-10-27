@@ -94,7 +94,15 @@ export const LinkStack = ( {
 							buttonDisplay={ styles.buyButtonDisplay }
 							cartUrl={ services.cartUrl }
 							checkoutUrl={ services.checkoutUrl }
-							onAddToCart={ services.addToCart }
+							onAddToCart={ ( item, from ) =>
+								services.addToCart(
+									item,
+									from,
+									1,
+									undefined,
+									reel
+								)
+							}
 							onNavigate={ track }
 							onOpen={ onOpenProduct }
 							onToast={ onToast }

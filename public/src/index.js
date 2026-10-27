@@ -38,6 +38,7 @@ const mount = ( node ) => {
 		<Embed
 			widgetId={ widgetId }
 			reelId={ reelId }
+			productId={ Number( node.dataset.productId || 0 ) }
 			version={ node.dataset.version || '' }
 		/>
 	);

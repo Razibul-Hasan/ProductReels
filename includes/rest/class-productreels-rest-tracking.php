@@ -82,7 +82,17 @@ class Productreels_Rest_Tracking extends Productreels_Rest_Controller {
 				'methods'             => WP_REST_Server::READABLE,
 				'callback'            => array( $this, 'render' ),
 				'permission_callback' => array( $this, 'public_read_permission' ),
-				'args'                => $this->id_arg(),
+				'args'                => array_merge(
+					$this->id_arg(),
+					array(
+						'product' => array(
+							'type'              => 'integer',
+							'default'           => 0,
+							'minimum'           => 0,
+							'sanitize_callback' => 'absint',
+						),
+					)
+				),
 			)
 		);
 
@@ -146,6 +156,12 @@ class Productreels_Rest_Tracking extends Productreels_Rest_Controller {
 	 * version token changes with the same generation, so the browser asks
 	 * for a fresh URL the moment anything relevant is edited.
 	 *
+	 * A widget whose reels come from the current product (since 1.1.1) shows
+	 * the reels tagged with `product` instead of its own, and its own when the
+	 * product has none. That variant is not kept in a transient: one per
+	 * product page would crowd the options table, and the query behind it is
+	 * one read of the reels table. The public Cache-Control still applies.
+	 *
 	 * @since  1.0.0
 	 * @param  WP_REST_Request $request The request.
 	 * @return WP_REST_Response|WP_Error The response.
@@ -155,6 +171,25 @@ class Productreels_Rest_Tracking extends Productreels_Rest_Controller {
 
 		if ( null === $summary ) {
 			return $this->not_found( __( 'That widget no longer exists.', 'productreels' ) );
+		}
+
+		$product_id = (int) $request->get_param( 'product' );
+
+		if ( $product_id > 0 && 'product' === Productreels_Widgets::reel_source( $summary['styles_json'] ) ) {
+			$tagged = $this->reels->tagged_with_product( $product_id );
+
+			if ( ! empty( $tagged ) ) {
+				$styles = json_decode( $summary['styles_json'], true );
+
+				return $this->cacheable(
+					array(
+						'id'     => $summary['id'],
+						'name'   => $summary['name'],
+						'styles' => Productreels_Validator::validate_styles( is_array( $styles ) ? $styles : array() ),
+						'reels'  => array_map( array( $this, 'present_reel' ), $tagged ),
+					)
+				);
+			}
 		}
 
 		$payload = Productreels_Render_Cache::get( $summary['id'], $summary['styles_json'] );
@@ -276,8 +311,9 @@ class Productreels_Rest_Tracking extends Productreels_Rest_Controller {
 	/**
 	 * Whether a reel may be tracked against a widget.
 	 *
-	 * Inside a widget the reel has to actually belong to it; a standalone
-	 * reel (widget 0) only has to exist.
+	 * Inside a widget the reel has to be one the widget can show (its own,
+	 * or a product's for a "current product" widget); a standalone reel
+	 * (widget 0) only has to exist.
 	 *
 	 * @since  1.0.0
 	 * @access private
@@ -290,7 +326,7 @@ class Productreels_Rest_Tracking extends Productreels_Rest_Controller {
 			return $this->reels->exists( $reel_id );
 		}
 
-		return in_array( (int) $reel_id, $this->widgets->reel_ids( $widget_id ), true );
+		return $this->widgets->shows_reel( $widget_id, $reel_id );
 	}
 
 	/**

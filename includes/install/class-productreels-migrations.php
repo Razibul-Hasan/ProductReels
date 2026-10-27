@@ -58,6 +58,7 @@ class Productreels_Migrations {
 		return array(
 			'1.0.0' => array( __CLASS__, 'migrate_1_0_0' ),
 			'1.1.0' => array( __CLASS__, 'migrate_1_1_0' ),
+			'1.1.1' => array( __CLASS__, 'migrate_1_1_1' ),
 		);
 	}
 
@@ -149,5 +150,19 @@ class Productreels_Migrations {
 	 */
 	protected static function migrate_1_1_0() {
 		Productreels_Render_Cache::bump();
+	}
+
+	/**
+	 * Migration to schema revision 1.1.1.
+	 *
+	 * dbDelta() has already added the daily and sales tables. Nothing older
+	 * is read or rewritten; the only write is the day daily counting starts,
+	 * so Statistics can say how far back its date ranges reach.
+	 *
+	 * @since  1.1.1
+	 * @return void
+	 */
+	protected static function migrate_1_1_1() {
+		Productreels_Stats::since();
 	}
 }

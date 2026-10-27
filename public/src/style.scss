@@ -12,6 +12,25 @@
 @use '../../src/shared/styles/embed';
 @use '../../src/shared/styles/player';
 
+/* A widget placed on every product page by its Place it settings. Outside
+   the summary it sits on its own row below the floated gallery and summary. */
+.prs-product-page {
+	clear: both;
+	width: 100%;
+}
+
+.prs-product-page > .productreels-embed {
+	margin-block: var(--pr-space-8);
+}
+
+.prs-product-page--after-cart {
+	clear: none;
+}
+
+.prs-product-page--after-cart > .productreels-embed {
+	margin-block: var(--pr-space-6);
+}
+
 .productreels-embed .wr-embed-loading {
 	/* One row of thumbnails' worth of height, so the page settles before the payload lands. */
 	min-height: 120px;
