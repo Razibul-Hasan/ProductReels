@@ -24,6 +24,9 @@ import { WidgetsList } from './screens/WidgetsList';
 
 const DOCS_URL = 'https://bestwebexpert.com/productreels';
 
+/** "Hire an expert" in the app bar: custom work by the plugin's authors. */
+const SERVICE_URL = 'https://bestwebexpert.com/';
+
 /**
  * Every route, in one place: the section it belongs to (app bar pill and WP
  * submenu item), its name in the browser tab, and its frame. `app` routes get
@@ -163,6 +166,7 @@ const App = () => {
 								version={ boot.version }
 								logoUrl={ boot.logoUrl }
 								docsUrl={ DOCS_URL }
+								serviceUrl={ SERVICE_URL }
 							/>
 							<div className="pr-page">
 								<Screen route={ route } navigate={ navigate } />

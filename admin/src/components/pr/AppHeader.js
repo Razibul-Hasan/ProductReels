@@ -1,10 +1,11 @@
 /**
  * AppHeader: the ProductReels bar under the WordPress admin bar.
  *
- * Wordmark, version, the three sections and the docs link. The sections are
- * real links to hash routes, so the router (and its unsaved-changes gate)
- * handles them like any other address change, and middle-click opens a tab.
- * The widget editor replaces this bar with its own header.
+ * Wordmark, version, the three sections, "Hire an expert" and the docs link.
+ * The sections are real links to hash routes, so the router (and its
+ * unsaved-changes gate) handles them like any other address change, and
+ * middle-click opens a tab. The widget editor replaces this bar with its own
+ * header.
  */
 
 import { __ } from '@wordpress/i18n';
@@ -32,14 +33,21 @@ export const SECTIONS = [
 ];
 
 /**
- * @param {Object} props         Props.
- * @param {string} props.current The current section id.
- * @param {string} props.version The plugin version.
- * @param {string} props.logoUrl The logo mark, shown at 28px when set.
- * @param {string} props.docsUrl The documentation URL.
+ * @param {Object} props            Props.
+ * @param {string} props.current    The current section id.
+ * @param {string} props.version    The plugin version.
+ * @param {string} props.logoUrl    The logo mark, shown at 28px when set.
+ * @param {string} props.docsUrl    The documentation URL.
+ * @param {string} props.serviceUrl Where "Hire an expert" goes: custom work.
  * @return {Object} The bar.
  */
-export const AppHeader = ( { current, version, logoUrl, docsUrl } ) => (
+export const AppHeader = ( {
+	current,
+	version,
+	logoUrl,
+	docsUrl,
+	serviceUrl,
+} ) => (
 	<header className="pr-appbar">
 		<a className="pr-appbar__brand" href="#/widgets">
 			{ logoUrl && (
@@ -72,20 +80,39 @@ export const AppHeader = ( { current, version, logoUrl, docsUrl } ) => (
 				</a>
 			) ) }
 		</nav>
-		{ docsUrl && (
+		{ ( serviceUrl || docsUrl ) && (
 			<div className="pr-appbar__end">
-				<a
-					className="pr-docs pr-t-label"
-					href={ docsUrl }
-					target="_blank"
-					rel="noopener noreferrer"
-				>
-					{ __( 'Documentation', 'productreels' ) }
-					<Icon name="external" size={ 14 } />
-					<span className="pr-sr">
-						{ __( '(opens in a new tab)', 'productreels' ) }
-					</span>
-				</a>
+				{ serviceUrl && (
+					<a
+						className="pr-service pr-t-label"
+						href={ serviceUrl }
+						target="_blank"
+						rel="noopener noreferrer"
+					>
+						<Icon name="briefcase" size={ 15 } />
+						{ /* Icon only on narrow screens; still the link's name. */ }
+						<span className="pr-service__label">
+							{ __( 'Hire an expert', 'productreels' ) }
+						</span>
+						<span className="pr-sr">
+							{ __( '(opens in a new tab)', 'productreels' ) }
+						</span>
+					</a>
+				) }
+				{ docsUrl && (
+					<a
+						className="pr-docs pr-t-label"
+						href={ docsUrl }
+						target="_blank"
+						rel="noopener noreferrer"
+					>
+						{ __( 'Documentation', 'productreels' ) }
+						<Icon name="external" size={ 14 } />
+						<span className="pr-sr">
+							{ __( '(opens in a new tab)', 'productreels' ) }
+						</span>
+					</a>
+				) }
 			</div>
 		) }
 	</header>

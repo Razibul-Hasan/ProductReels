@@ -36,6 +36,36 @@
 	white-space: nowrap;
 }
 
+/* "Hire an expert": an outlined pill, so the offer reads apart from the
+   docs link without competing with the page's primary button. */
+.pr-service {
+	display: inline-flex;
+	flex: none;
+	align-items: center;
+	gap: 6px;
+	height: 32px;
+	padding-inline: var(--pr-space-3);
+	border: 1px solid var(--pr-line);
+	border-radius: var(--pr-radius-pill);
+	background: var(--pr-surface);
+	color: var(--pr-ink);
+	text-decoration: none;
+	white-space: nowrap;
+	transition: background-color 0.15s, border-color 0.15s;
+}
+
+.pr-service:hover,
+.pr-service:focus {
+	border-color: var(--pr-line-strong);
+	background: var(--pr-surface-sunken);
+	color: var(--pr-ink);
+}
+
+.pr-service:focus-visible {
+	outline: none;
+	box-shadow: var(--pr-focus-ring);
+}
+
 /* wp-admin's common.css rings every focused link (`a:focus`), mouse clicks
    included. The shell's links ring on keyboard focus only, like the rest. */
 .pr-appbar a:focus:not(:focus-visible) {
@@ -80,6 +110,22 @@
 	.pr-appbar {
 		gap: var(--pr-space-4);
 		padding-inline: var(--pr-space-5);
+	}
+
+	/* Icon only: the label stays as the link's accessible name. */
+	.pr-service {
+		width: 32px;
+		padding: 0;
+		justify-content: center;
+	}
+
+	.pr-service__label {
+		position: absolute;
+		width: 1px;
+		height: 1px;
+		overflow: hidden;
+		clip: rect(0 0 0 0);
+		white-space: nowrap;
 	}
 
 	.pr-page {
