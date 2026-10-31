@@ -44,3 +44,7 @@ export const overview = {
 	get: () => get( '/overview' ),
 	completeGuide: () => post( '/overview/guide' ),
 };
+
+export const promo = {
+	dismiss: ( campaign ) => post( '/promo/dismiss', { campaign } ),
+};

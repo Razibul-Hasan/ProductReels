@@ -28,6 +28,7 @@ import {
 	Menu,
 	Notice,
 	PageHeader,
+	PromoBanner,
 	ReelStack,
 	SearchField,
 	ShortcodeChip,
@@ -803,6 +804,8 @@ export const WidgetsList = ( { navigate, creating = false } ) => {
 
 	return (
 		<div className="pr-home">
+			{ /* First thing under the app bar, above the page header. */ }
+			<PromoBanner />
 			{ body }
 
 			{ editingReel !== null && (

@@ -1,0 +1,444 @@
+/**
+ * The seasonal banner on the Widgets screen (components/pr/PromoBanner.js).
+ *
+ * Campaign art, so it carries its own palette as --pr-promo-* properties
+ * rather than the app's colour tokens; spacing, radius and type family still
+ * come from the app. The layout follows the banner's own width (a container
+ * query), not the window's, because the WordPress sidebar may be open,
+ * folded or gone. Every animation stops under prefers-reduced-motion.
+ */
+
+.pr-promo-wrap {
+	container-type: inline-size;
+}
+
+.pr-promo {
+	--pr-promo-from: #6510e8;
+	--pr-promo-to: #350079;
+	--pr-promo-glow: rgba(176, 108, 255, 0.5);
+	--pr-promo-night: #1d0048;
+	--pr-promo-ink: #fff;
+	--pr-promo-ink-soft: rgba(255, 255, 255, 0.84);
+	--pr-promo-cta: #a3ff12;
+	--pr-promo-cta-hover: #b9ff4d;
+	--pr-promo-cta-ink: #1a0540;
+	--pr-promo-focus: 0 0 0 2px var(--pr-promo-to), 0 0 0 4px var(--pr-promo-ink);
+
+	position: relative;
+	isolation: isolate;
+	overflow: hidden;
+	display: grid;
+	grid-template-columns: auto minmax(0, 1.3fr) minmax(0, 1fr) auto auto;
+	grid-template-areas: "art lead text cta close";
+	align-items: center;
+	column-gap: var(--pr-space-6);
+	min-height: 136px;
+	padding-block: var(--pr-space-4);
+	padding-inline: var(--pr-space-6) var(--pr-space-4);
+	border-radius: var(--pr-radius-md);
+	background:
+		radial-gradient(90% 160% at 0% 0%, var(--pr-promo-glow), transparent 60%),
+		radial-gradient(70% 130% at 100% 100%, rgba(18, 0, 52, 0.55), transparent 65%),
+		linear-gradient(110deg, var(--pr-promo-from) 0%, var(--pr-promo-to) 100%);
+	box-shadow: 0 14px 32px -16px rgba(53, 0, 121, 0.6);
+	color: var(--pr-promo-ink);
+	font-family: var(--pr-font-sans);
+	animation: pr-promo-in 420ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+
+/* ------------------------------------------------------------- Scenery */
+
+.pr-promo__scenery {
+	position: absolute;
+	inset: 0;
+	z-index: -1;
+	pointer-events: none;
+}
+
+.pr-promo__stars {
+	position: absolute;
+	inset: 0;
+	width: 100%;
+	height: 100%;
+	fill: var(--pr-promo-ink);
+	animation: pr-promo-twinkle 3.6s ease-in-out infinite;
+}
+
+// Moon and tree sit in the far corner, behind the call to action and the
+// dismiss button, so they never cross the copy.
+.pr-promo__moon {
+	position: absolute;
+	top: -40px;
+	inset-inline-end: 72px;
+	width: 84px;
+	height: 84px;
+	border-radius: 50%;
+	background: radial-gradient(circle at 38% 38%, #fff8dc 0%, #ffe9a8 45%, #f5c96a 100%);
+	box-shadow: 0 0 40px 10px rgba(255, 228, 150, 0.28);
+	opacity: 0.9;
+}
+
+.pr-promo__tree {
+	position: absolute;
+	bottom: 0;
+	inset-inline-end: -20px;
+	width: 120px;
+	height: auto;
+	fill: var(--pr-promo-night);
+	opacity: 0.7;
+}
+
+.pr-promo__bat {
+	position: absolute;
+	width: 30px;
+	height: auto;
+	fill: var(--pr-promo-night);
+	animation: pr-promo-bat 6s ease-in-out infinite;
+}
+
+.pr-promo__bat--1 {
+	top: 16px;
+	inset-inline-start: 34%;
+}
+
+.pr-promo__bat--2 {
+	top: 54px;
+	inset-inline-end: 22%;
+	width: 22px;
+	animation-delay: -2s;
+	animation-duration: 7s;
+}
+
+.pr-promo__bat--3 {
+	bottom: 18px;
+	inset-inline-start: 46%;
+	width: 18px;
+	opacity: 0.75;
+	animation-delay: -4s;
+}
+
+/* ------------------------------------------------------------- Content */
+
+.pr-promo__art {
+	grid-area: art;
+	display: block;
+	width: 116px;
+	height: auto;
+	filter: drop-shadow(0 6px 16px rgba(255, 138, 31, 0.35));
+}
+
+.pr-promo__ghost {
+	animation: pr-promo-float 4.8s ease-in-out infinite;
+}
+
+.pr-promo__face {
+	animation: pr-promo-flicker 3.2s steps(1, end) infinite;
+}
+
+.pr-promo__lead {
+	grid-area: lead;
+	min-width: 0;
+}
+
+.pr-promo__label {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	margin: 0 0 var(--pr-space-2);
+	padding: 3px 10px;
+	border: 1px solid rgba(255, 255, 255, 0.24);
+	border-radius: var(--pr-radius-pill);
+	background: rgba(255, 255, 255, 0.12);
+	color: var(--pr-promo-ink);
+	font-size: 11px;
+	line-height: 16px;
+	font-weight: 700;
+	letter-spacing: 0.12em;
+	text-transform: uppercase;
+	white-space: nowrap;
+}
+
+.pr-promo__title {
+	margin: 0;
+	padding: 0;
+	color: var(--pr-promo-ink);
+	font-family: var(--pr-font-display);
+	font-size: 25px;
+	line-height: 1.15;
+	font-weight: 800;
+	letter-spacing: -0.025em;
+	text-wrap: balance;
+	text-shadow: 0 2px 12px rgba(20, 0, 60, 0.35);
+}
+
+.pr-promo__text {
+	grid-area: text;
+	max-width: 36ch;
+	margin: 0;
+	color: var(--pr-promo-ink-soft);
+	font-size: 15px;
+	line-height: 1.45;
+	font-weight: 500;
+	text-wrap: pretty;
+}
+
+.pr-promo__cta,
+.pr-promo__cta:visited,
+.pr-promo__cta:focus {
+	grid-area: cta;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 10px;
+	min-height: 48px;
+	padding: 0 22px;
+	border-radius: var(--pr-radius-pill);
+	background: var(--pr-promo-cta);
+	color: var(--pr-promo-cta-ink);
+	font-size: 15px;
+	line-height: 20px;
+	font-weight: 700;
+	text-decoration: none;
+	white-space: nowrap;
+	outline: none;
+	box-shadow: 0 10px 24px -10px rgba(163, 255, 18, 0.75), inset 0 -2px 0 rgba(0, 0, 0, 0.14);
+	transition: transform 160ms ease, background-color 160ms ease, box-shadow 160ms ease;
+}
+
+.pr-promo__cta:hover {
+	background: var(--pr-promo-cta-hover);
+	color: var(--pr-promo-cta-ink);
+	transform: translateY(-1px);
+	box-shadow: 0 14px 30px -10px rgba(163, 255, 18, 0.9), inset 0 -2px 0 rgba(0, 0, 0, 0.14);
+}
+
+.pr-promo__cta:active {
+	transform: translateY(0);
+}
+
+.pr-promo__cta:focus-visible {
+	box-shadow: var(--pr-promo-focus);
+}
+
+.pr-promo__arrow {
+	display: inline-flex;
+	transition: transform 160ms ease;
+}
+
+// The RTL build mirrors the nudge.
+.pr-promo__cta:hover .pr-promo__arrow {
+	transform: translateX(3px);
+}
+
+.pr-promo__close {
+	grid-area: close;
+	align-self: start;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 32px;
+	height: 32px;
+	margin: 0;
+	padding: 0;
+	border: 0;
+	border-radius: var(--pr-radius-pill);
+	background: rgba(255, 255, 255, 0.12);
+	color: var(--pr-promo-ink);
+	cursor: pointer;
+	transition: background-color 160ms ease;
+}
+
+.pr-promo__close:hover {
+	background: rgba(255, 255, 255, 0.24);
+}
+
+.pr-promo__close:focus {
+	outline: none;
+}
+
+.pr-promo__close:focus-visible {
+	box-shadow: var(--pr-promo-focus);
+}
+
+/* -------------------------------------------------------------- Tablet */
+
+@container (max-width: 980px) {
+
+	.pr-promo {
+		grid-template-columns: auto minmax(0, 1fr) auto auto;
+		grid-template-areas:
+			"art lead cta close"
+			"art text cta close";
+		row-gap: 6px;
+		column-gap: var(--pr-space-5);
+	}
+
+	.pr-promo__lead {
+		align-self: end;
+	}
+
+	.pr-promo__text {
+		align-self: start;
+		max-width: none;
+		font-size: 14px;
+	}
+
+	.pr-promo__title {
+		font-size: 21px;
+	}
+
+	.pr-promo__art {
+		width: 96px;
+	}
+}
+
+/* -------------------------------------------------------------- Mobile */
+
+@container (max-width: 720px) {
+
+	.pr-promo {
+		grid-template-columns: auto minmax(0, 1fr);
+		grid-template-areas:
+			"art lead"
+			"text text"
+			"cta cta";
+		row-gap: var(--pr-space-3);
+		column-gap: var(--pr-space-3);
+		padding: var(--pr-space-5) var(--pr-space-4);
+	}
+
+	.pr-promo__lead {
+		align-self: center;
+		// Room for the dismiss button in the corner.
+		padding-inline-end: 36px;
+	}
+
+	.pr-promo__art {
+		width: 72px;
+	}
+
+	.pr-promo__title {
+		font-size: 19px;
+	}
+
+	.pr-promo__label {
+		margin-bottom: 6px;
+	}
+
+	.pr-promo__cta,
+	.pr-promo__cta:visited,
+	.pr-promo__cta:focus {
+		white-space: normal;
+		text-align: center;
+	}
+
+	.pr-promo__close {
+		position: absolute;
+		top: var(--pr-space-3);
+		inset-inline-end: var(--pr-space-3);
+	}
+
+	.pr-promo__moon {
+		top: -34px;
+		inset-inline-end: 12%;
+		width: 72px;
+		height: 72px;
+	}
+
+	.pr-promo__tree {
+		display: none;
+	}
+}
+
+/* ---------------------------------------------------------- Animation */
+
+@keyframes pr-promo-in {
+
+	from {
+		opacity: 0;
+		transform: translateY(6px);
+	}
+
+	to {
+		opacity: 1;
+		transform: none;
+	}
+}
+
+@keyframes pr-promo-float {
+
+	0%,
+	100% {
+		transform: translateY(0);
+	}
+
+	50% {
+		transform: translateY(-5px);
+	}
+}
+
+@keyframes pr-promo-flicker {
+
+	0%,
+	100% {
+		opacity: 1;
+	}
+
+	42% {
+		opacity: 0.78;
+	}
+
+	46% {
+		opacity: 1;
+	}
+
+	71% {
+		opacity: 0.88;
+	}
+}
+
+@keyframes pr-promo-bat {
+
+	0%,
+	100% {
+		transform: translate(0, 0) rotate(0deg);
+	}
+
+	50% {
+		transform: translate(8px, -5px) rotate(-6deg);
+	}
+}
+
+@keyframes pr-promo-twinkle {
+
+	0%,
+	100% {
+		opacity: 0.35;
+	}
+
+	50% {
+		opacity: 0.85;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+	.pr-promo,
+	.pr-promo__stars,
+	.pr-promo__bat,
+	.pr-promo__ghost,
+	.pr-promo__face {
+		animation: none;
+	}
+
+	.pr-promo__cta,
+	.pr-promo__arrow,
+	.pr-promo__close {
+		transition: none;
+	}
+
+	.pr-promo__cta:hover,
+	.pr-promo__cta:hover .pr-promo__arrow {
+		transform: none;
+	}
+}

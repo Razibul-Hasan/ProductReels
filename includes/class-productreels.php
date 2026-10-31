@@ -122,6 +122,7 @@ class Productreels {
 		require_once plugin_dir_path( __DIR__ ) . 'includes/support/class-productreels-rate-limiter.php';
 		require_once plugin_dir_path( __DIR__ ) . 'includes/support/class-productreels-media.php';
 		require_once plugin_dir_path( __DIR__ ) . 'includes/support/class-productreels-render-cache.php';
+		require_once plugin_dir_path( __DIR__ ) . 'includes/support/class-productreels-promo.php';
 
 		/**
 		 * Integrations: WooCommerce helpers (always), Elementor (only when it is there).
@@ -152,6 +153,7 @@ class Productreels {
 		require_once plugin_dir_path( __DIR__ ) . 'includes/rest/class-productreels-rest-tracking.php';
 		require_once plugin_dir_path( __DIR__ ) . 'includes/rest/class-productreels-rest-settings.php';
 		require_once plugin_dir_path( __DIR__ ) . 'includes/rest/class-productreels-rest-overview.php';
+		require_once plugin_dir_path( __DIR__ ) . 'includes/rest/class-productreels-rest-promo.php';
 		require_once plugin_dir_path( __DIR__ ) . 'includes/rest/class-productreels-rest.php';
 
 		/**

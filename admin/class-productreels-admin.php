@@ -447,6 +447,8 @@ class Productreels_Admin
 				'title'      => $this->title_parts,
 				// The reel editor's "WooCommerce is turned off" notice links here.
 				'pluginsUrl' => current_user_can('activate_plugins') ? esc_url_raw(admin_url('plugins.php')) : '',
+				// The Widgets screen's seasonal banner, or null once it ended or was dismissed.
+				'promo'      => Productreels_Promo::bootstrap(),
 			),
 			Productreels_WooCommerce::bootstrap()
 		);

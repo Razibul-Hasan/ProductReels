@@ -38,3 +38,6 @@ delete_option( 'productreels_activation_redirected' );
 delete_option( 'productreels_guide_done' );
 delete_option( 'productreels_product_page_widgets' );
 delete_option( 'productreels_stats_since' );
+
+// Every user's dismissed seasonal banners.
+delete_metadata( 'user', 0, 'productreels_dismissed_promos', '', true );
