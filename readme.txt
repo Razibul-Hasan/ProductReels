@@ -145,6 +145,10 @@ Data is preserved by default. Enable **Delete all data on uninstall** under **Pr
 
 wp-rankings verification string: [https://wp-rankings.com/plugins/productreels](https://wp-rankings.com/plugins/productreels)
 
+= 1.1.2 =
+* Added a "Hire an expert" link to the ProductReels admin bar for custom website work.
+* Added a dismissible Halloween notice on the Widgets screen, shown only to administrators until October 31, 2026.
+
 = 1.1.1 =
 * Added automatic product-page placement and current-product reels, with fallback videos.
 * Added `[productreels]` product targeting and sales attribution with date-range reports.
@@ -159,6 +163,9 @@ wp-rankings verification string: [https://wp-rankings.com/plugins/productreels](
 * Initial release.
 
 == Upgrade Notice ==
+
+= 1.1.2 =
+Small admin update: a "Hire an expert" link and a dismissible seasonal notice. No data changes.
 
 = 1.1.1 =
 Adds product-page reels and sales reports. Two new database tables; existing data is preserved.
