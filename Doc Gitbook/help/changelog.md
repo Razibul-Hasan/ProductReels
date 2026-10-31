@@ -4,6 +4,15 @@ description: What's new in each version of ProductReels.
 
 # Changelog
 
+## 1.1.2
+
+A small admin update. Your reels, widgets, statistics and settings are kept, and nothing changes on your store.
+
+### New
+
+* **Hire an expert.** A link in the ProductReels bar, next to **Documentation**, for custom website work by the ProductReels team. It opens in a new tab.
+* A Halloween notice on the **Widgets** screen, shown only to administrators until October 31, 2026. Close it with **×** and it won't come back for you.
+
 ## 1.1.1
 
 Reels on every product page, sales tracked from reels, and date ranges in Statistics. Your reels, widgets, statistics and settings are kept.

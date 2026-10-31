@@ -2,14 +2,14 @@
 # This file is distributed under the GPL-2.0-or-later.
 msgid ""
 msgstr ""
-"Project-Id-Version: ProductReels – Shoppable Video Reels for WooCommerce 1.1.0\n"
+"Project-Id-Version: ProductReels – Shoppable Video Reels for WooCommerce 1.1.2\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/productreels\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-10-13T18:25:38+00:00\n"
+"POT-Creation-Date: 2026-10-31T15:13:53+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: productreels\n"
@@ -53,30 +53,30 @@ msgstr ""
 
 #: admin/class-productreels-admin.php:139
 #: admin/class-productreels-admin.php:140
-#: admin/src/App.js:36
-#: admin/src/components/pr/AppHeader.js:18
+#: admin/src/App.js:39
+#: admin/src/components/pr/AppHeader.js:19
 #: admin/src/components/pr/Studio.js:190
 #: admin/src/screens/ReelsLibrary.js:116
-#: admin/src/screens/WidgetsList.js:748
+#: admin/src/screens/WidgetsList.js:749
 msgid "Widgets"
 msgstr ""
 
 #: admin/class-productreels-admin.php:149
-#: admin/src/App.js:63
-#: admin/src/components/pr/AppHeader.js:24
+#: admin/src/App.js:66
+#: admin/src/components/pr/AppHeader.js:25
 #: admin/src/components/pr/Studio.js:32
 #: admin/src/screens/ReelsLibrary.js:609
-#: admin/src/screens/Statistics.js:155
-#: admin/src/screens/Statistics.js:375
+#: admin/src/screens/Statistics.js:243
+#: admin/src/screens/Statistics.js:498
 #: admin/src/screens/WidgetEditor.js:67
-#: admin/src/screens/WidgetsList.js:272
+#: admin/src/screens/WidgetsList.js:273
 #: src/shared/templates/Carousel.jsx:201
 msgid "Reels"
 msgstr ""
 
 #: admin/class-productreels-admin.php:150
-#: admin/src/App.js:68
-#: admin/src/components/pr/AppHeader.js:30
+#: admin/src/App.js:71
+#: admin/src/components/pr/AppHeader.js:31
 #: admin/src/screens/Settings.js:429
 #: admin/src/screens/Settings.js:585
 #: admin/src/screens/Settings.js:629
@@ -84,10 +84,10 @@ msgid "Settings"
 msgstr ""
 
 #: admin/class-productreels-admin.php:151
-#: admin/src/App.js:42
+#: admin/src/App.js:45
 #: admin/src/components/pr/StepGuide.js:118
 #: admin/src/screens/CreateWidget.js:96
-#: admin/src/screens/WidgetsList.js:786
+#: admin/src/screens/WidgetsList.js:787
 #: block/src/index.js:81
 msgid "Create widget"
 msgstr ""
@@ -101,45 +101,45 @@ msgid "The ProductReels admin bundle is missing. Run \"npm install && npm run bu
 msgstr ""
 
 #. translators: %d: sequential number for an automatically named reel.
-#: includes/data/class-productreels-reels.php:607
+#: includes/data/class-productreels-reels.php:653
 #, php-format
 msgid "Untitled reel %d"
 msgstr ""
 
 #. translators: %s: the name of the widget being duplicated.
-#: includes/data/class-productreels-widgets.php:397
+#: includes/data/class-productreels-widgets.php:446
 #, php-format
 msgid "%s (Copy)"
 msgstr ""
 
 #. translators: %d: sequential number for an automatically named widget.
-#: includes/data/class-productreels-widgets.php:892
+#: includes/data/class-productreels-widgets.php:941
 #, php-format
 msgid "Untitled widget %d"
 msgstr ""
 
 #. translators: %d: widget id.
-#: includes/frontend/class-productreels-shortcodes.php:89
+#: includes/frontend/class-productreels-shortcodes.php:106
 #, php-format
 msgid "ProductReels: widget #%d was not found."
 msgstr ""
 
-#: includes/frontend/class-productreels-shortcodes.php:90
+#: includes/frontend/class-productreels-shortcodes.php:107
 msgid "ProductReels: the shortcode needs a widget id, e.g. [productreels id=\"1\"]."
 msgstr ""
 
 #. translators: %d: reel id.
-#: includes/frontend/class-productreels-shortcodes.php:119
+#: includes/frontend/class-productreels-shortcodes.php:161
 #, php-format
 msgid "ProductReels: reel #%d was not found."
 msgstr ""
 
-#: includes/frontend/class-productreels-shortcodes.php:120
+#: includes/frontend/class-productreels-shortcodes.php:162
 msgid "ProductReels: the shortcode needs a reel id, e.g. [productreels_reel id=\"1\"]."
 msgstr ""
 
 #: includes/integrations/widgets/class-productreels-elementor-widget.php:120
-#: admin/src/screens/WidgetsList.js:266
+#: admin/src/screens/WidgetsList.js:267
 #: block/src/index.js:178
 msgid "Widget"
 msgstr ""
@@ -200,7 +200,7 @@ msgstr ""
 #: includes/rest/class-productreels-rest-reels.php:231
 #: includes/rest/class-productreels-rest-reels.php:293
 #: includes/rest/class-productreels-rest-reels.php:327
-#: includes/rest/class-productreels-rest-tracking.php:196
+#: includes/rest/class-productreels-rest-tracking.php:231
 msgid "That reel no longer exists."
 msgstr ""
 
@@ -224,85 +224,91 @@ msgstr ""
 msgid "Please enter valid numbers."
 msgstr ""
 
-#: includes/rest/class-productreels-rest-tracking.php:157
-#: includes/rest/class-productreels-rest-tracking.php:166
-#: includes/rest/class-productreels-rest-widgets.php:178
-#: includes/rest/class-productreels-rest-widgets.php:228
-#: includes/rest/class-productreels-rest-widgets.php:251
-#: includes/rest/class-productreels-rest-widgets.php:277
-#: includes/rest/class-productreels-rest-widgets.php:307
+#: includes/rest/class-productreels-rest-tracking.php:173
+#: includes/rest/class-productreels-rest-tracking.php:201
+#: includes/rest/class-productreels-rest-widgets.php:183
+#: includes/rest/class-productreels-rest-widgets.php:233
+#: includes/rest/class-productreels-rest-widgets.php:256
+#: includes/rest/class-productreels-rest-widgets.php:282
+#: includes/rest/class-productreels-rest-widgets.php:319
 msgid "That widget no longer exists."
 msgstr ""
 
-#: includes/rest/class-productreels-rest-tracking.php:312
-#: includes/rest/class-productreels-rest-tracking.php:382
+#: includes/rest/class-productreels-rest-tracking.php:348
+#: includes/rest/class-productreels-rest-tracking.php:418
 msgid "That reel is not part of this widget."
 msgstr ""
 
-#: includes/rest/class-productreels-rest-tracking.php:333
+#: includes/rest/class-productreels-rest-tracking.php:369
 msgid "This view has already been counted."
 msgstr ""
 
-#: includes/rest/class-productreels-rest-tracking.php:378
+#: includes/rest/class-productreels-rest-tracking.php:414
 msgid "That button could not be identified."
 msgstr ""
 
-#: includes/rest/class-productreels-rest-tracking.php:389
+#: includes/rest/class-productreels-rest-tracking.php:425
 msgid "That button is not part of this reel."
 msgstr ""
 
-#: admin/src/App.js:48
+#: admin/src/App.js:51
 msgid "New widget"
 msgstr ""
 
-#: admin/src/App.js:53
-#: admin/src/screens/Statistics.js:507
-#: admin/src/screens/Statistics.js:567
+#: admin/src/App.js:56
+#: admin/src/screens/Statistics.js:636
+#: admin/src/screens/Statistics.js:703
 #: block/src/index.js:77
 msgid "Edit widget"
 msgstr ""
 
-#: admin/src/App.js:58
-#: admin/src/screens/Statistics.js:548
-#: admin/src/screens/WidgetsList.js:397
+#: admin/src/App.js:61
+#: admin/src/screens/Statistics.js:685
+#: admin/src/screens/WidgetsList.js:398
 msgid "Statistics"
 msgstr ""
 
-#: admin/src/App.js:176
+#: admin/src/App.js:180
 msgid "Leave without saving?"
 msgstr ""
 
-#: admin/src/App.js:177
+#: admin/src/App.js:181
 msgid "Leave"
 msgstr ""
 
-#: admin/src/App.js:178
+#: admin/src/App.js:182
 #: admin/src/screens/ReelEditor.js:1178
-#: admin/src/screens/WidgetEditor.js:655
+#: admin/src/screens/WidgetEditor.js:666
 msgid "Keep editing"
 msgstr ""
 
 #. translators: %s: what has unsaved changes, e.g. a widget's name.
-#: admin/src/App.js:186
+#: admin/src/App.js:190
 #, js-format
 msgid "Your changes to %s will be lost."
 msgstr ""
 
-#: admin/src/App.js:192
+#: admin/src/App.js:196
 msgid "Your changes will be lost."
 msgstr ""
 
-#: admin/src/components/pr/AppHeader.js:61
+#: admin/src/components/pr/AppHeader.js:69
 msgid "ProductReels sections"
 msgstr ""
 
-#: admin/src/components/pr/AppHeader.js:83
-msgid "Documentation"
+#: admin/src/components/pr/AppHeader.js:95
+msgid "Hire an expert"
 msgstr ""
 
-#: admin/src/components/pr/AppHeader.js:86
-#: admin/src/screens/Statistics.js:349
+#: admin/src/components/pr/AppHeader.js:98
+#: admin/src/components/pr/AppHeader.js:112
+#: admin/src/components/pr/PromoBanner.js:246
+#: admin/src/screens/Statistics.js:472
 msgid "(opens in a new tab)"
+msgstr ""
+
+#: admin/src/components/pr/AppHeader.js:109
+msgid "Documentation"
 msgstr ""
 
 #: admin/src/components/pr/Badge.js:17
@@ -375,6 +381,7 @@ msgstr ""
 #: admin/src/components/pr/Data.js:123
 #: admin/src/components/pr/ShopLinks.js:47
 #: block/src/index.js:186
+#: src/shared/player/ProductPanel.jsx:380
 msgid "Loading…"
 msgstr ""
 
@@ -488,7 +495,7 @@ msgstr ""
 #: admin/src/components/pr/LinkForm.js:90
 #: admin/src/screens/editor/CardStep.js:127
 #: admin/src/screens/editor/CardStep.js:147
-#: admin/src/screens/Statistics.js:289
+#: admin/src/screens/Statistics.js:412
 msgid "Button text"
 msgstr ""
 
@@ -501,7 +508,7 @@ msgid "Short and specific works best."
 msgstr ""
 
 #: admin/src/components/pr/LinkForm.js:102
-#: admin/src/screens/Statistics.js:295
+#: admin/src/screens/Statistics.js:418
 msgid "Campaign"
 msgstr ""
 
@@ -514,7 +521,7 @@ msgid "Groups this button's clicks in statistics."
 msgstr ""
 
 #: admin/src/components/pr/LinkForm.js:115
-#: admin/src/screens/Statistics.js:299
+#: admin/src/screens/Statistics.js:422
 msgid "Link"
 msgstr ""
 
@@ -568,12 +575,12 @@ msgid "Products couldn't be loaded"
 msgstr ""
 
 #: admin/src/components/pr/ProductPicker.js:122
-#: admin/src/screens/editor/ReelsStep.js:279
+#: admin/src/screens/editor/ReelsStep.js:336
 #: admin/src/screens/ReelEditor.js:818
 #: admin/src/screens/ReelsLibrary.js:454
 #: admin/src/screens/Settings.js:600
-#: admin/src/screens/Statistics.js:470
-#: admin/src/screens/WidgetsList.js:689
+#: admin/src/screens/Statistics.js:594
+#: admin/src/screens/WidgetsList.js:690
 msgid "Try again"
 msgstr ""
 
@@ -605,7 +612,9 @@ msgid "SKU %s"
 msgstr ""
 
 #: admin/src/components/pr/ProductPicker.js:211
-#: src/shared/ProductCard.jsx:273
+#: src/shared/player/ProductPanel.jsx:366
+#: src/shared/player/ProductPanel.jsx:372
+#: src/shared/ProductCard.jsx:294
 msgid "Out of stock"
 msgstr ""
 
@@ -614,17 +623,41 @@ msgid "Search products by name or SKU"
 msgstr ""
 
 #: admin/src/components/pr/ProductPicker.js:240
-#: admin/src/screens/editor/ReelsStep.js:337
+#: admin/src/screens/editor/ReelsStep.js:394
 #: admin/src/screens/ReelsLibrary.js:586
 msgid "Load more"
 msgstr ""
 
 #. translators: 1: how many are shown, 2: how many there are in all.
 #: admin/src/components/pr/ProductPicker.js:245
-#: admin/src/screens/editor/ReelsStep.js:327
+#: admin/src/screens/editor/ReelsStep.js:384
 #: admin/src/screens/ReelsLibrary.js:595
 #, js-format
 msgid "Showing %1$s of %2$s"
+msgstr ""
+
+#: admin/src/components/pr/PromoBanner.js:189
+msgid "Couldn’t hide the banner. Try again."
+msgstr ""
+
+#: admin/src/components/pr/PromoBanner.js:206
+msgid "Halloween special"
+msgstr ""
+
+#: admin/src/components/pr/PromoBanner.js:209
+msgid "Is Your Website Scaring Away Customers?"
+msgstr ""
+
+#: admin/src/components/pr/PromoBanner.js:216
+msgid "Give your business a stunning website makeover this Halloween!"
+msgstr ""
+
+#: admin/src/components/pr/PromoBanner.js:227
+msgid "Explore Website Makeovers"
+msgstr ""
+
+#: admin/src/components/pr/PromoBanner.js:253
+msgid "Dismiss the Halloween banner"
 msgstr ""
 
 #. translators: 1: a setting name, e.g. "Gap", 2: a unit, e.g. "px".
@@ -685,7 +718,7 @@ msgid "Not in a widget"
 msgstr ""
 
 #: admin/src/components/pr/ReelCard.js:117
-#: admin/src/screens/WidgetsList.js:383
+#: admin/src/screens/WidgetsList.js:384
 msgid "Edit"
 msgstr ""
 
@@ -705,7 +738,7 @@ msgid "Select %s"
 msgstr ""
 
 #: admin/src/components/pr/ReelCard.js:179
-#: admin/src/screens/WidgetsList.js:231
+#: admin/src/screens/WidgetsList.js:232
 msgid "Views:"
 msgstr ""
 
@@ -719,8 +752,8 @@ msgstr ""
 #. translators: %s: the name of a reel, widget or button.
 #: admin/src/components/pr/ReelCard.js:202
 #: admin/src/components/pr/ShopLinks.js:205
-#: admin/src/screens/WidgetsList.js:203
-#: admin/src/screens/WidgetsList.js:379
+#: admin/src/screens/WidgetsList.js:204
+#: admin/src/screens/WidgetsList.js:380
 #, js-format
 msgid "Edit %s"
 msgstr ""
@@ -728,7 +761,7 @@ msgstr ""
 #. translators: %s: a reel title or widget name.
 #: admin/src/components/pr/ReelCard.js:233
 #: admin/src/screens/ReelsLibrary.js:185
-#: admin/src/screens/WidgetsList.js:388
+#: admin/src/screens/WidgetsList.js:389
 #, js-format
 msgid "More actions for %s"
 msgstr ""
@@ -816,12 +849,12 @@ msgid "Remove %s"
 msgstr ""
 
 #: admin/src/components/pr/ShortcodeChip.js:64
-#: admin/src/screens/WidgetsList.js:619
+#: admin/src/screens/WidgetsList.js:620
 msgid "Couldn’t copy. Select the shortcode and copy it yourself."
 msgstr ""
 
 #: admin/src/components/pr/ShortcodeChip.js:74
-#: admin/src/screens/WidgetsList.js:614
+#: admin/src/screens/WidgetsList.js:615
 msgid "Shortcode copied"
 msgstr ""
 
@@ -922,11 +955,11 @@ msgid "Upload a vertical video or paste a YouTube Shorts, Vimeo or video link. T
 msgstr ""
 
 #: admin/src/components/pr/StepGuide.js:108
-#: admin/src/screens/editor/ReelsStep.js:310
+#: admin/src/screens/editor/ReelsStep.js:367
 #: admin/src/screens/ReelEditor.js:1008
 #: admin/src/screens/ReelsLibrary.js:541
 #: admin/src/screens/ReelsLibrary.js:635
-#: admin/src/screens/WidgetsList.js:779
+#: admin/src/screens/WidgetsList.js:780
 msgid "Add reel"
 msgstr ""
 
@@ -947,7 +980,7 @@ msgid "Paste the shortcode, or add the ProductReels block in the editor or Eleme
 msgstr ""
 
 #: admin/src/components/pr/StepGuide.js:128
-#: admin/src/screens/WidgetsList.js:418
+#: admin/src/screens/WidgetsList.js:419
 msgid "Copy shortcode"
 msgstr ""
 
@@ -1025,15 +1058,15 @@ msgid "Rename widget: %s"
 msgstr ""
 
 #: admin/src/components/pr/Studio.js:169
-#: admin/src/screens/editor/PlaceStep.js:62
-#: admin/src/screens/Statistics.js:557
+#: admin/src/screens/editor/PlaceStep.js:157
+#: admin/src/screens/Statistics.js:692
 #: admin/src/screens/WidgetEditor.js:227
 msgid "Untitled widget"
 msgstr ""
 
 #: admin/src/components/pr/Studio.js:185
-#: admin/src/screens/Statistics.js:466
-#: admin/src/screens/Statistics.js:549
+#: admin/src/screens/Statistics.js:590
+#: admin/src/screens/Statistics.js:686
 msgid "Back to widgets"
 msgstr ""
 
@@ -1042,7 +1075,7 @@ msgid "Unsaved changes"
 msgstr ""
 
 #: admin/src/components/pr/Studio.js:206
-#: admin/src/screens/WidgetEditor.js:654
+#: admin/src/screens/WidgetEditor.js:665
 msgid "Discard changes"
 msgstr ""
 
@@ -1051,7 +1084,7 @@ msgid "More: duplicate or delete"
 msgstr ""
 
 #: admin/src/components/pr/Studio.js:227
-#: admin/src/screens/editor/PlaceStep.js:55
+#: admin/src/screens/editor/PlaceStep.js:149
 msgid "Save widget"
 msgstr ""
 
@@ -1124,7 +1157,7 @@ msgid "Choose how reels sit on the page. You can change it any time."
 msgstr ""
 
 #: admin/src/screens/CreateWidget.js:113
-#: admin/src/screens/WidgetEditor.js:561
+#: admin/src/screens/WidgetEditor.js:572
 msgid "Choose reels"
 msgstr ""
 
@@ -1182,7 +1215,7 @@ msgid "Classic"
 msgstr ""
 
 #: admin/src/screens/editor/CardStep.js:92
-msgid "Image above the details"
+msgid "Opens a product panel beside the reel"
 msgstr ""
 
 #: admin/src/screens/editor/CardStep.js:104
@@ -1198,7 +1231,8 @@ msgid "Buy button"
 msgstr ""
 
 #: admin/src/screens/editor/CardStep.js:116
-#: src/shared/ProductCard.jsx:264
+#: src/shared/player/ProductPanel.jsx:395
+#: src/shared/ProductCard.jsx:285
 msgid "Add to cart"
 msgstr ""
 
@@ -1408,6 +1442,7 @@ msgid "Reset"
 msgstr ""
 
 #: admin/src/screens/editor/LayoutStep.js:353
+#: admin/src/screens/editor/PlaceStep.js:91
 msgid "Position"
 msgstr ""
 
@@ -1617,46 +1652,86 @@ msgstr ""
 msgid "Normal"
 msgstr ""
 
-#: admin/src/screens/editor/PlaceStep.js:49
-msgid "Save the widget to get its shortcode."
+#: admin/src/screens/editor/PlaceStep.js:35
+msgid "Above the product"
 msgstr ""
 
-#: admin/src/screens/editor/PlaceStep.js:66
-#: admin/src/screens/WidgetsList.js:277
-msgid "Shortcode"
+#: admin/src/screens/editor/PlaceStep.js:39
+msgid "Under Add to cart"
+msgstr ""
+
+#: admin/src/screens/editor/PlaceStep.js:43
+msgid "Below the product, above the tabs"
+msgstr ""
+
+#: admin/src/screens/editor/PlaceStep.js:47
+msgid "Below the tabs"
+msgstr ""
+
+#: admin/src/screens/editor/PlaceStep.js:51
+msgid "At the end of the page"
 msgstr ""
 
 #: admin/src/screens/editor/PlaceStep.js:72
+msgid "Product pages"
+msgstr ""
+
+#: admin/src/screens/editor/PlaceStep.js:74
+msgid "Show on product pages"
+msgstr ""
+
+#: admin/src/screens/editor/PlaceStep.js:77
+msgid "Adds this widget to every product page, showing each product’s own reels."
+msgstr ""
+
+#: admin/src/screens/editor/PlaceStep.js:81
+msgid "Adds this widget to every product page. To show each product’s own reels, choose “Current product’s reels” in the Reels step."
+msgstr ""
+
+#: admin/src/screens/editor/PlaceStep.js:92
+msgid "Where it appears on the page. Applies once you save the widget."
+msgstr ""
+
+#: admin/src/screens/editor/PlaceStep.js:143
+msgid "Save the widget to get its shortcode."
+msgstr ""
+
+#: admin/src/screens/editor/PlaceStep.js:163
+#: admin/src/screens/WidgetsList.js:278
+msgid "Shortcode"
+msgstr ""
+
+#: admin/src/screens/editor/PlaceStep.js:169
 msgid "Paste it into any page, post or text widget."
 msgstr ""
 
-#: admin/src/screens/editor/PlaceStep.js:79
-#: admin/src/screens/editor/PlaceStep.js:91
+#: admin/src/screens/editor/PlaceStep.js:176
+#: admin/src/screens/editor/PlaceStep.js:188
 msgid "Block editor"
 msgstr ""
 
 #. translators: %s: the widget's name.
-#: admin/src/screens/editor/PlaceStep.js:83
+#: admin/src/screens/editor/PlaceStep.js:180
 #, js-format
 msgid "Add the ProductReels block and choose “%s”."
 msgstr ""
 
-#: admin/src/screens/editor/PlaceStep.js:96
-#: admin/src/screens/editor/PlaceStep.js:108
+#: admin/src/screens/editor/PlaceStep.js:193
+#: admin/src/screens/editor/PlaceStep.js:205
 msgid "Elementor"
 msgstr ""
 
 #. translators: %s: the widget's name.
-#: admin/src/screens/editor/PlaceStep.js:100
+#: admin/src/screens/editor/PlaceStep.js:197
 #, js-format
 msgid "Drag the ProductReels widget onto the page and choose “%s”."
 msgstr ""
 
-#: admin/src/screens/editor/PlaceStep.js:113
+#: admin/src/screens/editor/PlaceStep.js:210
 msgid "Single reels"
 msgstr ""
 
-#: admin/src/screens/editor/PlaceStep.js:116
+#: admin/src/screens/editor/PlaceStep.js:213
 msgid "To show one reel on its own, use <code>[productreels_reel id=\"…\"]</code> with the reel’s ID from the Reels screen."
 msgstr ""
 
@@ -1734,77 +1809,98 @@ msgstr ""
 msgid "Navigation buttons"
 msgstr ""
 
+#: admin/src/screens/editor/ReelsStep.js:68
+#: admin/src/screens/editor/ReelsStep.js:71
+msgid "Reels to show"
+msgstr ""
+
+#: admin/src/screens/editor/ReelsStep.js:77
+msgid "Reels you pick"
+msgstr ""
+
+#: admin/src/screens/editor/ReelsStep.js:81
+msgid "Current product’s reels"
+msgstr ""
+
+#: admin/src/screens/editor/ReelsStep.js:87
+msgid "On a product page, shows the reels tagged with that product. The reels you pick below show where a product has none, and on other pages."
+msgstr ""
+
+#: admin/src/screens/editor/ReelsStep.js:91
+msgid "Shows the reels you pick below, in this order, wherever the widget is placed."
+msgstr ""
+
 #. translators: 1: reel title, 2: its position, 3: how many reels.
-#: admin/src/screens/editor/ReelsStep.js:214
+#: admin/src/screens/editor/ReelsStep.js:271
 #, js-format
 msgid "Picked up %1$s, position %2$d of %3$d. Use the arrow keys to move it, Space to drop it, Escape to cancel."
 msgstr ""
 
 #. translators: 1: reel title, 2: its new position, 3: how many reels.
-#: admin/src/screens/editor/ReelsStep.js:232
+#: admin/src/screens/editor/ReelsStep.js:289
 #, js-format
 msgid "%1$s moved to position %2$d of %3$d."
 msgstr ""
 
 #. translators: 1: reel title, 2: its position, 3: how many reels.
-#: admin/src/screens/editor/ReelsStep.js:241
+#: admin/src/screens/editor/ReelsStep.js:298
 #, js-format
 msgid "%1$s dropped at position %2$d of %3$d."
 msgstr ""
 
 #. translators: 1: reel title, 2: its position, 3: how many reels.
-#: admin/src/screens/editor/ReelsStep.js:249
+#: admin/src/screens/editor/ReelsStep.js:306
 #, js-format
 msgid "Moving %1$s was cancelled. It is back at position %2$d of %3$d."
 msgstr ""
 
-#: admin/src/screens/editor/ReelsStep.js:276
+#: admin/src/screens/editor/ReelsStep.js:333
 #: admin/src/screens/ReelsLibrary.js:451
 msgid "Couldn’t load your reels."
 msgstr ""
 
 #. translators: %s: what was searched for.
-#: admin/src/screens/editor/ReelsStep.js:289
+#: admin/src/screens/editor/ReelsStep.js:346
 #, js-format
 msgid "No reels match “%s”."
 msgstr ""
 
-#: admin/src/screens/editor/ReelsStep.js:294
+#: admin/src/screens/editor/ReelsStep.js:351
 #: admin/src/screens/ReelsLibrary.js:497
-#: admin/src/screens/WidgetsList.js:738
+#: admin/src/screens/WidgetsList.js:739
 msgid "Clear search"
 msgstr ""
 
-#: admin/src/screens/editor/ReelsStep.js:300
+#: admin/src/screens/editor/ReelsStep.js:357
 msgid "Your library is empty. Add a reel to get started."
 msgstr ""
 
-#: admin/src/screens/editor/ReelsStep.js:356
+#: admin/src/screens/editor/ReelsStep.js:415
 msgid "To reorder, press Space or Enter on the grip, move the reel with the arrow keys, and press Space to drop it. Escape cancels."
 msgstr ""
 
 #. translators: %s: number of reels.
-#: admin/src/screens/editor/ReelsStep.js:373
+#: admin/src/screens/editor/ReelsStep.js:432
 #, js-format
 msgid "%s reel in this widget"
 msgid_plural "%s reels in this widget"
 msgstr[0] ""
 msgstr[1] ""
 
-#: admin/src/screens/editor/ReelsStep.js:398
+#: admin/src/screens/editor/ReelsStep.js:457
 msgid "Add from your library"
 msgstr ""
 
-#: admin/src/screens/editor/ReelsStep.js:399
+#: admin/src/screens/editor/ReelsStep.js:458
 msgid "Tap to add"
 msgstr ""
 
-#: admin/src/screens/editor/ReelsStep.js:404
+#: admin/src/screens/editor/ReelsStep.js:463
 #: admin/src/screens/ReelsLibrary.js:627
 msgid "Search reels"
 msgstr ""
 
-#: admin/src/screens/editor/ReelsStep.js:418
+#: admin/src/screens/editor/ReelsStep.js:477
 msgid "Add new reel"
 msgstr ""
 
@@ -1926,6 +2022,7 @@ msgid "Cover"
 msgstr ""
 
 #: admin/src/screens/ReelEditor.js:964
+#: src/shared/player/ProductPanel.jsx:572
 msgid "Shop this reel"
 msgstr ""
 
@@ -2023,7 +2120,7 @@ msgid "No reels have a button"
 msgstr ""
 
 #: admin/src/screens/ReelsLibrary.js:54
-#: admin/src/screens/WidgetsList.js:118
+#: admin/src/screens/WidgetsList.js:119
 msgid "Every reel is in a widget"
 msgstr ""
 
@@ -2032,20 +2129,21 @@ msgid "Select every reel shown"
 msgstr ""
 
 #: admin/src/screens/ReelsLibrary.js:113
-#: admin/src/screens/Statistics.js:271
+#: admin/src/screens/Statistics.js:404
 msgid "Buttons"
 msgstr ""
 
 #: admin/src/screens/ReelsLibrary.js:119
-#: admin/src/screens/Statistics.js:109
-#: admin/src/screens/Statistics.js:169
-#: admin/src/screens/WidgetsList.js:137
-#: admin/src/screens/WidgetsList.js:280
+#: admin/src/screens/Statistics.js:196
+#: admin/src/screens/Statistics.js:257
+#: admin/src/screens/stats/TrendChart.js:98
+#: admin/src/screens/WidgetsList.js:138
+#: admin/src/screens/WidgetsList.js:281
 msgid "Views"
 msgstr ""
 
 #: admin/src/screens/ReelsLibrary.js:123
-#: admin/src/screens/WidgetsList.js:307
+#: admin/src/screens/WidgetsList.js:308
 msgid "Actions"
 msgstr ""
 
@@ -2157,8 +2255,8 @@ msgstr[1] ""
 
 #. translators: %s: a reel title or widget name.
 #: admin/src/screens/ReelsLibrary.js:767
-#: admin/src/screens/WidgetEditor.js:680
-#: admin/src/screens/WidgetsList.js:830
+#: admin/src/screens/WidgetEditor.js:691
+#: admin/src/screens/WidgetsList.js:833
 #, js-format
 msgid "Delete “%s”?"
 msgstr ""
@@ -2377,108 +2475,198 @@ msgstr ""
 msgid "Once you save, deleting ProductReels from Plugins removes every reel, widget and statistic for good. Videos and images in your Media Library stay."
 msgstr ""
 
-#: admin/src/screens/Statistics.js:94
+#: admin/src/screens/Statistics.js:49
+msgid "All time"
+msgstr ""
+
+#: admin/src/screens/Statistics.js:50
+msgid "90 days"
+msgstr ""
+
+#: admin/src/screens/Statistics.js:51
+msgid "30 days"
+msgstr ""
+
+#: admin/src/screens/Statistics.js:52
+msgid "7 days"
+msgstr ""
+
+#. translators: %s: widget name.
+#: admin/src/screens/Statistics.js:66
+#, js-format
+msgid "%s, all time."
+msgstr ""
+
+#. translators: 1: widget name; 2: number of days.
+#: admin/src/screens/Statistics.js:71
+#, js-format
+msgid "%1$s, last %2$s days."
+msgstr ""
+
+#: admin/src/screens/Statistics.js:153
 msgid "Sorted by title"
 msgstr ""
 
-#: admin/src/screens/Statistics.js:95
+#: admin/src/screens/Statistics.js:154
 msgid "Sorted by views"
 msgstr ""
 
-#: admin/src/screens/Statistics.js:96
+#: admin/src/screens/Statistics.js:155
 msgid "Sorted by clicks"
 msgstr ""
 
-#: admin/src/screens/Statistics.js:97
+#: admin/src/screens/Statistics.js:156
 msgid "Sorted by click rate"
 msgstr ""
 
-#: admin/src/screens/Statistics.js:112
-#: admin/src/screens/WidgetsList.js:140
+#: admin/src/screens/Statistics.js:157
+msgid "Sorted by orders"
+msgstr ""
+
+#: admin/src/screens/Statistics.js:158
+msgid "Sorted by revenue"
+msgstr ""
+
+#: admin/src/screens/Statistics.js:168
+#: admin/src/screens/Statistics.js:280
+#: admin/src/screens/stats/TrendChart.js:114
+msgid "Orders"
+msgstr ""
+
+#: admin/src/screens/Statistics.js:173
+msgid "Paid, with a product added from a reel"
+msgstr ""
+
+#: admin/src/screens/Statistics.js:179
+#: admin/src/screens/Statistics.js:287
+#: admin/src/screens/stats/TrendChart.js:120
+msgid "Revenue"
+msgstr ""
+
+#: admin/src/screens/Statistics.js:184
+msgid "Those products’ order lines, before tax"
+msgstr ""
+
+#: admin/src/screens/Statistics.js:199
+#: admin/src/screens/WidgetsList.js:141
 msgid "Counted after one second of playback"
 msgstr ""
 
-#: admin/src/screens/Statistics.js:118
-#: admin/src/screens/Statistics.js:176
-#: admin/src/screens/Statistics.js:302
-#: admin/src/screens/WidgetsList.js:146
-#: admin/src/screens/WidgetsList.js:287
+#: admin/src/screens/Statistics.js:205
+#: admin/src/screens/Statistics.js:264
+#: admin/src/screens/Statistics.js:425
+#: admin/src/screens/stats/TrendChart.js:104
+#: admin/src/screens/WidgetsList.js:147
+#: admin/src/screens/WidgetsList.js:288
 msgid "Clicks"
 msgstr ""
 
-#: admin/src/screens/Statistics.js:121
-#: admin/src/screens/WidgetsList.js:149
+#: admin/src/screens/Statistics.js:208
+#: admin/src/screens/WidgetsList.js:150
 msgid "Buttons and product cards"
 msgstr ""
 
-#: admin/src/screens/Statistics.js:124
-#: admin/src/screens/Statistics.js:183
-#: admin/src/screens/WidgetsList.js:152
-#: admin/src/screens/WidgetsList.js:294
+#: admin/src/screens/Statistics.js:211
+#: admin/src/screens/Statistics.js:271
+#: admin/src/screens/WidgetsList.js:153
+#: admin/src/screens/WidgetsList.js:295
 msgid "Click rate"
 msgstr ""
 
-#: admin/src/screens/Statistics.js:129
-#: admin/src/screens/WidgetsList.js:157
+#: admin/src/screens/Statistics.js:216
+#: admin/src/screens/WidgetsList.js:158
 msgid "Clicks per view"
 msgstr ""
 
-#: admin/src/screens/Statistics.js:163
+#: admin/src/screens/Statistics.js:251
 msgid "Reel"
 msgstr ""
 
 #. translators: %s: reel title.
-#: admin/src/screens/Statistics.js:246
+#: admin/src/screens/Statistics.js:365
 #, js-format
 msgid "Product card in %s"
 msgstr ""
 
 #. translators: %s: reel title.
-#: admin/src/screens/Statistics.js:251
+#: admin/src/screens/Statistics.js:370
 #, js-format
 msgid "In %s"
 msgstr ""
 
-#: admin/src/screens/Statistics.js:274
+#: admin/src/screens/Statistics.js:384
 msgid "Buttons and product cards across this widget’s reels"
 msgstr ""
 
-#: admin/src/screens/Statistics.js:278
+#: admin/src/screens/Statistics.js:388
 msgid "Custom buttons across this widget’s reels"
 msgstr ""
 
-#: admin/src/screens/Statistics.js:334
-msgid "No campaign"
-msgstr ""
-
-#: admin/src/screens/Statistics.js:378
-msgid "Loading statistics…"
+#: admin/src/screens/Statistics.js:391
+msgid "All time: button clicks aren’t counted by day"
 msgstr ""
 
 #: admin/src/screens/Statistics.js:457
+msgid "No campaign"
+msgstr ""
+
+#: admin/src/screens/Statistics.js:501
+msgid "Loading statistics…"
+msgstr ""
+
+#: admin/src/screens/Statistics.js:581
 msgid "This widget no longer exists."
 msgstr ""
 
-#: admin/src/screens/Statistics.js:458
+#: admin/src/screens/Statistics.js:582
 msgid "Couldn’t load the statistics."
 msgstr ""
 
-#: admin/src/screens/Statistics.js:490
+#: admin/src/screens/Statistics.js:619
 msgid "No stats yet"
 msgstr ""
 
-#: admin/src/screens/Statistics.js:491
+#: admin/src/screens/Statistics.js:620
 msgid "Place the widget on a page. Numbers appear once visitors watch and tap."
 msgstr ""
 
-#: admin/src/screens/Statistics.js:535
+#: admin/src/screens/Statistics.js:672
 msgid "No button or product card has been clicked yet."
 msgstr ""
 
-#. translators: %s: widget name.
-#: admin/src/screens/Statistics.js:555
+#: admin/src/screens/Statistics.js:713
+msgid "Date range"
+msgstr ""
+
+#. translators: %s: a date.
+#: admin/src/screens/Statistics.js:722
 #, js-format
-msgid "%s, all time."
+msgid "Daily numbers start on %s, when this update was installed."
+msgstr ""
+
+#. translators: %s: a measure, e.g. "Views".
+#: admin/src/screens/stats/TrendChart.js:193
+#: admin/src/screens/stats/TrendChart.js:331
+#, js-format
+msgid "%s per day"
+msgstr ""
+
+#: admin/src/screens/stats/TrendChart.js:198
+msgid "Measure"
+msgstr ""
+
+#. translators: 1: a measure, e.g. "Views"; 2: number of days.
+#: admin/src/screens/stats/TrendChart.js:219
+#, js-format
+msgid "%1$s over the last %2$s days"
+msgstr ""
+
+#: admin/src/screens/stats/TrendChart.js:322
+msgid "Nothing on these days yet."
+msgstr ""
+
+#: admin/src/screens/stats/TrendChart.js:337
+msgid "Day"
 msgstr ""
 
 #: admin/src/screens/WidgetEditor.js:68
@@ -2515,17 +2703,17 @@ msgid "Widget saved"
 msgstr ""
 
 #: admin/src/screens/WidgetEditor.js:415
-#: admin/src/screens/WidgetsList.js:651
+#: admin/src/screens/WidgetsList.js:652
 msgid "Widget deleted"
 msgstr ""
 
 #: admin/src/screens/WidgetEditor.js:430
-#: admin/src/screens/WidgetsList.js:635
+#: admin/src/screens/WidgetsList.js:636
 msgid "Widget duplicated"
 msgstr ""
 
 #: admin/src/screens/WidgetEditor.js:469
-#: admin/src/screens/WidgetsList.js:408
+#: admin/src/screens/WidgetsList.js:409
 msgid "Duplicate"
 msgstr ""
 
@@ -2534,102 +2722,106 @@ msgid "Save first"
 msgstr ""
 
 #: admin/src/screens/WidgetEditor.js:479
-#: admin/src/screens/WidgetEditor.js:683
-#: admin/src/screens/WidgetsList.js:427
-#: admin/src/screens/WidgetsList.js:833
+#: admin/src/screens/WidgetEditor.js:694
+#: admin/src/screens/WidgetsList.js:428
+#: admin/src/screens/WidgetsList.js:836
 msgid "Delete widget"
 msgstr ""
 
-#: admin/src/screens/WidgetEditor.js:547
+#: admin/src/screens/WidgetEditor.js:551
 msgid "Add reels to see your widget"
 msgstr ""
 
-#: admin/src/screens/WidgetEditor.js:548
+#: admin/src/screens/WidgetEditor.js:554
+msgid "On product pages this widget shows each product’s reels. Pick reels in the Reels step to preview its look, and to show where a product has none."
+msgstr ""
+
+#: admin/src/screens/WidgetEditor.js:558
 msgid "Pick reels from your library in the Reels step."
 msgstr ""
 
-#: admin/src/screens/WidgetEditor.js:653
+#: admin/src/screens/WidgetEditor.js:664
 msgid "Discard changes?"
 msgstr ""
 
 #. translators: %s: the widget's name.
-#: admin/src/screens/WidgetEditor.js:663
+#: admin/src/screens/WidgetEditor.js:674
 #, js-format
 msgid "Your changes to %s since the last save will be lost."
 msgstr ""
 
-#: admin/src/screens/WidgetEditor.js:669
+#: admin/src/screens/WidgetEditor.js:680
 msgid "The widget goes back to the layout and shape you chose when you created it."
 msgstr ""
 
-#: admin/src/screens/WidgetEditor.js:688
-#: admin/src/screens/WidgetsList.js:838
+#: admin/src/screens/WidgetEditor.js:699
+#: admin/src/screens/WidgetsList.js:841
 msgid "Pages that use its shortcode or block will show nothing. Its reels stay in your library."
 msgstr ""
 
 #. translators: %s: number of reels that are not in any widget.
-#: admin/src/screens/WidgetsList.js:123
+#: admin/src/screens/WidgetsList.js:124
 #, js-format
 msgid "%s reel isn’t in a widget"
 msgid_plural "%s reels aren’t in a widget"
 msgstr[0] ""
 msgstr[1] ""
 
-#: admin/src/screens/WidgetsList.js:160
+#: admin/src/screens/WidgetsList.js:161
 msgid "Reels in use"
 msgstr ""
 
 #. translators: 1: reels in at least one widget, 2: all reels.
-#: admin/src/screens/WidgetsList.js:165
+#: admin/src/screens/WidgetsList.js:166
 #, js-format
 msgid "%1$s of %2$s"
 msgstr ""
 
-#: admin/src/screens/WidgetsList.js:181
+#: admin/src/screens/WidgetsList.js:182
 msgid "Top reels"
 msgstr ""
 
-#: admin/src/screens/WidgetsList.js:191
+#: admin/src/screens/WidgetsList.js:192
 msgid "See all reels"
 msgstr ""
 
 #. translators: %s: click rate, e.g. 9.2%.
-#: admin/src/screens/WidgetsList.js:238
+#: admin/src/screens/WidgetsList.js:239
 #, js-format
 msgid "%s click rate"
 msgstr ""
 
-#: admin/src/screens/WidgetsList.js:301
+#: admin/src/screens/WidgetsList.js:302
 msgid "Created"
 msgstr ""
 
-#: admin/src/screens/WidgetsList.js:561
+#: admin/src/screens/WidgetsList.js:562
 msgid "You’re all set"
 msgstr ""
 
-#: admin/src/screens/WidgetsList.js:686
+#: admin/src/screens/WidgetsList.js:687
 msgid "Couldn’t load your widgets."
 msgstr ""
 
-#: admin/src/screens/WidgetsList.js:719
+#: admin/src/screens/WidgetsList.js:720
 msgid "Loading widgets…"
 msgstr ""
 
 #. translators: %s: the search term.
-#: admin/src/screens/WidgetsList.js:729
+#: admin/src/screens/WidgetsList.js:730
 #, js-format
 msgid "No widgets match “%s”"
 msgstr ""
 
-#: admin/src/screens/WidgetsList.js:732
+#: admin/src/screens/WidgetsList.js:733
 msgid "Try another name, or clear the search to see every widget."
 msgstr ""
 
-#: admin/src/screens/WidgetsList.js:750
+#: admin/src/screens/WidgetsList.js:751
 msgid "Styled sets of reels you can place on any page."
 msgstr ""
 
-#: admin/src/screens/WidgetsList.js:769
+#: admin/src/screens/WidgetsList.js:770
 #: block/src/index.js:187
 msgid "Search widgets"
 msgstr ""
@@ -2672,27 +2864,35 @@ msgstr ""
 msgid "No reels have been added to this widget yet."
 msgstr ""
 
+#: src/shared/player/LinkStack.jsx:57
+msgid "Show products"
+msgstr ""
+
+#: src/shared/player/LinkStack.jsx:58
+msgid "Hide products"
+msgstr ""
+
 #. translators: %s: reel title.
-#: src/shared/player/Player.jsx:607
+#: src/shared/player/Player.jsx:720
 #, js-format
 msgid "Reel player: %s"
 msgstr ""
 
-#: src/shared/player/Player.jsx:610
+#: src/shared/player/Player.jsx:723
 msgid "Reel player"
 msgstr ""
 
 #. translators: 1: the reel's position, 2: how many reels there are.
-#: src/shared/player/Player.jsx:619
+#: src/shared/player/Player.jsx:732
 #, js-format
 msgid "%1$d of %2$d"
 msgstr ""
 
-#: src/shared/player/Player.jsx:631
+#: src/shared/player/Player.jsx:744
 msgid "Close player"
 msgstr ""
 
-#: src/shared/player/Player.jsx:763
+#: src/shared/player/Player.jsx:884
 msgid "Tap for sound"
 msgstr ""
 
@@ -2706,12 +2906,85 @@ msgstr ""
 msgid "Next reel"
 msgstr ""
 
-#: src/shared/player/PlayerSlide.jsx:131
+#: src/shared/player/PlayerSlide.jsx:137
 msgid "Pause"
 msgstr ""
 
-#: src/shared/player/PlayerSlide.jsx:132
+#: src/shared/player/PlayerSlide.jsx:138
 msgid "Play"
+msgstr ""
+
+#. translators: 1: picture number, 2: how many pictures there are.
+#: src/shared/player/ProductPanel.jsx:197
+#, js-format
+msgid "Show picture %1$d of %2$d"
+msgstr ""
+
+#: src/shared/player/ProductPanel.jsx:320
+#: src/shared/ProductCard.jsx:234
+msgid "Product added to cart!"
+msgstr ""
+
+#. translators: %s: the error message from WooCommerce.
+#: src/shared/player/ProductPanel.jsx:329
+#: src/shared/ProductCard.jsx:199
+#, js-format
+msgid "Failed to add to cart: %s"
+msgstr ""
+
+#: src/shared/player/ProductPanel.jsx:332
+#: src/shared/ProductCard.jsx:202
+msgid "Failed to add to cart. Please try again."
+msgstr ""
+
+#: src/shared/player/ProductPanel.jsx:348
+msgid "View product"
+msgstr ""
+
+#: src/shared/player/ProductPanel.jsx:353
+#: src/shared/player/ProductPanel.jsx:536
+#: src/shared/ProductCard.jsx:303
+msgid "View cart"
+msgstr ""
+
+#: src/shared/player/ProductPanel.jsx:361
+msgid "Unavailable"
+msgstr ""
+
+#: src/shared/player/ProductPanel.jsx:385
+#: src/shared/ProductCard.jsx:312
+msgid "Select options"
+msgstr ""
+
+#: src/shared/player/ProductPanel.jsx:394
+#: src/shared/ProductCard.jsx:284
+msgid "Buy now"
+msgstr ""
+
+#: src/shared/player/ProductPanel.jsx:409
+#: src/shared/ProductCard.jsx:375
+#: src/shared/ProductCard.jsx:429
+msgid "Adding…"
+msgstr ""
+
+#: src/shared/player/ProductPanel.jsx:524
+msgid "View full details"
+msgstr ""
+
+#: src/shared/player/ProductPanel.jsx:767
+msgid "Product details"
+msgstr ""
+
+#: src/shared/player/ProductPanel.jsx:776
+msgid "Back to products"
+msgstr ""
+
+#: src/shared/player/ProductPanel.jsx:791
+msgid "Close product details"
+msgstr ""
+
+#: src/shared/player/ProductPanel.jsx:792
+msgid "Hide product details"
 msgstr ""
 
 #: src/shared/player/Seekbar.jsx:111
@@ -2738,50 +3011,23 @@ msgid "Volume"
 msgstr ""
 
 #. translators: %s: average rating, e.g. 4.5.
-#: src/shared/ProductCard.jsx:55
+#: src/shared/ProductCard.jsx:60
 #, js-format
 msgid "Rated %s out of 5"
 msgstr ""
 
-#. translators: %s: the error message from WooCommerce.
-#: src/shared/ProductCard.jsx:193
-#, js-format
-msgid "Failed to add to cart: %s"
-msgstr ""
-
-#: src/shared/ProductCard.jsx:196
-msgid "Failed to add to cart. Please try again."
-msgstr ""
-
-#: src/shared/ProductCard.jsx:228
-msgid "Product added to cart!"
-msgstr ""
-
-#: src/shared/ProductCard.jsx:263
-msgid "Buy now"
-msgstr ""
-
-#: src/shared/ProductCard.jsx:282
-msgid "View cart"
-msgstr ""
-
-#: src/shared/ProductCard.jsx:291
-msgid "Select options"
-msgstr ""
-
 #. translators: 1: a button's text, e.g. "Add to cart"; 2: product name.
-#: src/shared/ProductCard.jsx:308
+#: src/shared/ProductCard.jsx:329
 #, js-format
 msgctxt "button text: product name"
 msgid "%1$s: %2$s"
 msgstr ""
 
 #: src/shared/ProductCard.jsx:344
-#: src/shared/ProductCard.jsx:398
-msgid "Adding…"
+msgid "Shop now"
 msgstr ""
 
-#: src/shared/storeApi.js:24
+#: src/shared/storeApi.js:35
 msgid "WooCommerce is not available."
 msgstr ""
 
@@ -2794,12 +3040,12 @@ msgid "Next reels"
 msgstr ""
 
 #. translators: %s: reel title.
-#: src/shared/Thumbnail.jsx:258
+#: src/shared/Thumbnail.jsx:265
 #, js-format
 msgid "Play reel: %s"
 msgstr ""
 
-#: src/shared/Thumbnail.jsx:259
+#: src/shared/Thumbnail.jsx:266
 msgid "Untitled"
 msgstr ""
 
