@@ -4,7 +4,7 @@ Tags: shoppable reels, reels, woocommerce, shoppable video, product video
 Requires at least: 6.6
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 1.1.2
+Stable tag: 1.1.3
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -145,6 +145,9 @@ Data is preserved by default. Enable **Delete all data on uninstall** under **Pr
 
 wp-rankings verification string: [https://wp-rankings.com/plugins/productreels](https://wp-rankings.com/plugins/productreels)
 
+= 1.1.3 =
+* Replaced the Halloween notice with a dismissible Black Friday notice on the Widgets screen, shown only to administrators until December 31, 2026.
+
 = 1.1.2 =
 * Added a "Hire an expert" link to the ProductReels admin bar for custom website work.
 * Added a dismissible Halloween notice on the Widgets screen, shown only to administrators until October 31, 2026.
@@ -163,6 +166,9 @@ wp-rankings verification string: [https://wp-rankings.com/plugins/productreels](
 * Initial release.
 
 == Upgrade Notice ==
+
+= 1.1.3 =
+Small admin update: the seasonal notice on the Widgets screen now shows the Black Friday campaign. No data changes.
 
 = 1.1.2 =
 Small admin update: a "Hire an expert" link and a dismissible seasonal notice. No data changes.
