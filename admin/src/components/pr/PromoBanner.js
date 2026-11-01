@@ -8,7 +8,12 @@
  * the person's user meta, so it never comes back for them.
  */
 
-import { useEffect, useRef, useState } from '@wordpress/element';
+import {
+	createInterpolateElement,
+	useEffect,
+	useRef,
+	useState,
+} from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { Icon } from '@shared/Icon';
 import { boot, promo as promoApi } from '../../api';
@@ -49,97 +54,200 @@ const focusPast = ( node ) => {
 	( after || others[ others.length - 1 ] )?.focus();
 };
 
-const Bat = ( { className } ) => (
-	<svg className={ className } viewBox="0 0 48 22" focusable="false">
-		<path d="M24 7.2c.9-1.6 1.9-2.6 2.9-2.9-.3 1.1 0 2 .8 2.6 3.3-3 8.7-4.5 14.3-3.4-2.4 1.2-3.8 3.1-4 5.6-2-1-4.3-.8-5.8.7-1-1.7-2.9-2.4-4.6-1.9L24 16.4l-3.6-8.5c-1.7-.5-3.6.2-4.6 1.9-1.5-1.5-3.8-1.7-5.8-.7-.2-2.5-1.6-4.4-4-5.6 5.6-1.1 11 .4 14.3 3.4.8-.6 1.1-1.5.8-2.6 1 .3 2 1.3 2.9 2.9z" />
-	</svg>
-);
-
-/** Moon, bare tree, bats and stars behind the content. */
+/** Gold light streaks, confetti and a gift box behind the content. */
 const Scenery = () => (
 	<div className="pr-promo__scenery" aria-hidden="true">
 		<svg
-			className="pr-promo__stars"
+			className="pr-promo__streaks"
+			viewBox="0 0 1200 140"
+			preserveAspectRatio="none"
+			focusable="false"
+		>
+			<defs>
+				<linearGradient id="pr-promo-streak" x1="0" x2="1">
+					<stop offset="0" stopColor="#ffc62b" stopOpacity="0" />
+					<stop offset="0.7" stopColor="#ffc62b" stopOpacity="0.9" />
+					<stop offset="1" stopColor="#fff3c4" stopOpacity="0.6" />
+				</linearGradient>
+			</defs>
+			<path
+				d="M760 52C900 40 1040 22 1200 -6"
+				stroke="url(#pr-promo-streak)"
+				strokeWidth="2.5"
+			/>
+			<path
+				d="M820 70C960 52 1080 30 1200 10"
+				stroke="url(#pr-promo-streak)"
+				strokeWidth="1"
+				opacity="0.6"
+			/>
+			<path
+				d="M940 146C1040 120 1120 104 1200 98"
+				stroke="url(#pr-promo-streak)"
+				strokeWidth="2.5"
+			/>
+		</svg>
+		<svg
+			className="pr-promo__confetti"
 			viewBox="0 0 1200 140"
 			preserveAspectRatio="xMidYMid slice"
 			focusable="false"
 		>
-			<circle cx="180" cy="22" r="1.4" />
-			<circle cx="330" cy="112" r="1.1" />
-			<circle cx="460" cy="18" r="1.6" />
-			<circle cx="610" cy="96" r="1.2" />
-			<circle cx="700" cy="30" r="1.5" />
-			<circle cx="860" cy="120" r="1.1" />
-			<circle cx="940" cy="16" r="1.3" />
-			<circle cx="1080" cy="104" r="1.6" />
-			<circle cx="1150" cy="34" r="1.1" />
+			<path
+				className="pr-promo__bit"
+				d="M590 26c5-7 10-8 14-3s9 4 13-3"
+				fill="none"
+				stroke="#f2b01e"
+				strokeWidth="3.5"
+				strokeLinecap="round"
+			/>
+			<rect
+				className="pr-promo__bit"
+				x="52"
+				y="22"
+				width="9"
+				height="4"
+				rx="1"
+				transform="rotate(-24 56 24)"
+			/>
+			<rect
+				className="pr-promo__bit"
+				x="560"
+				y="104"
+				width="5"
+				height="12"
+				rx="1"
+				transform="rotate(40 562 110)"
+			/>
+			<rect
+				className="pr-promo__bit"
+				x="780"
+				y="92"
+				width="16"
+				height="6"
+				rx="1"
+				transform="rotate(-36 788 95)"
+			/>
+			<rect
+				className="pr-promo__bit"
+				x="1080"
+				y="20"
+				width="5"
+				height="12"
+				rx="1"
+				transform="rotate(32 1082 26)"
+			/>
 		</svg>
-		<span className="pr-promo__moon" />
-		<svg className="pr-promo__tree" viewBox="0 0 160 140" focusable="false">
-			<path d="M70 140c3-22 4-44 1-62-9-6-20-9-33-8 9-4 20-4 30-1-6-9-15-15-27-19 13 2 24 8 31 18 1-12-3-24-11-34 11 8 16 20 16 33 6-9 15-15 27-17-10 6-17 14-20 24 11-5 23-6 35-2-13 0-24 4-33 11-2 18-1 38 4 57z" />
-			<path d="M0 140c18-10 40-14 64-12 30 2 58 4 96-6v18z" />
+		<svg className="pr-promo__gift" viewBox="0 0 80 72" focusable="false">
+			<path d="M8 34h64v38H8z" fill="#262626" />
+			<path d="M4 24h72v14H4z" fill="#3a3a3a" />
+			<path
+				d="M8 38h64"
+				stroke="#000"
+				strokeOpacity="0.4"
+				strokeWidth="2"
+			/>
+			<path d="M34 24h12v48H34z" fill="#f2b01e" />
+			<path
+				d="M40 24c-6-12-20-18-24-10s10 10 24 10zM40 24c6-12 20-18 24-10s-10 10-24 10z"
+				fill="none"
+				stroke="#f2b01e"
+				strokeWidth="5"
+				strokeLinejoin="round"
+			/>
 		</svg>
-		<Bat className="pr-promo__bat pr-promo__bat--1" />
-		<Bat className="pr-promo__bat pr-promo__bat--2" />
-		<Bat className="pr-promo__bat pr-promo__bat--3" />
 	</div>
 );
 
-/** Jack-o'-lantern with a ghost peeking over it. */
-const Lantern = () => (
+/** Black and gold shopping bags with a swinging price tag. */
+const Bags = () => (
 	<svg
 		className="pr-promo__art"
-		viewBox="0 0 128 104"
+		viewBox="0 0 150 116"
 		aria-hidden="true"
 		focusable="false"
 	>
 		<defs>
-			<radialGradient id="pr-promo-pumpkin" cx="40%" cy="35%" r="75%">
-				<stop offset="0" stopColor="#ffb054" />
-				<stop offset="0.55" stopColor="#ff7a12" />
-				<stop offset="1" stopColor="#d9530a" />
-			</radialGradient>
+			<linearGradient id="pr-promo-gold" x1="0" y1="0" x2="1" y2="1">
+				<stop offset="0" stopColor="#ffe07a" />
+				<stop offset="0.5" stopColor="#f6b51e" />
+				<stop offset="1" stopColor="#c98a00" />
+			</linearGradient>
+			<linearGradient id="pr-promo-bag" x1="0" y1="0" x2="1" y2="1">
+				<stop offset="0" stopColor="#2b2b2b" />
+				<stop offset="1" stopColor="#0a0a0a" />
+			</linearGradient>
 		</defs>
-		<g className="pr-promo__ghost">
-			<path
-				d="M98 6c-11 0-18 8-18 19v26l5-4 5 4 5-4 5 4 5-4 5 4 6-4V25c0-11-7-19-18-19z"
-				fill="#f6f1ff"
-			/>
-			<ellipse cx="92" cy="24" rx="2.6" ry="3.4" fill="#2a0a5e" />
-			<ellipse cx="104" cy="24" rx="2.6" ry="3.4" fill="#2a0a5e" />
-			<ellipse cx="98" cy="33" rx="2.6" ry="3.2" fill="#2a0a5e" />
-		</g>
 		<path
-			d="M54 34c-.4-6 1.6-11 6.4-14.6l3.6 3.2c-3.6 2.8-5 6.4-4.8 11.4z"
-			fill="#5f8f2c"
-		/>
-		<path
-			d="M60.4 22.8c4-4.6 9.6-5.6 14.4-3.4-4 .6-7.6 2.6-10.4 6z"
-			fill="#7fb03a"
-		/>
-		<ellipse cx="34" cy="68" rx="24" ry="30" fill="#e8620b" />
-		<ellipse cx="80" cy="68" rx="24" ry="30" fill="#e8620b" />
-		<ellipse
-			cx="57"
-			cy="68"
-			rx="28"
-			ry="33"
-			fill="url(#pr-promo-pumpkin)"
-		/>
-		<path
-			d="M45 38c-6 8-8 18-8 30s2 22 8 30M69 38c6 8 8 18 8 30s-2 22-8 30"
+			d="M12 50c0-10 4-18 12-18s12 8 12 18"
 			fill="none"
-			stroke="#c4480a"
-			strokeWidth="1.6"
-			strokeLinecap="round"
-			opacity="0.6"
+			stroke="#e3a514"
+			strokeWidth="3"
 		/>
-		<g className="pr-promo__face" fill="#ffe066">
-			<path d="M38 62l8-11 7 11z" />
-			<path d="M61 62l7-11 8 11z" />
-			<path d="M54 69l3-4 3 4z" />
-			<path d="M34 74c8 11 38 11 46 0l-5 1.2-2.6 4.2-4.4-2.6-4 4.4-4-4.4-4.4 2.6L49 75.2z" />
+		<path d="M4 46h40l-4 66H8z" fill="url(#pr-promo-gold)" />
+		<path
+			d="M46 38c0-20 8-32 21-32s21 12 21 32"
+			fill="none"
+			stroke="url(#pr-promo-gold)"
+			strokeWidth="4"
+			strokeLinecap="round"
+		/>
+		<path d="M30 34h74l-4 80H34z" fill="url(#pr-promo-bag)" />
+		<path d="M30 34h74l-1 10H31z" fill="#000" opacity="0.35" />
+		<g className="pr-promo__words" fill="#fff" transform="rotate(-8 66 70)">
+			<text x="38" y="62" fontSize="14">
+				BLACK
+			</text>
+			<text x="38" y="77" fontSize="14">
+				FRIDAY
+			</text>
+			<path d="M38 82l52-4 2 17-52 4z" fill="#ffcc1f" />
+			<text x="44" y="96" fontSize="15" fill="#0a0a0a">
+				SALE
+			</text>
 		</g>
+		<path
+			d="M88 36c8 4 16 10 22 18"
+			fill="none"
+			stroke="#d9d9d9"
+			strokeWidth="1.2"
+		/>
+		<g className="pr-promo__tag">
+			<path
+				d="M104 46l14 4 14 26-12 34-24-7 6-34z"
+				fill="url(#pr-promo-gold)"
+			/>
+			<circle cx="110" cy="54" r="2.6" fill="#0a0a0a" />
+			<g
+				className="pr-promo__words"
+				fill="#0a0a0a"
+				transform="rotate(16 114 80)"
+			>
+				<text x="104" y="74" fontSize="7">
+					UP TO
+				</text>
+				<text x="101" y="88" fontSize="14">
+					70%
+				</text>
+				<text x="106" y="97" fontSize="8">
+					OFF
+				</text>
+			</g>
+		</g>
+	</svg>
+);
+
+/** The tag in the label. */
+const TagMark = () => (
+	<svg
+		className="pr-promo__tagmark"
+		viewBox="0 0 24 24"
+		width="14"
+		height="14"
+		aria-hidden="true"
+		focusable="false"
+	>
+		<path d="M3 12.2V4a1 1 0 0 1 1-1h8.2a1 1 0 0 1 .7.3l8 8a1 1 0 0 1 0 1.4l-8.2 8.2a1 1 0 0 1-1.4 0l-8-8a1 1 0 0 1-.3-.7zM8 9.5A1.5 1.5 0 1 0 8 6.5a1.5 1.5 0 0 0 0 3z" />
 	</svg>
 );
 
@@ -199,22 +307,26 @@ export const PromoBanner = () => {
 				aria-labelledby="pr-promo-title"
 			>
 				<Scenery />
-				<Lantern />
+				<Bags />
 				<div className="pr-promo__lead">
 					<p className="pr-promo__label">
-						<span aria-hidden="true">🎃</span>
-						{ __( 'Halloween special', 'productreels' ) }
+						<TagMark />
+						{ __( 'Black Friday special', 'productreels' ) }
 					</p>
 					<h2 id="pr-promo-title" className="pr-promo__title">
-						{ __(
-							'Is Your Website Scaring Away Customers?',
-							'productreels'
+						{ createInterpolateElement(
+							/* translators: <hl> marks the highlighted words. */
+							__(
+								'Is Your Website Ready for <hl>Black Friday?</hl>',
+								'productreels'
+							),
+							{ hl: <span className="pr-promo__hl" /> }
 						) }
 					</h2>
 				</div>
 				<p className="pr-promo__text">
 					{ __(
-						'Give your business a stunning website makeover this Halloween!',
+						'Give your business a stunning website makeover this Black Friday!',
 						'productreels'
 					) }
 				</p>
@@ -224,7 +336,7 @@ export const PromoBanner = () => {
 					target="_blank"
 					rel="noopener noreferrer"
 				>
-					{ __( 'Explore Website Makeovers', 'productreels' ) }
+					{ __( 'Explore Black Friday Deals', 'productreels' ) }
 					<span className="pr-promo__arrow" aria-hidden="true">
 						<svg
 							className="pr-icon--flip"
@@ -251,7 +363,7 @@ export const PromoBanner = () => {
 					className="pr-promo__close"
 					onClick={ dismiss }
 					aria-label={ __(
-						'Dismiss the Halloween banner',
+						'Dismiss the Black Friday banner',
 						'productreels'
 					) }
 				>

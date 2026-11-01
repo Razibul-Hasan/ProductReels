@@ -1,4 +1,5 @@
 <?php
+
 /**
  * The seasonal banner on the Widgets screen.
  *
@@ -10,7 +11,7 @@
  */
 
 // If this file is called directly, abort.
-if ( ! defined( 'WPINC' ) ) {
+if (! defined('WPINC')) {
 	die;
 }
 
@@ -28,7 +29,8 @@ if ( ! defined( 'WPINC' ) ) {
  * @subpackage Productreels/includes/support
  * @author     bestwpexpert <https://bestwebexpert.com/>
  */
-class Productreels_Promo {
+class Productreels_Promo
+{
 
 	/**
 	 * The running campaign's ID, stored in a dismissal.
@@ -36,7 +38,7 @@ class Productreels_Promo {
 	 * @since 1.1.2
 	 * @var   string
 	 */
-	const CAMPAIGN = 'halloween-2026';
+	const CAMPAIGN = 'black-friday-2026';
 
 	/**
 	 * The campaign's last moment, in the site's timezone.
@@ -44,7 +46,7 @@ class Productreels_Promo {
 	 * @since 1.1.2
 	 * @var   string
 	 */
-	const ENDS = '2026-10-31 23:59:59';
+	const ENDS = '2026-12-31 23:59:59';
 
 	/**
 	 * Where the call to action goes.
@@ -68,14 +70,15 @@ class Productreels_Promo {
 	 * @since  1.1.2
 	 * @return array{id:string,url:string,endsAt:int}|null The campaign.
 	 */
-	public static function bootstrap() {
-		if ( ! self::is_visible() ) {
+	public static function bootstrap()
+	{
+		if (! self::is_visible()) {
 			return null;
 		}
 
 		return array(
 			'id'     => self::CAMPAIGN,
-			'url'    => esc_url_raw( self::URL ),
+			'url'    => esc_url_raw(self::URL),
 			// Milliseconds, so a tab left open past the end hides it too.
 			'endsAt' => self::ends_at() * 1000,
 		);
@@ -87,12 +90,13 @@ class Productreels_Promo {
 	 * @since  1.1.2
 	 * @return bool Whether they should.
 	 */
-	public static function is_visible() {
-		if ( ! current_user_can( Productreels_Rest_Controller::CAPABILITY ) ) {
+	public static function is_visible()
+	{
+		if (! current_user_can(Productreels_Rest_Controller::CAPABILITY)) {
 			return false;
 		}
 
-		if ( time() > self::ends_at() || self::is_dismissed( get_current_user_id() ) ) {
+		if (time() > self::ends_at() || self::is_dismissed(get_current_user_id())) {
 			return false;
 		}
 
@@ -103,7 +107,7 @@ class Productreels_Promo {
 		 * @param bool   $show     Whether it shows.
 		 * @param string $campaign The campaign ID.
 		 */
-		return (bool) apply_filters( 'productreels_show_promo', true, self::CAMPAIGN );
+		return (bool) apply_filters('productreels_show_promo', true, self::CAMPAIGN);
 	}
 
 	/**
@@ -114,16 +118,17 @@ class Productreels_Promo {
 	 * @param  string $campaign The campaign ID.
 	 * @return void
 	 */
-	public static function dismiss( $user_id, $campaign ) {
-		$dismissed = self::dismissed( $user_id );
+	public static function dismiss($user_id, $campaign)
+	{
+		$dismissed = self::dismissed($user_id);
 
-		if ( in_array( $campaign, $dismissed, true ) ) {
+		if (in_array($campaign, $dismissed, true)) {
 			return;
 		}
 
 		$dismissed[] = $campaign;
 
-		update_user_meta( $user_id, self::META_KEY, $dismissed );
+		update_user_meta($user_id, self::META_KEY, $dismissed);
 	}
 
 	/**
@@ -133,8 +138,9 @@ class Productreels_Promo {
 	 * @param  int $user_id The user.
 	 * @return bool Whether they have.
 	 */
-	public static function is_dismissed( $user_id ) {
-		return in_array( self::CAMPAIGN, self::dismissed( $user_id ), true );
+	public static function is_dismissed($user_id)
+	{
+		return in_array(self::CAMPAIGN, self::dismissed($user_id), true);
 	}
 
 	/**
@@ -145,10 +151,11 @@ class Productreels_Promo {
 	 * @param  int $user_id The user.
 	 * @return string[] The IDs.
 	 */
-	private static function dismissed( $user_id ) {
-		$stored = get_user_meta( $user_id, self::META_KEY, true );
+	private static function dismissed($user_id)
+	{
+		$stored = get_user_meta($user_id, self::META_KEY, true);
 
-		return is_array( $stored ) ? array_values( array_filter( $stored, 'is_string' ) ) : array();
+		return is_array($stored) ? array_values(array_filter($stored, 'is_string')) : array();
 	}
 
 	/**
@@ -158,8 +165,9 @@ class Productreels_Promo {
 	 * @access private
 	 * @return int The timestamp.
 	 */
-	private static function ends_at() {
-		$ends = date_create_immutable( self::ENDS, wp_timezone() );
+	private static function ends_at()
+	{
+		$ends = date_create_immutable(self::ENDS, wp_timezone());
 
 		return $ends ? $ends->getTimestamp() : 0;
 	}
