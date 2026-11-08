@@ -12,7 +12,7 @@
  * @package           Productreels
  *
  * @wordpress-plugin
- * Plugin Name:       ProductReels – Shoppable Reels for WooCommerce
+ * Plugin Name:       ProductReels – Shoppable Video Reels for WooCommerce
  * Plugin URI:        https://bestwebexpert.com/productreels/
  * Description:       Turn product videos and customer UGC into shoppable Instagram-style reels. Grid, carousel, marquee, stacked and popup layouts, WooCommerce product tagging, CTA buttons, and built-in view/click analytics.
  * Version:           1.1.4

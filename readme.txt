@@ -1,4 +1,4 @@
-=== ProductReels – Shoppable Reels for WooCommerce ===
+=== ProductReels – Shoppable Video Reels for WooCommerce ===
 Contributors: bestwpexpert
 Tags: shoppable reels, reels, woocommerce, shoppable video, product video
 Requires at least: 6.6
@@ -147,7 +147,7 @@ wp-rankings verification string: [https://wp-rankings.com/plugins/productreels](
 
 = 1.1.4 =
 * Hardened database queries: table names now go through $wpdb->prepare() with the %i identifier placeholder, and every query is built from literal SQL (WordPress Plugin Check clean).
-* Plugin header name now matches the readme: "ProductReels – Shoppable Reels for WooCommerce".
+* Readme title now matches the plugin name: "ProductReels – Shoppable Video Reels for WooCommerce".
 
 = 1.1.3 =
 * Replaced the Halloween notice with a dismissible Black Friday notice on the Widgets screen, shown only to administrators until December 31, 2026.
