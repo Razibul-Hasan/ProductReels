@@ -4,7 +4,7 @@ Tags: shoppable reels, reels, woocommerce, shoppable video, product video
 Requires at least: 6.6
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 1.1.3
+Stable tag: 1.1.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -145,6 +145,10 @@ Data is preserved by default. Enable **Delete all data on uninstall** under **Pr
 
 wp-rankings verification string: [https://wp-rankings.com/plugins/productreels](https://wp-rankings.com/plugins/productreels)
 
+= 1.1.4 =
+* Hardened database queries: table names now go through $wpdb->prepare() with the %i identifier placeholder, and every query is built from literal SQL (WordPress Plugin Check clean).
+* Plugin header name now matches the readme: "ProductReels – Shoppable Reels for WooCommerce".
+
 = 1.1.3 =
 * Replaced the Halloween notice with a dismissible Black Friday notice on the Widgets screen, shown only to administrators until December 31, 2026.
 
@@ -166,6 +170,9 @@ wp-rankings verification string: [https://wp-rankings.com/plugins/productreels](
 * Initial release.
 
 == Upgrade Notice ==
+
+= 1.1.4 =
+Maintenance release: safer database queries and a consistent plugin name. No data changes.
 
 = 1.1.3 =
 Small admin update: the seasonal notice on the Widgets screen now shows the Black Friday campaign. No data changes.

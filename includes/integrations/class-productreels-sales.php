@@ -218,7 +218,8 @@ class Productreels_Sales {
 
 			$wpdb->query( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 				$wpdb->prepare(
-					"INSERT IGNORE INTO `{$table}` (order_id, item_id, widget_id, reel_id, product_id, quantity, revenue, day) VALUES (%d, %d, %d, %d, %d, %d, %f, %s)", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+					'INSERT IGNORE INTO %i (order_id, item_id, widget_id, reel_id, product_id, quantity, revenue, day) VALUES (%d, %d, %d, %d, %d, %d, %f, %s)',
+					$table,
 					(int) $order->get_id(),
 					(int) $item_id,
 					(int) $item->get_meta( self::WIDGET_META ),

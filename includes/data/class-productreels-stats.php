@@ -159,8 +159,9 @@ class Productreels_Stats {
 
 		$wpdb->query( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			$wpdb->prepare(
-				"INSERT INTO `{$table}` (day, widget_id, reel_id, views, clicks) VALUES (%s, %d, %d, %d, %d)
-				ON DUPLICATE KEY UPDATE views = views + VALUES(views), clicks = clicks + VALUES(clicks)", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+				'INSERT INTO %i (day, widget_id, reel_id, views, clicks) VALUES (%s, %d, %d, %d, %d)
+				ON DUPLICATE KEY UPDATE views = views + VALUES(views), clicks = clicks + VALUES(clicks)',
+				$table,
 				self::today(),
 				$widget_id,
 				$reel_id,
@@ -336,7 +337,8 @@ class Productreels_Stats {
 
 		$rows = $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			$wpdb->prepare(
-				"SELECT reel_id, SUM(views) AS views, SUM(clicks) AS clicks FROM `{$table}` WHERE widget_id = %d AND day >= %s GROUP BY reel_id", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+				'SELECT reel_id, SUM(views) AS views, SUM(clicks) AS clicks FROM %i WHERE widget_id = %d AND day >= %s GROUP BY reel_id',
+				$table,
 				$widget_id,
 				$from
 			),
@@ -367,15 +369,29 @@ class Productreels_Stats {
 		global $wpdb;
 
 		$table = Productreels_Schema::table( 'sales' );
-		$sql   = "SELECT reel_id, COUNT(DISTINCT order_id) AS orders, SUM(revenue) AS revenue FROM `{$table}` WHERE widget_id = %d";
-		$args  = array( (int) $widget_id );
 
-		if ( null !== $from ) {
-			$sql   .= ' AND day >= %s';
-			$args[] = $from;
+		// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		if ( null === $from ) {
+			$rows = $wpdb->get_results(
+				$wpdb->prepare(
+					'SELECT reel_id, COUNT(DISTINCT order_id) AS orders, SUM(revenue) AS revenue FROM %i WHERE widget_id = %d GROUP BY reel_id',
+					$table,
+					(int) $widget_id
+				),
+				ARRAY_A
+			);
+		} else {
+			$rows = $wpdb->get_results(
+				$wpdb->prepare(
+					'SELECT reel_id, COUNT(DISTINCT order_id) AS orders, SUM(revenue) AS revenue FROM %i WHERE widget_id = %d AND day >= %s GROUP BY reel_id',
+					$table,
+					(int) $widget_id,
+					$from
+				),
+				ARRAY_A
+			);
 		}
-
-		$rows = $wpdb->get_results( $wpdb->prepare( $sql . ' GROUP BY reel_id', $args ), ARRAY_A ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
+		// phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 
 		$out = array();
 
@@ -402,15 +418,29 @@ class Productreels_Stats {
 		global $wpdb;
 
 		$table = Productreels_Schema::table( 'sales' );
-		$sql   = "SELECT COUNT(DISTINCT order_id) AS orders, COALESCE(SUM(revenue), 0) AS revenue FROM `{$table}` WHERE widget_id = %d";
-		$args  = array( (int) $widget_id );
 
-		if ( null !== $from ) {
-			$sql   .= ' AND day >= %s';
-			$args[] = $from;
+		// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		if ( null === $from ) {
+			$row = $wpdb->get_row(
+				$wpdb->prepare(
+					'SELECT COUNT(DISTINCT order_id) AS orders, COALESCE(SUM(revenue), 0) AS revenue FROM %i WHERE widget_id = %d',
+					$table,
+					(int) $widget_id
+				),
+				ARRAY_A
+			);
+		} else {
+			$row = $wpdb->get_row(
+				$wpdb->prepare(
+					'SELECT COUNT(DISTINCT order_id) AS orders, COALESCE(SUM(revenue), 0) AS revenue FROM %i WHERE widget_id = %d AND day >= %s',
+					$table,
+					(int) $widget_id,
+					$from
+				),
+				ARRAY_A
+			);
 		}
-
-		$row = $wpdb->get_row( $wpdb->prepare( $sql, $args ), ARRAY_A ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
+		// phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 
 		return array(
 			'orders'  => isset( $row['orders'] ) ? (int) $row['orders'] : 0,
@@ -435,12 +465,12 @@ class Productreels_Stats {
 		$sales = Productreels_Schema::table( 'sales' );
 
 		$counts = $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-			$wpdb->prepare( "SELECT day, SUM(views) AS views, SUM(clicks) AS clicks FROM `{$daily}` WHERE widget_id = %d AND day >= %s GROUP BY day", $widget_id, $from ), // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+			$wpdb->prepare( 'SELECT day, SUM(views) AS views, SUM(clicks) AS clicks FROM %i WHERE widget_id = %d AND day >= %s GROUP BY day', $daily, $widget_id, $from ),
 			OBJECT_K
 		);
 
 		$sold = $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-			$wpdb->prepare( "SELECT day, COUNT(DISTINCT order_id) AS orders, SUM(revenue) AS revenue FROM `{$sales}` WHERE widget_id = %d AND day >= %s GROUP BY day", $widget_id, $from ), // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+			$wpdb->prepare( 'SELECT day, COUNT(DISTINCT order_id) AS orders, SUM(revenue) AS revenue FROM %i WHERE widget_id = %d AND day >= %s GROUP BY day', $sales, $widget_id, $from ),
 			OBJECT_K
 		);
 
@@ -476,7 +506,7 @@ class Productreels_Stats {
 
 		return array_map(
 			'intval',
-			$wpdb->get_col( $wpdb->prepare( "SELECT DISTINCT reel_id FROM `{$table}` WHERE widget_id = %d", (int) $widget_id ) ) // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+			$wpdb->get_col( $wpdb->prepare( 'SELECT DISTINCT reel_id FROM %i WHERE widget_id = %d', $table, (int) $widget_id ) ) // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		);
 	}
 
@@ -497,11 +527,13 @@ class Productreels_Stats {
 			return array();
 		}
 
-		$table        = Productreels_Schema::table( 'reels' );
-		$placeholders = implode( ',', array_fill( 0, count( $ids ), '%d' ) );
+		$table = Productreels_Schema::table( 'reels' );
 
 		$rows = $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-			$wpdb->prepare( "SELECT id, title, thumbnail, view_count FROM `{$table}` WHERE id IN ({$placeholders}) ORDER BY id DESC", $ids ), // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+			$wpdb->prepare(
+				'SELECT id, title, thumbnail, view_count FROM %i WHERE id IN (' . implode( ',', array_fill( 0, count( $ids ), '%d' ) ) . ') ORDER BY id DESC',
+				array_merge( array( $table ), $ids )
+			),
 			ARRAY_A
 		);
 

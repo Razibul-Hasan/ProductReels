@@ -148,13 +148,12 @@ class Productreels_Rest_Overview extends Productreels_Rest_Controller {
 
 		global $wpdb;
 
-		$skip = "p.post_type <> 'revision' AND p.post_status NOT IN ( 'trash', 'auto-draft', 'inherit' )";
-
-		// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Runs only during setup; the hit is stored. $skip is a fixed string.
+		// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Runs only during setup; the hit is stored.
 		$found = $wpdb->get_var(
 			$wpdb->prepare(
 				"SELECT p.ID FROM {$wpdb->posts} p
-				WHERE {$skip} AND ( p.post_content LIKE %s OR p.post_content LIKE %s )
+				WHERE p.post_type <> 'revision' AND p.post_status NOT IN ( 'trash', 'auto-draft', 'inherit' )
+				AND ( p.post_content LIKE %s OR p.post_content LIKE %s )
 				LIMIT 1",
 				'%' . $wpdb->esc_like( '[productreels' ) . '%',
 				'%' . $wpdb->esc_like( '<!-- wp:productreels/reels' ) . '%'
@@ -166,7 +165,9 @@ class Productreels_Rest_Overview extends Productreels_Rest_Controller {
 				$wpdb->prepare(
 					"SELECT p.ID FROM {$wpdb->postmeta} m
 					INNER JOIN {$wpdb->posts} p ON p.ID = m.post_id
-					WHERE m.meta_key = '_elementor_data' AND {$skip} AND m.meta_value LIKE %s
+					WHERE m.meta_key = '_elementor_data'
+					AND p.post_type <> 'revision' AND p.post_status NOT IN ( 'trash', 'auto-draft', 'inherit' )
+					AND m.meta_value LIKE %s
 					LIMIT 1",
 					'%' . $wpdb->esc_like( '"widgetType":"productreels"' ) . '%'
 				)

@@ -189,7 +189,7 @@ class Productreels_Product_Pages {
 
 		// Every widget that mentions the key; the JSON decides the rest.
 		$rows = $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-			$wpdb->prepare( "SELECT id, styles_json FROM `{$table}` WHERE styles_json LIKE %s ORDER BY id ASC", '%' . $wpdb->esc_like( '"productPage"' ) . '%' ), // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+			$wpdb->prepare( 'SELECT id, styles_json FROM %i WHERE styles_json LIKE %s ORDER BY id ASC', $table, '%' . $wpdb->esc_like( '"productPage"' ) . '%' ),
 			ARRAY_A
 		);
 
